@@ -1,6 +1,5 @@
 package com.app_template.App_Template.service.auth;
 
-import com.app_template.App_Template.entity.User;
 import com.app_template.App_Template.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +8,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
 
 // EmailService.java
 @Service
