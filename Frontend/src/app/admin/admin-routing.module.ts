@@ -6,6 +6,7 @@ import { adminGuard } from '../auth/guard/admin.guard';
 import {SendEmailComponent} from './send-email/send-email.component';
 import {ViewUserAccountComponent} from './view-user-account/view-user-account.component';
 import {CreateCategoryComponent} from './create-category/create-category.component';
+import {ViewCategoriesComponent} from './view-categories/view-categories.component';
 
 const routes: Routes = [
   {path: "", component: AdminDashboardComponent, canActivate: [adminGuard]},
@@ -13,6 +14,7 @@ const routes: Routes = [
   {path: "all-users", component: AllUsersComponent, canActivate: [adminGuard]},
   {path: "send-email", component: SendEmailComponent, canActivate: [adminGuard]},
   {path: "create-category", component: CreateCategoryComponent, canActivate: [adminGuard]},
+  {path: "view-categories", component: ViewCategoriesComponent, canActivate: [adminGuard]},
   {path: "view-user-account", component: ViewUserAccountComponent, canActivate: [adminGuard]}
 ]
 @NgModule({

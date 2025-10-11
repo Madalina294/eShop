@@ -11,6 +11,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import {CommonModule} from '@angular/common';
 import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-create-category',
@@ -37,7 +38,8 @@ export class CreateCategoryComponent {
   constructor(private fb: FormBuilder,
               private adminService: AdminService,
               private snackBar: MatSnackBar,
-              private translate: TranslateService) {
+              private translate: TranslateService,
+              private route: Router) {
 
     this.createCategoryForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -61,17 +63,17 @@ export class CreateCategoryComponent {
       next: (response) => {
         this.isSpinning.set(false);
         this.snackBar.open(
-          this.translate.instant('createCategory.successMessage'), 
-          this.translate.instant('createCategory.ok'), 
+          this.translate.instant('createCategory.successMessage'),
+          this.translate.instant('createCategory.ok'),
           {duration: 3000}
         );
-        this.createCategoryForm.reset();
+        this.route.navigateByUrl("/view-categories");
       },
       error: (error) => {
         this.isSpinning.set(false);
         this.snackBar.open(
-          this.translate.instant('createCategory.errorMessage'), 
-          this.translate.instant('createCategory.ok'), 
+          this.translate.instant('createCategory.errorMessage'),
+          this.translate.instant('createCategory.ok'),
           {duration: 3000}
         );
       }
