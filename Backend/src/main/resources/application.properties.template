@@ -1,4 +1,4 @@
-spring.application.name=App-Template
+spring.application.name=E-Shop
 
 # Database Configuration
 spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
