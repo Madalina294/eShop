@@ -307,5 +307,20 @@
     "successMessage": "Email sent successfully!",
     "errorMessage": "Error at sending the email! Please try again.",
     "ok": "Ok"
+  },
+  "createCategory": {
+    "title": "Create Category",
+    "subtitle": "Add a new category to the system",
+    "nameLabel": "Category Name",
+    "nameRequired": "Category name is required",
+    "namePlaceholder": "Enter category name",
+    "descriptionLabel": "Description",
+    "descriptionRequired": "Description is required",
+    "descriptionPlaceholder": "Enter category description",
+    "createButton": "Create Category",
+    "creating": "Creating...",
+    "successMessage": "Category created successfully!",
+    "errorMessage": "Error at creating the category!",
+    "ok": "Ok"
   }
 }

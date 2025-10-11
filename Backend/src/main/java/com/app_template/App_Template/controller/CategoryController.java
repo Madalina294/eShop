@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/category")
 @RequiredArgsConstructor
 
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping("/category")
+    @PostMapping("/create-category")
     public ResponseEntity<Category> addCategory(@RequestBody CategoryDto categoryDto) {
         Category category = categoryService.createCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(category);

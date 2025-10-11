@@ -8,7 +8,7 @@ export interface UserData {
   firstName: string;
   lastName: string;
   email: string;
-  imageUrl?: string; 
+  imageUrl?: string;
   mfaEnabled: boolean;
 }
 
@@ -45,7 +45,7 @@ export class AdminService {
       sortBy: sortBy,
       sortDir: sortDir
     });
-    
+
     return this.http.get<PaginatedResponse>(`${this.baseUrl}/users/paginated?${params}`, {
       headers: this.createAuthorizationHeader()
     });
@@ -66,6 +66,13 @@ export class AdminService {
   getUserById(userId: number){
     return this.http.get(`${this.baseUrl}/get-user/${userId}`, {
       headers: this.createAuthorizationHeader()
+    });
+  }
+
+  createCategory(categoryData: any){
+    const headers = this.createAuthorizationHeader().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}/category/create-category`, categoryData, {
+      headers: headers
     });
   }
 

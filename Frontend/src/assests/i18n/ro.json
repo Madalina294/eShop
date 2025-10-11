@@ -307,5 +307,20 @@
     "successMessage": "Email trimis cu succes!",
     "errorMessage": "Eroare la trimiterea emailului! Te rugăm încearcă din nou.",
     "ok": "Ok"
+  },
+  "createCategory": {
+    "title": "Creează Categorie",
+    "subtitle": "Adaugă o categorie nouă în sistem",
+    "nameLabel": "Nume Categorie",
+    "nameRequired": "Numele categoriei este obligatoriu",
+    "namePlaceholder": "Introdu numele categoriei",
+    "descriptionLabel": "Descriere",
+    "descriptionRequired": "Descrierea este obligatorie",
+    "descriptionPlaceholder": "Introdu descrierea categoriei",
+    "createButton": "Creează Categorie",
+    "creating": "Se creează...",
+    "successMessage": "Categorie creată cu succes!",
+    "errorMessage": "Eroare la crearea categoriei!",
+    "ok": "Ok"
   }
 }

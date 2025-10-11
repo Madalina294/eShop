@@ -26,7 +26,8 @@ export class BreadcrumbComponent implements OnInit {
     'all-users': 'Manage Users',
     'statistics': 'Statistics',
     'settings': 'Setting',
-    'activity-logs': 'Activity Logs'
+    'activity-logs': 'Activity Logs',
+    'create-category': 'Create Category'
   };
 
   constructor(

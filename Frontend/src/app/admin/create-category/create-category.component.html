@@ -1,0 +1,75 @@
+<app-breadcrumb></app-breadcrumb>
+<div class="category-main-container">
+  <mat-card class="category-header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>category</mat-icon>
+      </div>
+      <mat-card-title>{{ "createCategory.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        "createCategory.subtitle" | translate
+      }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <mat-card class="category-form-card">
+    <!-- Loading Spinner -->
+    <div *ngIf="isSpinning()" class="loading-overlay">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="50"
+        color="primary"
+      ></mat-progress-spinner>
+      <p>{{ "createCategory.creating" | translate }}</p>
+    </div>
+
+    <form
+      [formGroup]="createCategoryForm"
+      (ngSubmit)="onSubmit()"
+      class="category-form"
+    >
+      <!-- Name Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createCategory.nameLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'createCategory.namePlaceholder' | translate"
+        />
+        <mat-error *ngIf="createCategoryForm.get('name')?.hasError('required')">
+          {{ "createCategory.nameRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{
+          "createCategory.descriptionLabel" | translate
+        }}</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          [placeholder]="'createCategory.descriptionPlaceholder' | translate"
+        ></textarea>
+        <mat-error
+          *ngIf="createCategoryForm.get('description')?.hasError('required')"
+        >
+          {{ "createCategory.descriptionRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Submit Button -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="createCategoryForm.invalid || isSpinning()"
+        class="submit-button"
+      >
+        <mat-icon>add</mat-icon>
+        {{ "createCategory.createButton" | translate }}
+      </button>
+    </form>
+  </mat-card>
+</div>
