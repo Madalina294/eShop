@@ -322,5 +322,17 @@
     "successMessage": "Categorie creată cu succes!",
     "errorMessage": "Eroare la crearea categoriei!",
     "ok": "Ok"
+  },
+  "viewCategories": {
+    "title": "Categorii",
+    "subtitle": "Toate categoriile create în sistem",
+    "loadingCategories": "Se încarcă categoriile...",
+    "noCategories": "Nu există categorii create încă",
+    "noDescription": "Fără descriere",
+    "categoryId": "ID",
+    "editButton": "Editează",
+    "deleteButton": "Șterge",
+    "loadError": "Eroare la încărcarea categoriilor!",
+    "ok": "Ok"
   }
 }

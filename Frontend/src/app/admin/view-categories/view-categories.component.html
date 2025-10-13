@@ -1,1 +1,68 @@
-<p>view-categories works!</p>
+<div class="categories-container">
+  <mat-card class="categories-header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>category</mat-icon>
+      </div>
+      <mat-card-title>{{ "viewCategories.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        "viewCategories.subtitle" | translate
+      }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isSpinning()" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>{{ "viewCategories.loadingCategories" | translate }}</p>
+  </div>
+
+  <!-- Categories List -->
+  <div *ngIf="!isSpinning()" class="categories-list">
+    <div *ngIf="categories().length === 0" class="no-categories">
+      <mat-icon>category</mat-icon>
+      <p>{{ "viewCategories.noCategories" | translate }}</p>
+    </div>
+
+    <div class="categories-grid">
+      <mat-card *ngFor="let category of categories()" class="category-card">
+        <mat-card-content>
+          <div class="category-info">
+            <div class="category-icon">
+              <mat-icon>label</mat-icon>
+            </div>
+            <div class="category-details">
+              <h3>{{ category.name }}</h3>
+              <p class="description">
+                {{
+                  category.description ||
+                    ("viewCategories.noDescription" | translate)
+                }}
+              </p>
+              <div class="category-meta">
+                <span class="category-id"
+                  >{{ "viewCategories.categoryId" | translate }}:
+                  {{ category.id }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-button color="primary">
+            <mat-icon>edit</mat-icon>
+            {{ "viewCategories.editButton" | translate }}
+          </button>
+          <button mat-button color="warn">
+            <mat-icon>delete</mat-icon>
+            {{ "viewCategories.deleteButton" | translate }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -76,6 +76,12 @@ export class AdminService {
     });
   }
 
+  getCategories(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.baseUrl}/category/get-categories`, {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
 
   private createAuthorizationHeader(): HttpHeaders {
     const token = StorageService.getToken();

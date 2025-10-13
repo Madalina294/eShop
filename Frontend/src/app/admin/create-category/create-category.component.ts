@@ -67,7 +67,7 @@ export class CreateCategoryComponent {
           this.translate.instant('createCategory.ok'),
           {duration: 3000}
         );
-        this.route.navigateByUrl("/view-categories");
+        this.route.navigateByUrl("/admin/view-categories");
       },
       error: (error) => {
         this.isSpinning.set(false);

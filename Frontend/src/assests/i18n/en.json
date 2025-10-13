@@ -322,5 +322,17 @@
     "successMessage": "Category created successfully!",
     "errorMessage": "Error at creating the category!",
     "ok": "Ok"
+  },
+  "viewCategories": {
+    "title": "Categories",
+    "subtitle": "All categories created in the system",
+    "loadingCategories": "Loading categories...",
+    "noCategories": "No categories created yet",
+    "noDescription": "No description",
+    "categoryId": "ID",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "loadError": "Error loading categories!",
+    "ok": "Ok"
   }
 }
