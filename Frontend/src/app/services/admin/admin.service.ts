@@ -88,6 +88,18 @@ export class AdminService {
     })
   }
 
+  getCategoryById(id: number): Observable<any>{
+    return this.http.get(`${this.baseUrl}/category/get-category/${id}`,
+      {
+        headers: this.createAuthorizationHeader()
+      });
+  }
+
+  updateCategory(data: any):Observable<any>{
+    return this.http.put<Observable<any>>(`${this.baseUrl}/category/edit-category`, data,  {
+      headers: this.createAuthorizationHeader()
+    })
+  }
 
   private createAuthorizationHeader(): HttpHeaders {
     const token = StorageService.getToken();

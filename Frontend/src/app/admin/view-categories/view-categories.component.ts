@@ -9,7 +9,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
 import {MatDialog} from '@angular/material/dialog';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 
 export interface CategoryDto {
   id: number;
@@ -44,7 +44,8 @@ export class ViewCategoriesComponent implements OnInit{
   constructor(private adminService: AdminService,
               private snackBar: MatSnackBar,
               private translate: TranslateService,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private router: Router) {
   }
   ngOnInit(){
     this.loadCategories();
@@ -66,6 +67,12 @@ export class ViewCategoriesComponent implements OnInit{
         );
       }
     })
+  }
+
+  editCategory(id: number){
+    this.router.navigate(["/admin/edit-category"], {
+      queryParams: {categoryId: id}
+    });
   }
 
   deleteCategory(id: number){
