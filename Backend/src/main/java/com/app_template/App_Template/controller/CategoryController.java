@@ -39,4 +39,18 @@ public class CategoryController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/get-category/{id}")
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategory(id));
+    }
+
+    @PutMapping("/edit-category")
+    public ResponseEntity<CategoryDto> editCategory(@RequestBody CategoryDto categoryDto) {
+        try {
+            return ResponseEntity.ok(categoryService.updateCategory(categoryDto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

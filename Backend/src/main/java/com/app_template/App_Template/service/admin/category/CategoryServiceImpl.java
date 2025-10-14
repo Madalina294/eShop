@@ -38,4 +38,25 @@ public class CategoryServiceImpl implements CategoryService {
         }
         else throw new EntityNotFoundException("Category not found");
     }
+
+    @Override
+    public CategoryDto getCategory(Long id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        if (category.isPresent()) {
+            return category.get().getCategoryDto();
+        }
+        else throw new EntityNotFoundException("Category not found");
+    }
+
+    @Override
+    public CategoryDto updateCategory(CategoryDto categoryDto) {
+        Optional<Category> category = categoryRepository.findById(categoryDto.getId());
+        if (category.isPresent()) {
+            Category categoryEntity = category.get();
+            categoryEntity.setName(categoryDto.getName());
+            categoryEntity.setDescription(categoryDto.getDescription());
+           return categoryRepository.save(categoryEntity).getCategoryDto();
+        }
+        else throw new EntityNotFoundException("Category not found");
+    }
 }

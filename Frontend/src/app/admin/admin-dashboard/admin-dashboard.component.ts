@@ -40,7 +40,7 @@ export class AdminDashboardComponent {
       {
         title: this.translate.instant('adminDashboard.manageProductsAndCategories.title'),
         description: this.translate.instant('adminDashboard.manageProductsAndCategories.description'),
-        icon: 'history',
+        icon: 'category',
         route: '/admin/view-categories',
         color: 'primary'
       },

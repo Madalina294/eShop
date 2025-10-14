@@ -9,6 +9,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
 import {MatDialog} from '@angular/material/dialog';
+import {RouterLink} from '@angular/router';
 
 export interface CategoryDto {
   id: number;
@@ -29,7 +30,8 @@ export interface CategoryDto {
     MatCardActions,
     MatIcon,
     MatProgressSpinner,
-    TranslateModule
+    TranslateModule,
+    RouterLink
   ],
   templateUrl: './view-categories.component.html',
   styleUrl: './view-categories.component.scss'
