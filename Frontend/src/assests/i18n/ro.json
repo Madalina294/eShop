@@ -327,6 +327,24 @@
     "errorMessage": "Eroare la crearea categoriei!",
     "ok": "Ok"
   },
+  "editCategory": {
+    "title": "Editează Categoria",
+    "subtitle": "Actualizează informațiile categoriei",
+    "nameLabel": "Numele Categoriei",
+    "nameRequired": "Numele categoriei este obligatoriu",
+    "nameMinLength": "Numele trebuie să aibă minim 3 caractere",
+    "namePlaceholder": "Introdu numele categoriei",
+    "descriptionLabel": "Descriere",
+    "descriptionRequired": "Descrierea este obligatorie",
+    "descriptionMinLength": "Descrierea trebuie să aibă minim 10 caractere",
+    "descriptionPlaceholder": "Introdu descrierea categoriei",
+    "saveButton": "Salvează Modificările",
+    "cancelButton": "Anulează",
+    "loading": "Se încarcă...",
+    "successMessage": "Categoria a fost actualizată cu succes!",
+    "errorMessage": "Eroare la actualizarea categoriei!",
+    "ok": "Ok"
+  },
   "viewCategories": {
     "title": "Categorii",
     "subtitle": "Toate categoriile create în sistem",

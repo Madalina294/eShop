@@ -1,89 +1,188 @@
-.edit-category-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
+.category-main-container {
   padding: 2rem;
-  background-color: #f5f5f5;
-}
+  max-width: 800px;
+  margin: 0 auto;
 
-.edit-category-card {
-  width: 100%;
-  max-width: 700px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  
-  mat-card-header {
-    background-color: #3f51b5;
-    color: white;
-    padding: 1.5rem;
-    margin: -16px -16px 1rem -16px;
-    border-radius: 8px 8px 0 0;
-    
-    mat-card-title {
-      font-size: 1.5rem;
-      font-weight: 500;
-      margin: 0;
+  .category-header-card {
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    mat-card-header {
+      padding: 1.5rem;
+
+      [mat-card-avatar] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin-right: 20px;
+
+        mat-icon {
+          color: white;
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+
+        }
+      }
+
+      mat-card-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      mat-card-subtitle {
+        font-size: 1rem;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .category-form-card {
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 10;
+      border-radius: inherit;
+
+      p {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #667eea;
+      }
+    }
+
+    .category-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .full-width {
+        width: 100%;
+      }
+
+      mat-form-field {
+        mat-icon[matPrefix] {
+          margin-right: 0.5rem;
+          color: rgba(0, 0, 0, 0.54);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 1rem;
+
+        .submit-button {
+          padding: 0.75rem 2rem;
+          font-size: 1rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+          }
+        }
+
+        .cancel-button {
+          padding: 0.75rem 2rem;
+          font-size: 1rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+          }
+        }
+      }
     }
   }
 }
 
-.edit-category-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  position: relative;
-  padding: 1rem 0;
-  
-  .full-width {
-    width: 100%;
-  }
-  
-  .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    border-radius: 8px;
-  }
-  
-  .button-row {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
-    
-    button {
-      min-width: 120px;
-      height: 42px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-  }
-}
-
-// Responsive design
+// Responsive Design
 @media (max-width: 768px) {
-  .edit-category-container {
+  .category-main-container {
     padding: 1rem;
+
+    .category-header-card {
+      mat-card-header {
+        padding: 1rem;
+
+        mat-card-title {
+          font-size: 1.5rem;
+        }
+
+        mat-card-subtitle {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .category-form-card {
+      padding: 1.5rem;
+
+      .category-form {
+        gap: 1rem;
+
+        .action-buttons {
+          flex-direction: column;
+          width: 100%;
+
+          .submit-button,
+          .cancel-button {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }
   }
-  
-  .edit-category-card {
-    max-width: 100%;
-  }
-  
-  .button-row {
-    flex-direction: column;
-    
-    button {
-      width: 100%;
+}
+
+// Dark mode support (optional)
+@media (prefers-color-scheme: dark) {
+  .category-main-container {
+    .loading-overlay {
+      background: rgba(48, 48, 48, 0.95);
+
+      p {
+        color: #a5b4fc;
+      }
     }
   }
 }

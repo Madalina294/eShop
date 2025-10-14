@@ -1,83 +1,94 @@
-<div class="edit-category-container">
-  <mat-card class="edit-category-card">
+<app-breadcrumb></app-breadcrumb>
+<div class="category-main-container">
+  <mat-card class="category-header-card">
     <mat-card-header>
-      <mat-card-title>Editează Categoria</mat-card-title>
+      <div mat-card-avatar>
+        <mat-icon>edit</mat-icon>
+      </div>
+      <mat-card-title>{{ "editCategory.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ "editCategory.subtitle" | translate }}</mat-card-subtitle>
     </mat-card-header>
+  </mat-card>
 
-    <mat-card-content>
-      <form
-        [formGroup]="updateForm"
-        (ngSubmit)="onSubmit()"
-        class="edit-category-form"
-      >
-        <!-- Loading spinner -->
-        <div *ngIf="isLoading()" class="loading-overlay">
-          <mat-progress-spinner
-            mode="indeterminate"
-            diameter="50"
-          ></mat-progress-spinner>
-        </div>
+  <mat-card class="category-form-card">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading()" class="loading-overlay">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="50"
+        color="primary"
+      ></mat-progress-spinner>
+      <p>{{ "editCategory.loading" | translate }}</p>
+    </div>
 
-        <!-- Nume Categorie -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nume Categorie</mat-label>
-          <input
-            matInput
-            formControlName="name"
-            placeholder="Introdu numele categoriei"
-            [disabled]="isLoading()"
-          />
-          <mat-error *ngIf="updateForm.get('name')?.hasError('required')">
-            Numele categoriei este obligatoriu
-          </mat-error>
-          <mat-error *ngIf="updateForm.get('name')?.hasError('minlength')">
-            Numele trebuie să aibă minim 3 caractere
-          </mat-error>
-        </mat-form-field>
+    <form
+      [formGroup]="updateForm"
+      (ngSubmit)="onSubmit()"
+      class="category-form"
+    >
+      <!-- Name Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editCategory.nameLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'editCategory.namePlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error *ngIf="updateForm.get('name')?.hasError('required')">
+          {{ "editCategory.nameRequired" | translate }}
+        </mat-error>
+        <mat-error *ngIf="updateForm.get('name')?.hasError('minlength')">
+          {{ "editCategory.nameMinLength" | translate }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Descriere -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Descriere</mat-label>
-          <textarea
-            matInput
-            formControlName="description"
-            placeholder="Introdu descrierea categoriei"
-            rows="5"
-            [disabled]="isLoading()"
-          ></textarea>
-          <mat-error
-            *ngIf="updateForm.get('description')?.hasError('required')"
-          >
-            Descrierea este obligatorie
-          </mat-error>
-          <mat-error
-            *ngIf="updateForm.get('description')?.hasError('minlength')"
-          >
-            Descrierea trebuie să aibă minim 10 caractere
-          </mat-error>
-        </mat-form-field>
+      <!-- Description Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editCategory.descriptionLabel" | translate }}</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          [placeholder]="'editCategory.descriptionPlaceholder' | translate"
+          [disabled]="isLoading()"
+        ></textarea>
+        <mat-error
+          *ngIf="updateForm.get('description')?.hasError('required')"
+        >
+          {{ "editCategory.descriptionRequired" | translate }}
+        </mat-error>
+        <mat-error
+          *ngIf="updateForm.get('description')?.hasError('minlength')"
+        >
+          {{ "editCategory.descriptionMinLength" | translate }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Butoane -->
-        <div class="button-row">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="isLoading() || updateForm.invalid"
-          >
-            Salvează Modificările
-          </button>
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="updateForm.invalid || isLoading()"
+          class="submit-button"
+        >
+          <mat-icon>save</mat-icon>
+          {{ "editCategory.saveButton" | translate }}
+        </button>
 
-          <button
-            mat-raised-button
-            type="button"
-            (click)="onCancel()"
-            [disabled]="isLoading()"
-          >
-            Anulează
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="onCancel()"
+          [disabled]="isLoading()"
+          class="cancel-button"
+        >
+          <mat-icon>cancel</mat-icon>
+          {{ "editCategory.cancelButton" | translate }}
+        </button>
+      </div>
+    </form>
   </mat-card>
 </div>

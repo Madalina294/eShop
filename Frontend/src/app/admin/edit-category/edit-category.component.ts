@@ -7,8 +7,11 @@ import {MatFormField, MatLabel, MatError} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle} from '@angular/material/card';
+import {MatIcon} from '@angular/material/icon';
 import {CommonModule} from '@angular/common';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
 
 
 @Component({
@@ -16,6 +19,7 @@ import {CommonModule} from '@angular/common';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    TranslateModule,
     MatFormField,
     MatInput,
     MatButton,
@@ -25,7 +29,9 @@ import {CommonModule} from '@angular/common';
     MatCard,
     MatCardHeader,
     MatCardTitle,
-    MatCardContent
+    MatCardSubtitle,
+    MatIcon,
+    BreadcrumbComponent
   ],
   templateUrl: './edit-category.component.html',
   styleUrl: './edit-category.component.scss'
@@ -40,7 +46,8 @@ export class EditCategoryComponent {
               private adminService: AdminService,
               private route: ActivatedRoute,
               private router: Router,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private translate: TranslateService) {
     // Inițializează formularul mai întâi (gol)
     this.updateForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -67,14 +74,22 @@ export class EditCategoryComponent {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.snackBar.open("Eroare la încărcarea categoriei!", "Ok", {duration: 3000});
+        this.snackBar.open(
+          this.translate.instant('editCategory.errorMessage'), 
+          this.translate.instant('editCategory.ok'), 
+          {duration: 3000}
+        );
       }
     });
   }
 
   onSubmit(){
     if (this.updateForm.invalid) {
-      this.snackBar.open("Te rog completează toate câmpurile corect!", "Ok", {duration: 3000});
+      this.snackBar.open(
+        this.translate.instant('editCategory.errorMessage'), 
+        this.translate.instant('editCategory.ok'), 
+        {duration: 3000}
+      );
       return;
     }
 
@@ -88,7 +103,11 @@ export class EditCategoryComponent {
     this.adminService.updateCategory(data).subscribe({
       next: response => {
         this.isLoading.set(false);
-        this.snackBar.open("Categoria a fost actualizată cu succes!", "Ok", {duration: 3000});
+        this.snackBar.open(
+          this.translate.instant('editCategory.successMessage'), 
+          this.translate.instant('editCategory.ok'), 
+          {duration: 3000}
+        );
         // Redirect înapoi la lista de categorii după 1 secundă
         setTimeout(() => {
           this.router.navigate(['/admin/view-categories']);
@@ -96,7 +115,11 @@ export class EditCategoryComponent {
       },
       error: err => {
         this.isLoading.set(false);
-        this.snackBar.open("Ceva nu a mers bine! Te rog încearcă din nou!", "Ok", {duration: 3000});
+        this.snackBar.open(
+          this.translate.instant('editCategory.errorMessage'), 
+          this.translate.instant('editCategory.ok'), 
+          {duration: 3000}
+        );
       }
     });
   }

@@ -327,6 +327,24 @@
     "errorMessage": "Error at creating the category!",
     "ok": "Ok"
   },
+  "editCategory": {
+    "title": "Edit Category",
+    "subtitle": "Update category information",
+    "nameLabel": "Category Name",
+    "nameRequired": "Category name is required",
+    "nameMinLength": "Name must be at least 3 characters",
+    "namePlaceholder": "Enter category name",
+    "descriptionLabel": "Description",
+    "descriptionRequired": "Description is required",
+    "descriptionMinLength": "Description must be at least 10 characters",
+    "descriptionPlaceholder": "Enter category description",
+    "saveButton": "Save Changes",
+    "cancelButton": "Cancel",
+    "loading": "Loading...",
+    "successMessage": "Category updated successfully!",
+    "errorMessage": "Error at updating the category!",
+    "ok": "Ok"
+  },
   "viewCategories": {
     "title": "Categories",
     "subtitle": "All categories created in the system",
