@@ -241,6 +241,10 @@
     "activityLogs": {
       "title": "Jurnale activitate",
       "description": "Monitorizează activitățile utilizatorilor"
+    },
+    "manageProductsAndCategories": {
+      "title": "Gestionează Produsele și Categoriile",
+      "description": "Vizualizează și gestionează toate categoriile și produsele aferente"
     }
   },
   "allUsers": {
@@ -332,6 +336,8 @@
     "categoryId": "ID",
     "editButton": "Editează",
     "deleteButton": "Șterge",
+    "confirmDelete": "Ești sigur că vrei să ștergi această categorie? Această acțiune nu poate fi anulată.",
+    "categoryDeletedSuccess": "Categorie ștearsă cu succes!",
     "loadError": "Eroare la încărcarea categoriilor!",
     "ok": "Ok"
   }

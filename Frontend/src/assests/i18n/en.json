@@ -241,6 +241,10 @@
     "activityLogs": {
       "title": "Activity Logs",
       "description": "Monitor the activities of the users"
+    },
+    "manageProductsAndCategories": {
+      "title": "Manage Products and Categories",
+      "description": "View and Manage all categories and their products"
     }
   },
   "allUsers": {
@@ -332,6 +336,9 @@
     "categoryId": "ID",
     "editButton": "Edit",
     "deleteButton": "Delete",
+    "confirmDelete": "Are you sure you want to delete this category? This action cannot be undone.",
+    "categoryDeletedSuccess": "Category deleted successfully!",
+    "deleteError": "Something went wrong. Please try again!",
     "loadError": "Error loading categories!",
     "ok": "Ok"
   }

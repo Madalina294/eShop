@@ -76,6 +76,12 @@ export class AdminService {
     });
   }
 
+  deleteCategory(id:number){
+    return this.http.delete(`${this.baseUrl}/category/delete-category/${id}`, {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
   getCategories(): Observable<any[]>{
     return this.http.get<any[]>(`${this.baseUrl}/category/get-categories`, {
       headers: this.createAuthorizationHeader()

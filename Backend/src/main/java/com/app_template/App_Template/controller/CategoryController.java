@@ -3,6 +3,7 @@ package com.app_template.App_Template.controller;
 import com.app_template.App_Template.dto.CategoryDto;
 import com.app_template.App_Template.entity.Category;
 import com.app_template.App_Template.service.admin.category.CategoryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,15 @@ public class CategoryController {
     @GetMapping("/get-categories")
     public ResponseEntity<List<CategoryDto>> getCategories() {
         return ResponseEntity.ok(categoryService.getCategories());
+    }
+
+    @DeleteMapping("/delete-category/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
+        try{
+            categoryService.deleteCategory(id);
+            return ResponseEntity.ok(null);
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }

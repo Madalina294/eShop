@@ -57,7 +57,7 @@
             <mat-icon>edit</mat-icon>
             {{ "viewCategories.editButton" | translate }}
           </button>
-          <button mat-button color="warn">
+          <button mat-button color="warn" (click)="deleteCategory(category.id)">
             <mat-icon>delete</mat-icon>
             {{ "viewCategories.deleteButton" | translate }}
           </button>

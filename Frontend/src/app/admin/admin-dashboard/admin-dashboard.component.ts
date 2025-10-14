@@ -38,6 +38,13 @@ export class AdminDashboardComponent {
         color: 'primary'
       },
       {
+        title: this.translate.instant('adminDashboard.manageProductsAndCategories.title'),
+        description: this.translate.instant('adminDashboard.manageProductsAndCategories.description'),
+        icon: 'history',
+        route: '/admin/view-categories',
+        color: 'primary'
+      },
+      {
         title: this.translate.instant('adminDashboard.statistics.title'),
         description: this.translate.instant('adminDashboard.statistics.description'),
         icon: 'analytics',
