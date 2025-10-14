@@ -327,6 +327,20 @@
     "errorMessage": "Eroare la crearea categoriei!",
     "ok": "Ok"
   },
+  "breadcrumb": {
+    "home": "Acasă",
+    "adminDashboard": "Panou Admin",
+    "dashboard": "Dashboard",
+    "manageUsers": "Gestionează Utilizatori",
+    "statistics": "Statistici",
+    "settings": "Setări",
+    "activityLogs": "Jurnale de Activitate",
+    "createCategory": "Creează Categorie",
+    "editCategory": "Editează Categoria",
+    "viewCategories": "Vezi Categorii",
+    "sendEmail": "Trimite Email",
+    "viewUserAccount": "Vezi Cont Utilizator"
+  },
   "editCategory": {
     "title": "Editează Categoria",
     "subtitle": "Actualizează informațiile categoriei",

@@ -327,6 +327,20 @@
     "errorMessage": "Error at creating the category!",
     "ok": "Ok"
   },
+  "breadcrumb": {
+    "home": "Home",
+    "adminDashboard": "Admin Dashboard",
+    "dashboard": "Dashboard",
+    "manageUsers": "Manage Users",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "activityLogs": "Activity Logs",
+    "createCategory": "Create Category",
+    "editCategory": "Edit Category",
+    "viewCategories": "View Categories",
+    "sendEmail": "Send Email",
+    "viewUserAccount": "View User Account"
+  },
   "editCategory": {
     "title": "Edit Category",
     "subtitle": "Update category information",
