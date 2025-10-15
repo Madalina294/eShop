@@ -4,14 +4,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--ant-background-color-base, #f5f5f5);
-  border-radius: 25px;
+ // background: var(--ant-background-color-base, #f5f5f5);
+  //border-radius: 25px;
   padding: 4px;
-  border: 2px solid var(--ant-border-color-base, #d9d9d9);
+  //border: 2px solid var(--ant-border-color-base, #d9d9d9);
   transition: all 0.3s ease;
-  &:hover {
-    box-shadow: var(--ant-box-shadow-popover, 0 4px 12px rgba(0, 0, 0, 0.15));
-  }
+
 }
 
 .theme-option {
@@ -55,7 +53,7 @@
   position: relative;
   width: 45px;
   height: 25px;
-  background: var(--ant-border-color-base, #d9d9d9);
+ // background: var(--ant-border-color-base, #d9d9d9);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -88,11 +86,6 @@
 
 // Dark mode specific styles
 .dark-mode {
-  .theme-toggle-container {
-    background: var(--ant-background-color-light, #1f1f1f);
-    border-color: var(--ant-border-color-base, #303030);
-  }
-
   .theme-toggle {
     background: var(--ant-background-color-base, #000);
     border-color: var(--ant-border-color-base, #303030);
@@ -126,10 +119,6 @@
 
 // Light mode specific styles
 .light-mode {
-  .theme-toggle-container {
-    background: var(--ant-background-color-light, #fafafa);
-    border-color: var(--ant-border-color-base, #d9d9d9);
-  }
 
   .theme-toggle {
     background: var(--ant-background-color-base, #f5f5f5);

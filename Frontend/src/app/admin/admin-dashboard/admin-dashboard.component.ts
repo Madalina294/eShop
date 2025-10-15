@@ -38,8 +38,8 @@ export class AdminDashboardComponent {
         color: 'primary'
       },
       {
-        title: this.translate.instant('adminDashboard.manageProductsAndCategories.title'),
-        description: this.translate.instant('adminDashboard.manageProductsAndCategories.description'),
+        title: this.translate.instant('adminDashboard.manageCategories.title'),
+        description: this.translate.instant('adminDashboard.manageCategories.description'),
         icon: 'category',
         route: '/admin/view-categories',
         color: 'primary'

@@ -242,9 +242,9 @@
       "title": "Activity Logs",
       "description": "Monitor the activities of the users"
     },
-    "manageProductsAndCategories": {
-      "title": "Manage Products and Categories",
-      "description": "View and Manage all categories and their products"
+    "manageCategories": {
+      "title": "Manage Categories",
+      "description": "View and Manage all categories"
     }
   },
   "allUsers": {
