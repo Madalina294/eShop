@@ -1,29 +1,34 @@
 package com.app_template.App_Template.service.admin.product;
 
+import java.io.IOException;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.app_template.App_Template.dto.ProductDto;
 import com.app_template.App_Template.entity.Category;
 import com.app_template.App_Template.entity.Product;
 import com.app_template.App_Template.repository.CategoryRepository;
 import com.app_template.App_Template.repository.ProductRepository;
+import com.app_template.App_Template.service.image.ImageService;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageService imageService;
 
     @Override
-    public Product addProduct(ProductDto productDto) {
+    public Product addProduct(ProductDto productDto, MultipartFile image) throws IOException {
         Product product = new Product();
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
         product.setDescription(productDto.getDescription());
-        product.setImage(productDto.getImage());
         product.setColor(productDto.getColor());
         product.setDimensions(productDto.getDimensions());
         product.setMaterial(productDto.getMaterial());
@@ -35,6 +40,17 @@ public class ProductServiceImpl implements ProductService {
             throw new EntityNotFoundException("Category not found");
         }
         product.setCategory(category.get());
-        return productRepository.save(product);
+        
+        // Salvează produsul pentru a obține ID-ul
+        Product savedProduct = productRepository.save(product);
+        
+        // Procesează și salvează imaginea dacă există
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = imageService.saveProductImage(savedProduct.getId(), image);
+            savedProduct.setImage(imageUrl);
+            savedProduct = productRepository.save(savedProduct);
+        }
+        
+        return savedProduct;
     }
 }

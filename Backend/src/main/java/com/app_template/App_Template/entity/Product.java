@@ -29,7 +29,6 @@ public class Product {
 
     private double price;
 
-    @Lob
     private String image;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

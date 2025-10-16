@@ -20,6 +20,8 @@ public class ImageServiceImpl implements ImageService {
 
     @Value("${app.upload.dir:uploads/users/}")
     private String uploadDir;
+    
+    private static final String PRODUCTS_UPLOAD_DIR = "uploads/products/";
 
     // Tipuri MIME permise pentru imagini
     private static final List<String> ALLOWED_MIME_TYPES = Arrays.asList(
@@ -118,11 +120,7 @@ public class ImageServiceImpl implements ImageService {
         }
 
         // Verifică dimensiunea
-        if (file.getSize() > MAX_FILE_SIZE) {
-            return false;
-        }
-
-        return true;
+        return file.getSize() <= MAX_FILE_SIZE;
     }
 
     @Override
@@ -154,5 +152,60 @@ public class ImageServiceImpl implements ImageService {
         }
         
         return extension;
+    }
+    
+    // ============= METODE PENTRU PRODUSE =============
+    
+    @Override
+    public String saveProductImage(Long productId, MultipartFile file) throws IOException {
+        // Validări de securitate
+        validateImageFile(file);
+
+        // Creează directorul dacă nu există
+        File directory = new File(PRODUCTS_UPLOAD_DIR);
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (!created) {
+                throw new IOException("Failed to create upload directory: " + PRODUCTS_UPLOAD_DIR);
+            }
+        }
+
+        // Generează numele fișierului
+        String extension = getFileExtension(file.getOriginalFilename());
+        String fileName = "product_" + productId + "." + extension;
+        Path filePath = Paths.get(PRODUCTS_UPLOAD_DIR, fileName);
+
+        // Șterge imaginea veche dacă există
+        deleteProductImage(productId);
+
+        // Salvează fișierul nou
+        try {
+            Files.write(filePath, file.getBytes());
+            log.info("Product image saved successfully for product {}: {}", productId, fileName);
+            return "/uploads/products/" + fileName;
+        } catch (IOException e) {
+            log.error("Failed to save product image for product {}: {}", productId, e.getMessage());
+            throw new IOException("Failed to save product image: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public void deleteProductImage(Long productId) throws IOException {
+        File directory = new File(PRODUCTS_UPLOAD_DIR);
+        if (!directory.exists()) {
+            return;
+        }
+        
+        // Caută și șterge toate fișierele pentru produsul dat
+        File[] files = directory.listFiles((dir, name) -> name.startsWith("product_" + productId + "."));
+        if (files != null) {
+            for (File file : files) {
+                if (file.delete()) {
+                    log.info("Deleted old image for product {}: {}", productId, file.getName());
+                } else {
+                    log.warn("Failed to delete old image for product {}: {}", productId, file.getName());
+                }
+            }
+        }
     }
 }

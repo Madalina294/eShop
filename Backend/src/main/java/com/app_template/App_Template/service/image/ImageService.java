@@ -9,4 +9,8 @@ public interface ImageService {
     void deleteUserImage(Long userId) throws IOException;
     boolean isValidImageFile(MultipartFile file);
     String getImageUrl(Long userId, String fileName);
+    
+    // Metode pentru produse
+    String saveProductImage(Long productId, MultipartFile file) throws IOException;
+    void deleteProductImage(Long productId) throws IOException;
 }

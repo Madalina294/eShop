@@ -101,7 +101,7 @@ export class AddProductComponent implements OnInit {
     }
 
     // Verifică dacă imaginea a fost selectată
-    if (!this.tempImagePreview()) {
+    if (!this.selectedFile) {
       this.snackBar.open(
         this.translate.instant('createProduct.imageRequired'),
         this.translate.instant('createProduct.ok'),
@@ -124,10 +124,9 @@ export class AddProductComponent implements OnInit {
     formData.append("quantity", this.createProductForm.get('quantity')?.value);
     formData.append("categoryId", this.createProductForm.get('categoryId')?.value);
     
-    // Trimite imaginea ca string (base64)
-    const imageBase64 = this.tempImagePreview();
-    if (imageBase64) {
-      formData.append("image", imageBase64);
+    // Trimite imaginea ca fișier (exact ca la user)
+    if (this.selectedFile) {
+      formData.append("image", this.selectedFile, this.selectedFile.name);
     }
 
     this.adminService.addProduct(formData).subscribe({
@@ -168,16 +167,14 @@ export class AddProductComponent implements OnInit {
         return;
       }
 
-      // Save file for upload
+      // Save file for upload (exact ca la user)
       this.selectedFile = file;
 
-      // Generate preview
+      // Generate preview pentru UI
       const reader = new FileReader();
       reader.onload = () => {
-        const base64String = reader.result as string;
-        this.tempImagePreview.set(base64String); // base64 string
-        // Setează form control-ul pentru imagine
-        this.createProductForm.patchValue({ image: base64String });
+        this.tempImagePreview.set(reader.result as string); // base64 string doar pentru preview
+        this.createProductForm.patchValue({ image: 'selected' }); // marchează că există imagine
         this.cdr.markForCheck(); // force UI update (OnPush)
       };
       reader.readAsDataURL(file);
