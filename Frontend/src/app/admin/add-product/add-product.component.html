@@ -1,0 +1,213 @@
+<app-breadcrumb></app-breadcrumb>
+<div class="product-main-container">
+  <mat-card class="product-header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>product</mat-icon>
+      </div>
+      <mat-card-title>{{ "createProduct.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        "createProduct.subtitle" | translate
+      }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <mat-card class="product-form-card">
+    <!-- Loading Spinner -->
+    <div *ngIf="isSpinning()" class="loading-overlay">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="50"
+        color="primary"
+      ></mat-progress-spinner>
+      <p>{{ "createProduct.creating" | translate }}</p>
+    </div>
+
+    <form
+      [formGroup]="createProductForm"
+      (ngSubmit)="onSubmit()"
+      class="product-form"
+    >
+      <!-- Name Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.nameLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'createProduct.namePlaceholder' | translate"
+        />
+        <mat-error *ngIf="createProductForm.get('name')?.hasError('required')">
+          {{ "createProduct.nameRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Price Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.priceLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="price"
+          [placeholder]="'createProduct.pricePlaceholder' | translate"
+        />
+        <mat-error *ngIf="createProductForm.get('price')?.hasError('required')">
+          {{ "createProduct.priceRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{
+          "createProduct.descriptionLabel" | translate
+        }}</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          [placeholder]="'createProduct.descriptionPlaceholder' | translate"
+        ></textarea>
+        <mat-error
+          *ngIf="createProductForm.get('description')?.hasError('required')"
+        >
+          {{ "createProduct.descriptionRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Color Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.colorLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="color"
+          [placeholder]="'createProduct.colorPlaceholder' | translate"
+        />
+        <mat-error *ngIf="createProductForm.get('color')?.hasError('required')">
+          {{ "createProduct.colorRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Material Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.materialLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="material"
+          [placeholder]="'createProduct.materialPlaceholder' | translate"
+        />
+        <mat-error
+          *ngIf="createProductForm.get('material')?.hasError('required')"
+        >
+          {{ "createProduct.priceRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Dimensions Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.dimensionsLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="dimensions"
+          [placeholder]="'createProduct.dimensionsPlaceholder' | translate"
+        />
+        <mat-error
+          *ngIf="createProductForm.get('dimensions')?.hasError('required')"
+        >
+          {{ "createProduct.dimensionsRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Weight Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.weightLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="weight"
+          [placeholder]="'createProduct.weightPlaceholder' | translate"
+        />
+        <mat-error
+          *ngIf="createProductForm.get('weight')?.hasError('required')"
+        >
+          {{ "createProduct.weightRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Quantity Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.quantityLabel" | translate }}</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="quantity"
+          [placeholder]="'createProduct.quantityPlaceholder' | translate"
+        />
+        <mat-error
+          *ngIf="createProductForm.get('quantity')?.hasError('required')"
+        >
+          {{ "createProduct.quantityRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Category Dropdown -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "createProduct.categoryLabel" | translate }}</mat-label>
+        <mat-select
+          formControlName="categoryId"
+          [placeholder]="'createProduct.categoryPlaceholder' | translate"
+        >
+          <mat-option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="createProductForm.get('categoryId')?.hasError('required')"
+        >
+          {{ "createProduct.categoryRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Image Upload Section -->
+      <div class="image-upload-section">
+        <label class="image-label"
+          >{{ "createProduct.imageLabel" | translate }} *</label
+        >
+        <div class="image-preview-container">
+          <img
+            [src]="imageToDisplay()"
+            class="product-image-preview"
+            alt="Product preview"
+          />
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            style="display: none"
+          />
+          <button mat-raised-button type="button" (click)="fileInput.click()">
+            <mat-icon>add_photo_alternate</mat-icon>
+            {{ "createProduct.selectImage" | translate }}
+          </button>
+        </div>
+        <mat-error
+          *ngIf="
+            createProductForm.get('image')?.hasError('required') &&
+            createProductForm.get('image')?.touched
+          "
+        >
+          {{ "createProduct.imageRequired" | translate }}
+        </mat-error>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="createProductForm.invalid || isSpinning()"
+        class="submit-button"
+      >
+        <mat-icon>add</mat-icon>
+        {{ "createProduct.createButton" | translate }}
+      </button>
+    </form>
+  </mat-card>
+</div>

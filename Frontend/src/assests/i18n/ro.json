@@ -245,6 +245,10 @@
     "manageCategories": {
       "title": "Gestionează Categoriile",
       "description": "Vizualizează și gestionează toate categoriile"
+    },
+    "manageProducts": {
+      "title": "Gestionează Produsele",
+      "description": "Vizualizează și gestionează toate produsele"
     }
   },
   "allUsers": {
@@ -338,6 +342,8 @@
     "createCategory": "Creează Categorie",
     "editCategory": "Editează Categoria",
     "viewCategories": "Vezi Categorii",
+    "viewProducts": "Vezi Produsele",
+    "createProduct": "Creează Produs",
     "sendEmail": "Trimite Email",
     "viewUserAccount": "Vezi Cont Utilizator"
   },
@@ -371,6 +377,46 @@
     "confirmDelete": "Ești sigur că vrei să ștergi această categorie? Această acțiune nu poate fi anulată.",
     "categoryDeletedSuccess": "Categorie ștearsă cu succes!",
     "loadError": "Eroare la încărcarea categoriilor!",
+    "ok": "Ok"
+  },
+  "createProduct": {
+    "title": "Creează Produs",
+    "subtitle": "Adaugă un produs nou în sistem",
+    "creating": "Se creează...",
+    "nameLabel": "Nume Produs",
+    "nameRequired": "Numele produsului este obligatoriu",
+    "namePlaceholder": "Introdu numele produsului",
+    "priceLabel": "Preț",
+    "priceRequired": "Prețul este obligatoriu",
+    "pricePlaceholder": "Introdu prețul",
+    "descriptionLabel": "Descriere",
+    "descriptionRequired": "Descrierea este obligatorie",
+    "descriptionPlaceholder": "Introdu descrierea produsului",
+    "colorLabel": "Culoare",
+    "colorRequired": "Culoarea este obligatorie",
+    "colorPlaceholder": "Introdu culoarea",
+    "materialLabel": "Material",
+    "materialRequired": "Materialul este obligatoriu",
+    "materialPlaceholder": "Introdu materialul",
+    "dimensionsLabel": "Dimensiuni",
+    "dimensionsRequired": "Dimensiunile sunt obligatorii",
+    "dimensionsPlaceholder": "Introdu dimensiunile (ex: 10x20x30 cm)",
+    "weightLabel": "Greutate",
+    "weightRequired": "Greutatea este obligatorie",
+    "weightPlaceholder": "Introdu greutatea (ex: 1.5 kg)",
+    "quantityLabel": "Cantitate",
+    "quantityRequired": "Cantitatea este obligatorie",
+    "quantityPlaceholder": "Introdu cantitatea disponibilă",
+    "categoryLabel": "Categorie",
+    "categoryRequired": "Categoria este obligatorie",
+    "categoryPlaceholder": "Selectează o categorie",
+    "imageLabel": "Imagine Produs",
+    "imageRequired": "Imaginea este obligatorie",
+    "selectImage": "Selectează Imagine",
+    "createButton": "Creează Produs",
+    "successMessage": "Produs creat cu succes!",
+    "errorMessage": "Eroare la crearea produsului!",
+    "errorLoadingCategories": "Eroare la încărcarea categoriilor!",
     "ok": "Ok"
   }
 }

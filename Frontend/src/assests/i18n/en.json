@@ -245,6 +245,10 @@
     "manageCategories": {
       "title": "Manage Categories",
       "description": "View and Manage all categories"
+    },
+    "manageProducts": {
+      "title": "Manage Products",
+      "description": "View and Manage all products"
     }
   },
   "allUsers": {
@@ -338,6 +342,8 @@
     "createCategory": "Create Category",
     "editCategory": "Edit Category",
     "viewCategories": "View Categories",
+    "viewProducts": "View Products",
+    "createProduct": "Create Product",
     "sendEmail": "Send Email",
     "viewUserAccount": "View User Account"
   },
@@ -372,6 +378,46 @@
     "categoryDeletedSuccess": "Category deleted successfully!",
     "deleteError": "Something went wrong. Please try again!",
     "loadError": "Error loading categories!",
+    "ok": "Ok"
+  },
+  "createProduct": {
+    "title": "Create Product",
+    "subtitle": "Add a new product to the system",
+    "creating": "Creating...",
+    "nameLabel": "Product Name",
+    "nameRequired": "Product name is required",
+    "namePlaceholder": "Enter product name",
+    "priceLabel": "Price",
+    "priceRequired": "Price is required",
+    "pricePlaceholder": "Enter price",
+    "descriptionLabel": "Description",
+    "descriptionRequired": "Description is required",
+    "descriptionPlaceholder": "Enter product description",
+    "colorLabel": "Color",
+    "colorRequired": "Color is required",
+    "colorPlaceholder": "Enter color",
+    "materialLabel": "Material",
+    "materialRequired": "Material is required",
+    "materialPlaceholder": "Enter material",
+    "dimensionsLabel": "Dimensions",
+    "dimensionsRequired": "Dimensions are required",
+    "dimensionsPlaceholder": "Enter dimensions (e.g., 10x20x30 cm)",
+    "weightLabel": "Weight",
+    "weightRequired": "Weight is required",
+    "weightPlaceholder": "Enter weight (e.g., 1.5 kg)",
+    "quantityLabel": "Quantity",
+    "quantityRequired": "Quantity is required",
+    "quantityPlaceholder": "Enter available quantity",
+    "categoryLabel": "Category",
+    "categoryRequired": "Category is required",
+    "categoryPlaceholder": "Select a category",
+    "imageLabel": "Product Image",
+    "imageRequired": "Image is required",
+    "selectImage": "Select Image",
+    "createButton": "Create Product",
+    "successMessage": "Product created successfully!",
+    "errorMessage": "Error creating product!",
+    "errorLoadingCategories": "Error loading categories!",
     "ok": "Ok"
   }
 }

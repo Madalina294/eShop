@@ -8,6 +8,8 @@ import {ViewUserAccountComponent} from './view-user-account/view-user-account.co
 import {CreateCategoryComponent} from './create-category/create-category.component';
 import {ViewCategoriesComponent} from './view-categories/view-categories.component';
 import {EditCategoryComponent} from './edit-category/edit-category.component';
+import {AddProductComponent} from './add-product/add-product.component';
+import {ViewProductsComponent} from './view-products/view-products.component';
 
 const routes: Routes = [
   {path: "", component: AdminDashboardComponent, canActivate: [adminGuard]},
@@ -15,8 +17,10 @@ const routes: Routes = [
   {path: "all-users", component: AllUsersComponent, canActivate: [adminGuard]},
   {path: "send-email", component: SendEmailComponent, canActivate: [adminGuard]},
   {path: "create-category", component: CreateCategoryComponent, canActivate: [adminGuard]},
+  {path: "add-product", component: AddProductComponent, canActivate: [adminGuard]},
   {path: "view-categories", component: ViewCategoriesComponent, canActivate: [adminGuard]},
   {path: "edit-category", component: EditCategoryComponent, canActivate: [adminGuard]},
+  {path: "view-products", component: ViewProductsComponent, canActivate: [adminGuard]},
   {path: "view-user-account", component: ViewUserAccountComponent, canActivate: [adminGuard]}
 ]
 @NgModule({

@@ -101,6 +101,12 @@ export class AdminService {
     })
   }
 
+  addProduct(data: any){
+    return this.http.post(`${this.baseUrl}/product/add-product`, data,  {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
   private createAuthorizationHeader(): HttpHeaders {
     const token = StorageService.getToken();
     if (!token) {

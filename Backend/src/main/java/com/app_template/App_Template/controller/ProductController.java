@@ -7,10 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/product")
@@ -20,7 +17,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/add-product")
-    public ResponseEntity<Product> addProduct(@RequestBody ProductDto productDto) {
+    public ResponseEntity<Product> addProduct(@ModelAttribute ProductDto productDto) {
         try{
             Product product = productService.addProduct(productDto);
             return new ResponseEntity<>(product, HttpStatus.OK);
