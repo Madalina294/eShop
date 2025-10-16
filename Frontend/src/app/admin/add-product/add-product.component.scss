@@ -6,11 +6,12 @@
 
 .product-header-card {
   margin-bottom: 2rem;
-  
+
   mat-card-header {
     display: flex;
     align-items: center;
-    
+    padding-bottom: 10px;
+
     div[mat-card-avatar] {
       display: flex;
       align-items: center;
@@ -19,7 +20,8 @@
       border-radius: 50%;
       width: 40px;
       height: 40px;
-      
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
       mat-icon {
         color: white;
       }
@@ -45,7 +47,7 @@
   justify-content: center;
   z-index: 1000;
   border-radius: 4px;
-  
+
   p {
     margin-top: 1rem;
     font-size: 1rem;
@@ -57,15 +59,15 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  
+
   .full-width {
     width: 100%;
   }
-  
+
   .submit-button {
     margin-top: 1rem;
     align-self: flex-start;
-    
+
     mat-icon {
       margin-right: 0.5rem;
     }
@@ -75,38 +77,39 @@
 .image-upload-section {
   margin: 1.5rem 0;
   padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid rgb(72, 45, 219);
   border-radius: 4px;
-  
+
   .image-label {
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
     margin-bottom: 1rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: rgb(255, 255, 255);
   }
-  
+
   .image-preview-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-    
+    color: white;
+
     .product-image-preview {
       width: 200px;
       height: 200px;
       object-fit: cover;
       border-radius: 8px;
-      border: 2px solid rgba(0, 0, 0, 0.12);
+      border: 2px solid rgb(72, 45, 219);
     }
-    
+
     button {
       mat-icon {
         margin-right: 0.5rem;
       }
     }
   }
-  
+
   mat-error {
     display: block;
     margin-top: 0.5rem;
@@ -119,11 +122,11 @@
   .product-main-container {
     padding: 1rem;
   }
-  
+
   .product-form-card {
     padding: 1rem;
   }
-  
+
   .image-upload-section {
     .image-preview-container {
       .product-image-preview {
@@ -134,3 +137,12 @@
   }
 }
 
+::ng-deep .light-mode{
+  .image-label{
+    color: #1f1f1f !important;
+  }
+
+  .image-preview-container{
+    color: #1f1f1f !important;
+  }
+}
