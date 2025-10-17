@@ -12,6 +12,21 @@ export interface UserData {
   mfaEnabled: boolean;
 }
 
+export interface ProductData {
+  productId: number;
+  name: string;
+  price: number;
+  description: string;
+  categoryId: number;
+  imageUrl?: string;
+  color: string;
+  dimensions: string;
+  material: string;
+  weight: string;
+  quantity: number;
+
+}
+
 export interface PaginatedResponse {
   content: UserData[];
   totalElements: number;
@@ -22,6 +37,18 @@ export interface PaginatedResponse {
   last: boolean;
   numberOfElements: number;
 }
+
+export interface ProductPaginatedResponse {
+  content: ProductData[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +74,19 @@ export class AdminService {
     });
 
     return this.http.get<PaginatedResponse>(`${this.baseUrl}/users/paginated?${params}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getProductsPaginated(page: number = 0, size: number = 10, sortBy: string = 'id', sortDir: string = 'asc'): Observable<ProductPaginatedResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      sortBy: sortBy,
+      sortDir: sortDir
+    });
+
+    return this.http.get<ProductPaginatedResponse>(`${this.baseUrl}/products/paginated?${params}`, {
       headers: this.createAuthorizationHeader()
     });
   }

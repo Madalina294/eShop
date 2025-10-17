@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.app_template.App_Template.dto.ProductDto;
+import com.app_template.App_Template.entity.Product;
+import com.app_template.App_Template.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final ProductRepository productRepository;
     
     @Override
     public List<UserDto> getAllUsers() {
@@ -70,5 +74,17 @@ public class AdminServiceImpl implements AdminService {
             return user.get().getUserDto();
         }
         else throw new EntityNotFoundException("User not found");
+    }
+
+    @Override
+    public Page<ProductDto> getProductsPaginated(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return this.productRepository.findAll(pageable)
+                .map(Product::getProductDto);
     }
 }

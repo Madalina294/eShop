@@ -15,4 +15,121 @@
       <span>Add Product</span>
     </button>
   </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>{{ "viewProducts.loadingProducts" | translate }}</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error() && !loading()" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="loadProducts()">
+      <mat-icon>refresh</mat-icon>
+      {{ "viewProducts.loadAgain" | translate }}
+    </button>
+  </div>
+
+  <!-- Products List -->
+  <div *ngIf="!loading() && !error()" class="user-list">
+    <!-- Controls -->
+    <div class="controls-section">
+      <div class="sort-controls">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "viewProducts.sortBy" | translate }}</mat-label>
+          <mat-select
+            [value]="sortBy()"
+            (selectionChange)="onSortChange($event.value)"
+          >
+            <mat-option value="id">{{
+                "viewProducts.sortOptions.id" | translate
+              }}</mat-option>
+            <mat-option value="name">{{
+                "viewProducts.sortOptions.name" | translate
+              }}</mat-option>
+            <mat-option value="price">{{
+                "viewProducts.sortOptions.price" | translate
+              }}</mat-option>
+            <mat-option value="color">{{
+                "viewProducts.sortOptions.color" | translate
+              }}</mat-option>
+            <mat-option value="material">{{
+                "viewProducts.sortOptions.material" | translate
+              }}</mat-option>
+            <mat-option value="weight">{{
+                "viewProducts.sortOptions.weight" | translate
+              }}</mat-option>
+            <mat-option value="dimensions">{{
+                "viewProducts.sortOptions.dimension" | translate
+              }}</mat-option>
+            <mat-option value="category">{{
+                "viewProducts.sortOptions.category" | translate
+              }}</mat-option>
+            <mat-option value="quantity">{{
+                "viewProducts.sortOptions.quantity" | translate
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-icon-button
+          (click)="onSortDirectionChange()"
+          [title]="
+            sortDir() === 'asc'
+              ? ('viewProducts.sortAscending' | translate)
+              : ('viewProducts.sortDescending' | translate)
+          "
+        >
+          <mat-icon>{{
+              sortDir() === "asc" ? "arrow_upward" : "arrow_downward"
+            }}</mat-icon>
+        </button>
+      </div>
+
+      <div class="pagination-info">
+        {{ "viewProducts.showing" | translate }}
+        {{ currentPage() * pageSize() + 1 }} -
+        {{ Math.min((currentPage() + 1) * pageSize(), totalElements()) }}
+        {{ "viewProducts.of" | translate }} {{ totalElements() }}
+        {{ "viewProducts.products" | translate }}
+      </div>
+    </div>
+
+    <div *ngIf="products().length === 0" class="no-users">
+      <mat-icon>find_replace</mat-icon>
+      <p>{{ "viewProducts.noProductsFound" | translate }}</p>
+    </div>
+
+    <div class="products-grid">
+      <div *ngFor="let product of products()" class="product-row">
+        <p>Id: {{product.productId}}</p>
+        <p>Name: {{product.name}}</p>
+        <p>Price: {{product.price}} $</p>
+        <p>Category: {{getCategoryName(product.categoryId)}}</p>
+        <p>Color: {{product.color}}</p>
+        <p>Dimensions: {{product.dimensions}}</p>
+        <p>Material: {{product.material}}</p>
+        <p>Quantity: {{product.quantity}}</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      *ngIf="totalElements() > 0"
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="currentPage()"
+      [pageSizeOptions]="pageSizeOptions"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+      class="pagination-controls"
+    >
+    </mat-paginator>
+
+  </div>
 </div>

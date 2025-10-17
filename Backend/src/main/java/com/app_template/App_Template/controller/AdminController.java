@@ -47,6 +47,21 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/products/paginated")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getProductsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        try {
+            return ResponseEntity.ok(adminService.getProductsPaginated(page, size, sortBy, sortDir));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving products: " + e.getMessage());
+        }
+    }
+
     @DeleteMapping("/delete-user/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable(name="userId") Long userId) {
         try{
