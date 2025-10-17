@@ -13,7 +13,7 @@ export interface UserData {
 }
 
 export interface ProductData {
-  productId: number;
+  id: number;
   name: string;
   price: number;
   description: string;

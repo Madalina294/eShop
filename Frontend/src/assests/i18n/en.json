@@ -419,5 +419,46 @@
     "errorMessage": "Error creating product!",
     "errorLoadingCategories": "Error loading categories!",
     "ok": "Ok"
+  },
+  "viewProducts": {
+    "title": "Products",
+    "subtitle": "View and manage all products",
+    "loadingProducts": "Loading products...",
+    "loadAgain": "Load again",
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "id": "ID",
+      "name": "Name",
+      "price": "Price",
+      "color": "Color",
+      "material": "Material",
+      "weight": "Weight",
+      "dimension": "Dimensions",
+      "category": "Category",
+      "quantity": "Quantity"
+    },
+    "sortAscending": "Sort Ascending",
+    "sortDescending": "Sort Descending",
+    "showing": "Showing",
+    "of": "of",
+    "products": "products",
+    "noProductsFound": "No products found",
+    "loadError": "Error loading products",
+    "close": "Close",
+    "name": "Name",
+    "price": "Price",
+    "category": "Category",
+    "color": "Color",
+    "dimensions": "Dimensions",
+    "material": "Material",
+    "quantity": "Quantity",
+    "paginator": {
+      "itemsPerPage": "Items per page",
+      "nextPage": "Next page",
+      "previousPage": "Previous page",
+      "firstPage": "First page",
+      "lastPage": "Last page",
+      "ofLabel": "of"
+    }
   }
 }

@@ -74,6 +74,7 @@ export class ViewProductsComponent implements OnInit{
   products = signal<ProductData[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
+  categories = signal<Map<number, string>>(new Map());
 
   // Pagination properties
   totalElements = signal(0);
@@ -95,7 +96,24 @@ export class ViewProductsComponent implements OnInit{
   ) {}
 
   ngOnInit(){
+    this.loadCategories();
     this.loadProducts();
+  }
+
+  loadCategories() {
+    this.adminService.getCategories().subscribe({
+      next: (categories: any[]) => {
+        const categoryMap = new Map<number, string>();
+        categories.forEach(category => {
+          categoryMap.set(category.id, category.name);
+        });
+        this.categories.set(categoryMap);
+        console.log('Categories loaded:', categoryMap);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   loadProducts(){
@@ -150,7 +168,7 @@ export class ViewProductsComponent implements OnInit{
     this.loadProducts();
   }
 
-  getCategoryName(categoryId: number) {
-    return "TBD";
+  getCategoryName(categoryId: number): string {
+    return this.categories().get(categoryId) || 'No Category';
   }
 }

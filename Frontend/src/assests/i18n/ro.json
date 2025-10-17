@@ -418,5 +418,46 @@
     "errorMessage": "Eroare la crearea produsului!",
     "errorLoadingCategories": "Eroare la încărcarea categoriilor!",
     "ok": "Ok"
+  },
+  "viewProducts": {
+    "title": "Produse",
+    "subtitle": "Vizualizează și gestionează toate produsele",
+    "loadingProducts": "Se încarcă produsele...",
+    "loadAgain": "Încarcă din nou",
+    "sortBy": "Sortează după",
+    "sortOptions": {
+      "id": "ID",
+      "name": "Nume",
+      "price": "Preț",
+      "color": "Culoare",
+      "material": "Material",
+      "weight": "Greutate",
+      "dimension": "Dimensiuni",
+      "category": "Categorie",
+      "quantity": "Cantitate"
+    },
+    "sortAscending": "Sortare crescătoare",
+    "sortDescending": "Sortare descrescătoare",
+    "showing": "Se afișează",
+    "of": "din",
+    "products": "produse",
+    "noProductsFound": "Nu s-au găsit produse",
+    "loadError": "Eroare la încărcarea produselor",
+    "close": "Închide",
+    "name": "Nume",
+    "price": "Preț",
+    "category": "Categorie",
+    "color": "Culoare",
+    "dimensions": "Dimensiuni",
+    "material": "Material",
+    "quantity": "Cantitate",
+    "paginator": {
+      "itemsPerPage": "Produse per pagină",
+      "nextPage": "Pagina următoare",
+      "previousPage": "Pagina anterioară",
+      "firstPage": "Prima pagină",
+      "lastPage": "Ultima pagină",
+      "ofLabel": "din"
+    }
   }
 }

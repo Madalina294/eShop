@@ -6,11 +6,19 @@
       </div>
       <mat-card-title>{{ "viewProducts.title" | translate }}</mat-card-title>
       <mat-card-subtitle>{{
-          "viewProducts.subtitle" | translate
-        }}</mat-card-subtitle>
+        "viewProducts.subtitle" | translate
+      }}</mat-card-subtitle>
     </mat-card-header>
-    <button mat-button routerLink="/admin/add-product"
-            style="background-color: #6b46c1; color: white; align-content: flex-end; border-radius: 10px">
+    <button
+      mat-button
+      routerLink="/admin/add-product"
+      style="
+        background-color: #6b46c1;
+        color: white;
+        align-content: flex-end;
+        border-radius: 10px;
+      "
+    >
       <mat-icon>add</mat-icon>
       <span>Add Product</span>
     </button>
@@ -47,32 +55,32 @@
             (selectionChange)="onSortChange($event.value)"
           >
             <mat-option value="id">{{
-                "viewProducts.sortOptions.id" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.id" | translate
+            }}</mat-option>
             <mat-option value="name">{{
-                "viewProducts.sortOptions.name" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.name" | translate
+            }}</mat-option>
             <mat-option value="price">{{
-                "viewProducts.sortOptions.price" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.price" | translate
+            }}</mat-option>
             <mat-option value="color">{{
-                "viewProducts.sortOptions.color" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.color" | translate
+            }}</mat-option>
             <mat-option value="material">{{
-                "viewProducts.sortOptions.material" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.material" | translate
+            }}</mat-option>
             <mat-option value="weight">{{
-                "viewProducts.sortOptions.weight" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.weight" | translate
+            }}</mat-option>
             <mat-option value="dimensions">{{
-                "viewProducts.sortOptions.dimension" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.dimension" | translate
+            }}</mat-option>
             <mat-option value="category">{{
-                "viewProducts.sortOptions.category" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.category" | translate
+            }}</mat-option>
             <mat-option value="quantity">{{
-                "viewProducts.sortOptions.quantity" | translate
-              }}</mat-option>
+              "viewProducts.sortOptions.quantity" | translate
+            }}</mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -86,8 +94,8 @@
           "
         >
           <mat-icon>{{
-              sortDir() === "asc" ? "arrow_upward" : "arrow_downward"
-            }}</mat-icon>
+            sortDir() === "asc" ? "arrow_upward" : "arrow_downward"
+          }}</mat-icon>
         </button>
       </div>
 
@@ -105,16 +113,31 @@
       <p>{{ "viewProducts.noProductsFound" | translate }}</p>
     </div>
 
-    <div class="products-grid">
+    <div class="products-table">
+      <!-- Table Header -->
+      <div class="table-header">
+        <div class="table-cell">ID</div>
+        <div class="table-cell">{{ "viewProducts.name" | translate }}</div>
+        <div class="table-cell">{{ "viewProducts.price" | translate }}</div>
+        <div class="table-cell">{{ "viewProducts.category" | translate }}</div>
+        <div class="table-cell">{{ "viewProducts.color" | translate }}</div>
+        <div class="table-cell">
+          {{ "viewProducts.dimensions" | translate }}
+        </div>
+        <div class="table-cell">{{ "viewProducts.material" | translate }}</div>
+        <div class="table-cell">{{ "viewProducts.quantity" | translate }}</div>
+      </div>
+
+      <!-- Table Rows -->
       <div *ngFor="let product of products()" class="product-row">
-        <p>Id: {{product.productId}}</p>
-        <p>Name: {{product.name}}</p>
-        <p>Price: {{product.price}} $</p>
-        <p>Category: {{getCategoryName(product.categoryId)}}</p>
-        <p>Color: {{product.color}}</p>
-        <p>Dimensions: {{product.dimensions}}</p>
-        <p>Material: {{product.material}}</p>
-        <p>Quantity: {{product.quantity}}</p>
+        <div class="table-cell">{{ product.id }}</div>
+        <div class="table-cell">{{ product.name }}</div>
+        <div class="table-cell">{{ product.price }} $</div>
+        <div class="table-cell">{{ getCategoryName(product.categoryId) }}</div>
+        <div class="table-cell">{{ product.color }}</div>
+        <div class="table-cell">{{ product.dimensions }}</div>
+        <div class="table-cell">{{ product.material }}</div>
+        <div class="table-cell">{{ product.quantity }}</div>
       </div>
     </div>
 
@@ -130,6 +153,5 @@
       class="pagination-controls"
     >
     </mat-paginator>
-
   </div>
 </div>
