@@ -19,6 +19,7 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
 import {MatMenuItem} from '@angular/material/menu';
+import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
 @Injectable()
 export class CustomPaginatorIntl extends MatPaginatorIntl {
   constructor(private translate: TranslateService) {
@@ -203,18 +204,35 @@ export class ViewProductsComponent implements OnInit{
 
   onDeleteProduct(product: ProductData): void {
     this.closeMenu();
-    this.loading.set(true);
-    this.adminService.deleteProduct(product.id).subscribe({
-      next: value => {
-        this.loading.set(false);
-        this.snackBar.open("Product deleted successfuly!", "Ok", {duration:3000});
-        this.loadProducts();
-      },
-      error: err => {
-        this.loading.set(false);
-        this.snackBar.open("Somethimg went wrong. Please try again!", "Ok", {duration:3000});
+    const dialogRef = this.dialog.open(ConfirmDeleteComponent, {
+      width: '400px',
+      data: { message: this.translate.instant('viewProducts.confirmDelete') }
+    });
+    dialogRef.afterClosed().subscribe( result => {
+      if (result === true){
+        this.loading.set(true);
+        this.adminService.deleteProduct(product.id).subscribe({
+          next: value => {
+            this.loading.set(false);
+            this.snackBar.open(
+              this.translate.instant('viewProducts.productDeletedSuccess'), 
+              this.translate.instant('viewProducts.ok'), 
+              {duration: 3000}
+            );
+            this.loadProducts();
+          },
+          error: err => {
+            this.loading.set(false);
+            this.snackBar.open(
+              this.translate.instant('viewProducts.deleteError'), 
+              this.translate.instant('viewProducts.ok'), 
+              {duration: 3000}
+            );
+          }
+        })
+        console.log('Delete product:', product);
       }
     })
-    console.log('Delete product:', product);
+
   }
 }
