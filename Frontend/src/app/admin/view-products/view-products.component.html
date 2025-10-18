@@ -1,4 +1,4 @@
-<div class="products-container">
+<div class="products-container" (click)="closeMenu()">
   <mat-card class="products-header-card">
     <mat-card-header>
       <div mat-card-avatar>
@@ -126,6 +126,7 @@
         </div>
         <div class="table-cell">{{ "viewProducts.material" | translate }}</div>
         <div class="table-cell">{{ "viewProducts.quantity" | translate }}</div>
+        <div class="table-cell actions-header">Actions</div>
       </div>
 
       <!-- Table Rows -->
@@ -138,6 +139,40 @@
         <div class="table-cell">{{ product.dimensions }}</div>
         <div class="table-cell">{{ product.material }}</div>
         <div class="table-cell">{{ product.quantity }}</div>
+        <div class="table-cell actions-cell">
+          <button
+            mat-icon-button
+            class="menu-button"
+            (click)="handleMenuClick(product.id, $event)"
+            [attr.aria-label]="'Open menu for product ' + product.name"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+
+          <!-- Popup Menu -->
+          <div
+            *ngIf="activeMenuId() === product.id"
+            class="menu-popup"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              mat-menu-item
+              class="menu-item edit-item"
+              (click)="onEditProduct(product)"
+            >
+              <mat-icon>edit</mat-icon>
+              <span>Edit Product</span>
+            </button>
+            <button
+              mat-menu-item
+              class="menu-item delete-item"
+              (click)="onDeleteProduct(product)"
+            >
+              <mat-icon>delete</mat-icon>
+              <span>Delete Product</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

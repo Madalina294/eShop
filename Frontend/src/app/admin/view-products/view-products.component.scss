@@ -2,6 +2,7 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
+  pointer-events: auto;
 }
 
 .products-header-card {
@@ -68,6 +69,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  pointer-events: auto;
 }
 
 .controls-section {
@@ -79,17 +81,20 @@
   padding: 16px;
   background: #f5f5f5;
   border-radius: 8px;
+  pointer-events: auto;
 }
 
 .sort-controls {
   display: flex;
   align-items: center;
   gap: 16px;
+  pointer-events: auto;
 }
 
 .pagination-info {
   font-size: 14px;
   color: #666;
+  pointer-events: auto;
 }
 
 .no-users {
@@ -99,6 +104,7 @@
   justify-content: center;
   padding: 48px;
   gap: 16px;
+  pointer-events: auto;
 
   mat-icon {
     font-size: 64px;
@@ -119,8 +125,9 @@
   flex-direction: column;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
 }
 
 .table-header {
@@ -132,6 +139,7 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  pointer-events: auto;
 }
 
 .product-row {
@@ -139,6 +147,7 @@
   padding: 16px 0;
   border-bottom: 1px solid #e0e0e0;
   transition: background-color 0.2s ease;
+  pointer-events: auto;
 
   &:hover {
     background-color: #f5f5f5;
@@ -155,6 +164,7 @@
   display: flex;
   align-items: center;
   word-break: break-word;
+  pointer-events: auto;
   
   &:first-child {
     flex: 0.5;
@@ -165,8 +175,118 @@
     flex: 1.5;
     font-weight: 500;
   }
+
+  &.actions-header {
+    flex: 0.5;
+    justify-content: center;
+    font-weight: 600;
+    min-width: 80px;
+  }
+
+  &.actions-cell {
+    flex: 0.5;
+    justify-content: center;
+    min-width: 80px;
+    position: relative;
+    pointer-events: auto;
+  }
 }
 
 .pagination-controls {
   margin-top: 16px;
+  pointer-events: auto;
+}
+
+// Menu button and popup styles
+.menu-button {
+  color: #666;
+  transition: color 0.2s ease;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+
+  &:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.menu-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 9999;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  min-width: 160px;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+  pointer-events: auto;
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #333;
+    pointer-events: auto;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &.edit-item {
+      &:hover {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+
+    &.delete-item {
+      &:hover {
+        background-color: #ffebee;
+        color: #d32f2f;
+      }
+
+      mat-icon {
+        color: #d32f2f;
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

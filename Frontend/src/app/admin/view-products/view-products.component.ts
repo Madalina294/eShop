@@ -18,6 +18,7 @@ import {MatPaginator, MatPaginatorIntl, PageEvent} from '@angular/material/pagin
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
+import {MatMenuItem} from '@angular/material/menu';
 @Injectable()
 export class CustomPaginatorIntl extends MatPaginatorIntl {
   constructor(private translate: TranslateService) {
@@ -65,7 +66,8 @@ export class CustomPaginatorIntl extends MatPaginatorIntl {
     MatSelect,
     MatIconButton,
     NgForOf,
-    MatPaginator
+    MatPaginator,
+    MatMenuItem
   ],
   templateUrl: './view-products.component.html',
   styleUrl: './view-products.component.scss'
@@ -86,6 +88,9 @@ export class ViewProductsComponent implements OnInit{
 
   // Make Math available in template
   Math = Math;
+
+  // Menu management
+  activeMenuId = signal<number | null>(null);
 
   constructor(
     private adminService: AdminService,
@@ -170,5 +175,35 @@ export class ViewProductsComponent implements OnInit{
 
   getCategoryName(categoryId: number): string {
     return this.categories().get(categoryId) || 'No Category';
+  }
+
+  // Menu management methods
+  handleMenuClick(productId: number, event: Event): void {
+    event.stopPropagation();
+    console.log('Button clicked for product:', productId);
+    this.toggleMenu(productId);
+  }
+
+  toggleMenu(productId: number): void {
+    console.log('Toggle menu clicked for product:', productId);
+    console.log('Current activeMenuId:', this.activeMenuId());
+    this.activeMenuId.set(this.activeMenuId() === productId ? null : productId);
+    console.log('New activeMenuId:', this.activeMenuId());
+  }
+
+  closeMenu(): void {
+    this.activeMenuId.set(null);
+  }
+
+  onEditProduct(product: ProductData): void {
+    this.closeMenu();
+    // TODO: Implement edit product functionality
+    console.log('Edit product:', product);
+  }
+
+  onDeleteProduct(product: ProductData): void {
+    this.closeMenu();
+    // TODO: Implement delete product functionality
+    console.log('Delete product:', product);
   }
 }
