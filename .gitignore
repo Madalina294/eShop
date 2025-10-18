@@ -1,0 +1,146 @@
+# Eshop Project .gitignore
+# This file combines ignore patterns for both Backend (Spring Boot) and Frontend (Angular) projects
+
+# ==============================================
+# BACKEND (Spring Boot / Java / Maven)
+# ==============================================
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE Files
+.idea/
+*.iws
+*.iml
+*.ipr
+.project
+.classpath
+.factorypath
+.settings/
+.sts4-cache
+.apt_generated
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Configuration Files with Sensitive Data
+# Backend application properties
+Backend/src/main/resources/application.properties
+Backend/src/main/resources/application-*.properties
+
+# Environment files
+*.env
+.env
+.env.local
+.env.production
+
+# Log files
+*.log
+logs/
+
+# Uploaded files (user uploads, product images, etc.)
+Backend/uploads/
+uploads/
+
+# ==============================================
+# FRONTEND (Angular / Node.js)
+# ==============================================
+
+# Node modules
+Frontend/node_modules/
+node_modules/
+
+# Angular build outputs
+Frontend/dist/
+Frontend/tmp/
+Frontend/out-tsc/
+Frontend/bazel-out/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+
+# NPM/Yarn logs
+npm-debug.log
+yarn-error.log
+
+# Angular cache
+Frontend/.angular/cache/
+.angular/cache/
+
+# Sass cache
+Frontend/.sass-cache/
+.sass-cache/
+
+# Coverage reports
+Frontend/coverage/
+coverage/
+
+# Testing
+Frontend/libpeerconnection.log
+Frontend/testem.log
+Frontend/typings/
+libpeerconnection.log
+testem.log
+typings/
+
+# Connect lock
+Frontend/connect.lock
+connect.lock
+
+# ==============================================
+# GENERAL / SYSTEM FILES
+# ==============================================
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# IDE History
+.history/
+
+# Package lock files (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+
+# ==============================================
+# PROJECT SPECIFIC
+# ==============================================
+
+# Database files (if using local databases)
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
