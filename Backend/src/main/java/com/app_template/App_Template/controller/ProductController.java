@@ -4,10 +4,7 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app_template.App_Template.dto.ProductDto;
@@ -54,6 +51,16 @@ public class ProductController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }catch (IOException | IllegalArgumentException e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delete-product/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable(name = "id") Long id) {
+        try{
+            this.productService.deleteProduct(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 }

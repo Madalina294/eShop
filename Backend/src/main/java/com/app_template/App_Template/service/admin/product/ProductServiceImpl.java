@@ -53,4 +53,19 @@ public class ProductServiceImpl implements ProductService {
         
         return savedProduct;
     }
+
+    @Override
+    public void deleteProduct(Long productId) throws EntityNotFoundException {
+        Optional<Product> product = productRepository.findById(productId);
+        if(product.isPresent()){
+            try {
+                imageService.deleteProductImage(productId);
+            } catch (IOException e) {
+                // Log eroarea dar continuă cu ștergerea contului
+                System.err.println("Failed to delete product image: " + e.getMessage());
+            }
+            productRepository.delete(product.get());
+        }
+        else throw new EntityNotFoundException("Product not found");
+    }
 }

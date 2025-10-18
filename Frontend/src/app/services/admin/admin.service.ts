@@ -97,6 +97,12 @@ export class AdminService {
     });
   }
 
+  deleteProduct(productId: number) {
+    return this.http.delete(`${this.baseUrl}/product/delete-product/${productId}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+  
   sendEmail(requestData: any){
     return this.http.post(`${this.baseUrl}/send-email`, requestData, {
       headers: this.createAuthorizationHeader()

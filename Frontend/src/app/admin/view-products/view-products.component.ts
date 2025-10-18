@@ -203,7 +203,18 @@ export class ViewProductsComponent implements OnInit{
 
   onDeleteProduct(product: ProductData): void {
     this.closeMenu();
-    // TODO: Implement delete product functionality
+    this.loading.set(true);
+    this.adminService.deleteProduct(product.id).subscribe({
+      next: value => {
+        this.loading.set(false);
+        this.snackBar.open("Product deleted successfuly!", "Ok", {duration:3000});
+        this.loadProducts();
+      },
+      error: err => {
+        this.loading.set(false);
+        this.snackBar.open("Somethimg went wrong. Please try again!", "Ok", {duration:3000});
+      }
+    })
     console.log('Delete product:', product);
   }
 }
