@@ -18,7 +18,7 @@ export interface ProductData {
   price: number;
   description: string;
   categoryId: number;
-  imageUrl?: string;
+  image?: string;
   color: string;
   dimensions: string;
   material: string;
@@ -102,7 +102,7 @@ export class AdminService {
       headers: this.createAuthorizationHeader()
     });
   }
-  
+
   sendEmail(requestData: any){
     return this.http.post(`${this.baseUrl}/send-email`, requestData, {
       headers: this.createAuthorizationHeader()
@@ -143,6 +143,18 @@ export class AdminService {
 
   updateCategory(data: any):Observable<any>{
     return this.http.put<Observable<any>>(`${this.baseUrl}/category/edit-category`, data,  {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
+  updateProduct(data: any):Observable<ProductData>{
+    return this.http.put<ProductData>(`${this.baseUrl}/product/edit-product`, data,  {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
+  getProduct(productId: number): Observable<ProductData>{
+    return this.http.get<ProductData>(`${this.baseUrl}/product/get-product/${productId}`, {
       headers: this.createAuthorizationHeader()
     })
   }

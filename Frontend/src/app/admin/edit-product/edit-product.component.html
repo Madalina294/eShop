@@ -1,0 +1,231 @@
+<app-breadcrumb></app-breadcrumb>
+<div class="product-main-container">
+  <mat-card class="product-header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>edit</mat-icon>
+      </div>
+      <mat-card-title>{{ "editProduct.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        "editProduct.subtitle" | translate
+      }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <mat-card class="product-form-card">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading()" class="loading-overlay">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="50"
+        color="primary"
+      ></mat-progress-spinner>
+      <p>{{ "editProduct.loading" | translate }}</p>
+    </div>
+
+    <form
+      [formGroup]="updateProductForm"
+      (ngSubmit)="onSubmit()"
+      class="product-form"
+    >
+      <!-- Name Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.nameLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'editProduct.namePlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error *ngIf="updateProductForm.get('name')?.hasError('required')">
+          {{ "editProduct.nameRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Price Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.priceLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="price"
+          [placeholder]="'editProduct.pricePlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error *ngIf="updateProductForm.get('price')?.hasError('required')">
+          {{ "editProduct.priceRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.descriptionLabel" | translate }}</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          [placeholder]="'editProduct.descriptionPlaceholder' | translate"
+          [disabled]="isLoading()"
+        ></textarea>
+        <mat-error
+          *ngIf="updateProductForm.get('description')?.hasError('required')"
+        >
+          {{ "editProduct.descriptionRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Color Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.colorLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="color"
+          [placeholder]="'editProduct.colorPlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error *ngIf="updateProductForm.get('color')?.hasError('required')">
+          {{ "editProduct.colorRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Material Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.materialLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="material"
+          [placeholder]="'editProduct.materialPlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error
+          *ngIf="updateProductForm.get('material')?.hasError('required')"
+        >
+          {{ "editProduct.materialRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Dimensions Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.dimensionsLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="dimensions"
+          [placeholder]="'editProduct.dimensionsPlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error
+          *ngIf="updateProductForm.get('dimensions')?.hasError('required')"
+        >
+          {{ "editProduct.dimensionsRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Weight Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.weightLabel" | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="weight"
+          [placeholder]="'editProduct.weightPlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error
+          *ngIf="updateProductForm.get('weight')?.hasError('required')"
+        >
+          {{ "editProduct.weightRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Quantity Field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.quantityLabel" | translate }}</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="quantity"
+          [placeholder]="'editProduct.quantityPlaceholder' | translate"
+          [disabled]="isLoading()"
+        />
+        <mat-error
+          *ngIf="updateProductForm.get('quantity')?.hasError('required')"
+        >
+          {{ "editProduct.quantityRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Category Dropdown -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ "editProduct.categoryLabel" | translate }}</mat-label>
+        <mat-select
+          formControlName="categoryId"
+          [placeholder]="'editProduct.categoryPlaceholder' | translate"
+          [disabled]="isLoading()"
+        >
+          <mat-option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="updateProductForm.get('categoryId')?.hasError('required')"
+        >
+          {{ "editProduct.categoryRequired" | translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Image Upload Section -->
+      <div class="image-upload-section">
+        <label class="image-label">{{
+          "editProduct.imageLabel" | translate
+        }}</label>
+        <div class="image-preview-container">
+          <img
+            [src]="imageToDisplay()"
+            class="product-image-preview"
+            alt="Product preview"
+          />
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            style="display: none"
+            [disabled]="isLoading()"
+          />
+          <button
+            mat-raised-button
+            type="button"
+            (click)="fileInput.click()"
+            [disabled]="isLoading()"
+          >
+            <mat-icon>add_photo_alternate</mat-icon>
+            {{ "editProduct.changeImage" | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="updateProductForm.invalid || isLoading()"
+          class="submit-button"
+        >
+          <mat-icon>save</mat-icon>
+          {{ "editProduct.saveButton" | translate }}
+        </button>
+
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="onCancel()"
+          [disabled]="isLoading()"
+          class="cancel-button"
+        >
+          <mat-icon>cancel</mat-icon>
+          {{ "editProduct.cancelButton" | translate }}
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

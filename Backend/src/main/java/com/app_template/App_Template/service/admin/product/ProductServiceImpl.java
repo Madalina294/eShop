@@ -68,4 +68,51 @@ public class ProductServiceImpl implements ProductService {
         }
         else throw new EntityNotFoundException("Product not found");
     }
+
+    @Override
+    public ProductDto getProduct(Long productId) throws EntityNotFoundException {
+        Optional<Product> product = productRepository.findById(productId);
+        if(product.isPresent()){
+            return product.get().getProductDto();
+        }
+        else throw new EntityNotFoundException("Product not found");
+    }
+
+    @Override
+    public ProductDto updateProduct(ProductDto productDto, MultipartFile image) throws EntityNotFoundException, IOException {
+        Optional<Product> product = productRepository.findById(productDto.getId());
+        if(product.isPresent()){
+            Product foundProduct = product.get();
+            foundProduct.setName(productDto.getName());
+            foundProduct.setPrice(productDto.getPrice());
+            foundProduct.setDescription(productDto.getDescription());
+            foundProduct.setColor(productDto.getColor());
+            foundProduct.setDimensions(productDto.getDimensions());
+            foundProduct.setMaterial(productDto.getMaterial());
+            foundProduct.setWeight(productDto.getWeight());
+            foundProduct.setQuantity(productDto.getQuantity());
+
+            if (image != null && !image.isEmpty()) {
+                // Șterge imaginea veche mai întâi
+                try {
+                    imageService.deleteProductImage(productDto.getId());
+                } catch (IOException e) {
+                    // Log eroarea dar continuă
+                    System.err.println("Failed to delete old product image: " + e.getMessage());
+                }
+                // Salvează imaginea nouă
+                String imageUrl = imageService.saveProductImage(productDto.getId(), image);
+                foundProduct.setImage(imageUrl);
+            }
+            Optional<Category> category = categoryRepository.findById(productDto.getCategoryId());
+            if(category.isPresent()){
+                foundProduct.setCategory(category.get());
+            }
+            else {
+                throw new EntityNotFoundException("Category not found");
+            }
+            return productRepository.save(foundProduct).getProductDto();
+        }
+        else throw new EntityNotFoundException("Product not found");
+    }
 }

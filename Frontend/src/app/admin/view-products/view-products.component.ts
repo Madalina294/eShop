@@ -198,8 +198,9 @@ export class ViewProductsComponent implements OnInit{
 
   onEditProduct(product: ProductData): void {
     this.closeMenu();
-    // TODO: Implement edit product functionality
-    console.log('Edit product:', product);
+    this.router.navigate(['/admin/edit-product'], {
+      queryParams: { productId: product.id }
+    });
   }
 
   onDeleteProduct(product: ProductData): void {

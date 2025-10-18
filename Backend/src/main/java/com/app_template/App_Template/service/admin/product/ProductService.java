@@ -11,5 +11,7 @@ import com.app_template.App_Template.entity.Product;
 public interface ProductService {
     Product addProduct(ProductDto productDto, MultipartFile image) throws IOException;
     void deleteProduct(Long productId) throws EntityNotFoundException;
+    ProductDto getProduct(Long productId) throws EntityNotFoundException;
+    ProductDto updateProduct(ProductDto productDto, MultipartFile image) throws EntityNotFoundException, IOException;
 
 }

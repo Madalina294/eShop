@@ -1,0 +1,173 @@
+.product-main-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.product-header-card {
+  margin-bottom: 2rem;
+
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+
+    div[mat-card-avatar] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+      mat-icon {
+        color: white;
+      }
+    }
+  }
+}
+
+.product-form-card {
+  position: relative;
+  padding: 2rem;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: 4px;
+
+  p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: var(--primary-color);
+  }
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.image-upload-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid rgb(72, 45, 219);
+  border-radius: 4px;
+
+  .image-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: rgb(255, 255, 255);
+  }
+
+  .image-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+
+    .product-image-preview {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgb(72, 45, 219);
+    }
+
+    button {
+      mat-icon {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  mat-error {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #f44336;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+
+  .submit-button,
+  .cancel-button {
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .submit-button {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .cancel-button {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-main-container {
+    padding: 1rem;
+  }
+
+  .product-form-card {
+    padding: 1rem;
+  }
+
+  .image-upload-section {
+    .image-preview-container {
+      .product-image-preview {
+        width: 150px;
+        height: 150px;
+      }
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    .submit-button,
+    .cancel-button {
+      width: 100%;
+    }
+  }
+}
+
+::ng-deep .light-mode{
+  .image-label{
+    color: #1f1f1f !important;
+  }
+
+  .image-preview-container{
+    color: #1f1f1f !important;
+  }
+}
+

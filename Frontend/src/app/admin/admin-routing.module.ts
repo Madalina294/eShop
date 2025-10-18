@@ -10,6 +10,7 @@ import {ViewCategoriesComponent} from './view-categories/view-categories.compone
 import {EditCategoryComponent} from './edit-category/edit-category.component';
 import {AddProductComponent} from './add-product/add-product.component';
 import {ViewProductsComponent} from './view-products/view-products.component';
+import {EditProductComponent} from './edit-product/edit-product.component';
 
 const routes: Routes = [
   {path: "", component: AdminDashboardComponent, canActivate: [adminGuard]},
@@ -21,6 +22,7 @@ const routes: Routes = [
   {path: "view-categories", component: ViewCategoriesComponent, canActivate: [adminGuard]},
   {path: "edit-category", component: EditCategoryComponent, canActivate: [adminGuard]},
   {path: "view-products", component: ViewProductsComponent, canActivate: [adminGuard]},
+  {path: "edit-product", component: EditProductComponent, canActivate: [adminGuard]},
   {path: "view-user-account", component: ViewUserAccountComponent, canActivate: [adminGuard]}
 ]
 @NgModule({
