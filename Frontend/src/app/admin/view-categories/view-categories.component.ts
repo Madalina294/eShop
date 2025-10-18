@@ -10,6 +10,7 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
 import {MatDialog} from '@angular/material/dialog';
 import {Router, RouterLink} from '@angular/router';
+import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
 
 export interface CategoryDto {
   id: number;
@@ -31,7 +32,8 @@ export interface CategoryDto {
     MatIcon,
     MatProgressSpinner,
     TranslateModule,
-    RouterLink
+    RouterLink,
+    BreadcrumbComponent
   ],
   templateUrl: './view-categories.component.html',
   styleUrl: './view-categories.component.scss'
