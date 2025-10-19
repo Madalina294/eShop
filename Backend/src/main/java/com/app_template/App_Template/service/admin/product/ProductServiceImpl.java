@@ -1,8 +1,14 @@
 package com.app_template.App_Template.service.admin.product;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -114,5 +120,31 @@ public class ProductServiceImpl implements ProductService {
             return productRepository.save(foundProduct).getProductDto();
         }
         else throw new EntityNotFoundException("Product not found");
+    }
+
+    @Override
+    public List<ProductDto> getAllProducts() {
+        return this.productRepository.findAll().stream().map(Product::getProductDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductDto> getProductsPaginated(int page, int size, String sortBy, String sortDir, Long categoryId) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<Product> productPage;
+        
+        if (categoryId != null) {
+            Optional<Category> category = categoryRepository.findById(categoryId);
+            if (category.isPresent()) {
+                productPage = productRepository.findByCategory(category.get(), pageable);
+            } else {
+                productPage = productRepository.findAll(pageable);
+            }
+        } else {
+            productPage = productRepository.findAll(pageable);
+        }
+        
+        return productPage.map(Product::getProductDto);
     }
 }

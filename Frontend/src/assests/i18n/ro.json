@@ -508,5 +508,26 @@
       "lastPage": "Ultima pagină",
       "ofLabel": "din"
     }
+  },
+  "allProducts": {
+    "title": "Produsele Noastre",
+    "subtitle": "Explorează toate produsele disponibile",
+    "categories": "Categorii",
+    "allCategories": "Toate Categoriile",
+    "loadingProducts": "Se încarcă produsele...",
+    "showing": "Se afișează",
+    "of": "din",
+    "products": "produse",
+    "noProductsFound": "Nu s-au găsit produse",
+    "loadError": "Eroare la încărcarea produselor",
+    "ok": "Ok",
+    "paginator": {
+      "itemsPerPage": "Produse per pagină",
+      "nextPage": "Pagina următoare",
+      "previousPage": "Pagina anterioară",
+      "firstPage": "Prima pagină",
+      "lastPage": "Ultima pagină",
+      "ofLabel": "din"
+    }
   }
 }

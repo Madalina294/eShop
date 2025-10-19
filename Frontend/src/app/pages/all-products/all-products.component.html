@@ -1,0 +1,110 @@
+<div class="all-products-container">
+  <!-- Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>shopping_cart</mat-icon>
+      </div>
+      <mat-card-title>{{ "allProducts.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ "allProducts.subtitle" | translate }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>{{ "allProducts.loadingProducts" | translate }}</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading()" class="content-wrapper">
+    <!-- Sidebar with Categories -->
+    <aside class="categories-sidebar">
+      <mat-card class="categories-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>category</mat-icon>
+            {{ "allProducts.categories" | translate }}
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item 
+              class="category-item"
+              [class.active]="selectedCategoryId() === null"
+              (click)="onCategorySelect(null)"
+            >
+              <mat-icon matListItemIcon>all_inclusive</mat-icon>
+              <span matListItemTitle>{{ "allProducts.allCategories" | translate }}</span>
+            </mat-list-item>
+            <mat-list-item 
+              *ngFor="let category of categories()"
+              class="category-item"
+              [class.active]="selectedCategoryId() === category.id"
+              (click)="onCategorySelect(category.id)"
+            >
+              <mat-icon matListItemIcon>label</mat-icon>
+              <span matListItemTitle>{{ category.name }}</span>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+
+    <!-- Products Grid -->
+    <div class="products-section">
+      <!-- Pagination Info -->
+      <div class="pagination-info" *ngIf="totalElements() > 0">
+        {{ "allProducts.showing" | translate }}
+        {{ currentPage() * pageSize() + 1 }} -
+        {{ Math.min((currentPage() + 1) * pageSize(), totalElements()) }}
+        {{ "allProducts.of" | translate }} {{ totalElements() }}
+        {{ "allProducts.products" | translate }}
+      </div>
+
+      <!-- No Products Message -->
+      <div *ngIf="products().length === 0" class="no-products">
+        <mat-icon>inventory_2</mat-icon>
+        <p>{{ "allProducts.noProductsFound" | translate }}</p>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="products().length > 0">
+        <mat-card *ngFor="let product of products()" class="product-card">
+          <div class="product-image-container">
+            <img 
+              mat-card-image 
+              [src]="getProductImage(product)" 
+              [alt]="product.name"
+              class="product-image"
+            >
+          </div>
+          <mat-card-content>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-category">
+              <mat-icon>label</mat-icon>
+              <span>{{ getCategoryName(product.categoryId) }}</span>
+            </div>
+            <p class="product-price">{{ product.price }} $</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator
+        *ngIf="totalElements() > 0"
+        [length]="totalElements()"
+        [pageSize]="pageSize()"
+        [pageIndex]="currentPage()"
+        [pageSizeOptions]="pageSizeOptions"
+        [showFirstLastButtons]="true"
+        (page)="onPageChange($event)"
+        class="pagination-controls"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</div>

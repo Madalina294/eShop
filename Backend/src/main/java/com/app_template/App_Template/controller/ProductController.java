@@ -1,6 +1,7 @@
 package com.app_template.App_Template.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,5 +115,10 @@ public class ProductController {
         }catch (EntityNotFoundException e){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/get-all-products")
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        return ResponseEntity.ok(this.productService.getAllProducts());
     }
 }

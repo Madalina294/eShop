@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit{
         this.userStateService.setUser(userData);
 
         // Navighează către welcome
-        this.router.navigate(['/welcome']);
+        this.router.navigate(['/all-products']);
       }
     }
   }
@@ -159,7 +159,7 @@ export class LoginComponent implements OnInit{
           if (StorageService.isAdminLoggedIn()) {
             this.router.navigateByUrl("/welcome");
           } else if (StorageService.isCustomerLoggedIn()) {
-            this.router.navigateByUrl("/welcome");
+            this.router.navigateByUrl("/all-products");
           }
         } else {
           this.isSpinning.set(false);

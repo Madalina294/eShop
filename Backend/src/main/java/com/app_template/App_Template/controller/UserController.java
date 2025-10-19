@@ -1,21 +1,30 @@
 package com.app_template.App_Template.controller;
 
-import com.app_template.App_Template.auth.UpdateInfosRequest;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app_template.App_Template.auth.UpdateInfosRequest;
 import com.app_template.App_Template.auth.UpdatePasswordRequest;
-import com.app_template.App_Template.entity.User;
+import com.app_template.App_Template.dto.CategoryDto;
+import com.app_template.App_Template.dto.ProductDto;
 import com.app_template.App_Template.dto.UserDto;
+import com.app_template.App_Template.entity.User;
 import com.app_template.App_Template.repository.UserRepository;
+import com.app_template.App_Template.service.admin.category.CategoryService;
+import com.app_template.App_Template.service.admin.product.ProductService;
 import com.app_template.App_Template.service.user.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +41,12 @@ public class UserController {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private CategoryService categoryService;
     
 
     @DeleteMapping("/delete/{userId}")
@@ -99,6 +114,32 @@ public class UserController {
         }catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/get-all-products")
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        return ResponseEntity.ok(this.productService.getAllProducts());
+    }
+
+    @GetMapping("/get-products-paginated")
+    public ResponseEntity<?> getProductsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) Long categoryId) {
+        try {
+            Page<ProductDto> products = productService.getProductsPaginated(page, size, sortBy, sortDir, categoryId);
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving products: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-categories")
+    public ResponseEntity<List<CategoryDto>> getCategories() {
+        return ResponseEntity.ok(categoryService.getCategories());
     }
 
 }

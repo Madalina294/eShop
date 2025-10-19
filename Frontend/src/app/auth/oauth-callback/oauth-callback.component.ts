@@ -74,7 +74,7 @@ export class OAuthCallbackComponent implements OnInit {
 
               // Navighează către welcome
               setTimeout(() => {
-                this.router.navigate(['/welcome']);
+                this.router.navigate(['/all-products']);
               }, 500);
             },
             error: (error) => {

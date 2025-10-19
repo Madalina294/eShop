@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {StorageService} from '../storage/storage.service';
 import {Observable} from 'rxjs';
+import {ProductData} from '../admin/admin.service';
 
 
 @Injectable({
@@ -45,6 +46,34 @@ export class UserService {
     return this.http.put(this.baseUrl + `/update-password`, data, {headers: headers});
   }
 
+  getAllProducts(): Observable<ProductData[]>{
+    return this.http.get<ProductData[]>(this.baseUrl + `/get-all-products`, {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
+  getProductsPaginated(page: number = 0, size: number = 12, sortBy: string = 'id', sortDir: string = 'asc', categoryId?: number): Observable<any> {
+    let params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      sortBy: sortBy,
+      sortDir: sortDir
+    });
+
+    if (categoryId !== undefined && categoryId !== null) {
+      params.append('categoryId', categoryId.toString());
+    }
+
+    return this.http.get<any>(this.baseUrl + `/get-products-paginated?${params}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getCategories(): Observable<any[]>{
+    return this.http.get<any[]>(this.baseUrl + `/get-categories`, {
+      headers: this.createAuthorizationHeader()
+    })
+  }
 
   createAuthorizationHeader(): HttpHeaders{
     const token = StorageService.getToken();

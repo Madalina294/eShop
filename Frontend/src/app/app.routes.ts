@@ -9,6 +9,7 @@ import {ResetPasswordComponent} from './pages/reset-password/reset-password.comp
 import {EnterEmailComponent} from './pages/enter-email/enter-email.component';
 import {OAuthCallbackComponent} from './auth/oauth-callback/oauth-callback.component';
 import {EditPreferencesComponent} from './pages/edit-preferences/edit-preferences.component';
+import {AllProductsComponent} from './pages/all-products/all-products.component';
 
 export const routes: Routes = [
   {path:"", redirectTo: "login", pathMatch: "full"},
@@ -19,6 +20,7 @@ export const routes: Routes = [
   {path: 'profile', component: ProfileComponent, canActivate: [authGuard]},
   {path: 'update-password', component: UpdatePasswordComponent, canActivate: [authGuard]},
   {path: 'edit-preferences', component: EditPreferencesComponent, canActivate: [authGuard]},
+  {path: 'all-products', component: AllProductsComponent, canActivate: [authGuard]},
   {path: 'reset-password', component: ResetPasswordComponent},
   {path: 'enter-email', component: EnterEmailComponent},
   {path:"admin", loadChildren:() =>
