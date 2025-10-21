@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app_template.App_Template.dto.ProductDto;
+import com.app_template.App_Template.dto.ProductListDto;
 import com.app_template.App_Template.entity.Category;
 import com.app_template.App_Template.entity.Product;
 import com.app_template.App_Template.repository.CategoryRepository;
@@ -132,19 +133,28 @@ public class ProductServiceImpl implements ProductService {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         
-        Page<Product> productPage;
-        
         if (categoryId != null) {
-            Optional<Category> category = categoryRepository.findById(categoryId);
-            if (category.isPresent()) {
-                productPage = productRepository.findByCategory(category.get(), pageable);
-            } else {
-                productPage = productRepository.findAll(pageable);
-            }
+            Page<ProductListDto> productPage = productRepository.findByCategoryId(categoryId, pageable);
+            return productPage.map(this::convertToListDto);
         } else {
-            productPage = productRepository.findAll(pageable);
+            Page<Product> productPage = productRepository.findAll(pageable);
+            return productPage.map(Product::getProductDto);
         }
-        
-        return productPage.map(Product::getProductDto);
+    }
+    
+    private ProductDto convertToListDto(ProductListDto listDto) {
+        ProductDto productDto = new ProductDto();
+        productDto.setId(listDto.getId());
+        productDto.setName(listDto.getName());
+        productDto.setPrice(listDto.getPrice());
+        productDto.setImage(listDto.getImage());
+        productDto.setCategoryId(listDto.getCategoryId());
+        productDto.setColor(listDto.getColor());
+        productDto.setDimensions(listDto.getDimensions());
+        productDto.setMaterial(listDto.getMaterial());
+        productDto.setWeight(listDto.getWeight());
+        productDto.setQuantity(listDto.getQuantity());
+        productDto.setDescription(""); // Set empty description to avoid LOB issues
+        return productDto;
     }
 }

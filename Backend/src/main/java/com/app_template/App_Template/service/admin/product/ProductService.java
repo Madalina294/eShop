@@ -19,4 +19,5 @@ public interface ProductService {
     List<ProductDto> getAllProducts();
     Page<ProductDto> getProductsPaginated(int page, int size, String sortBy, String sortDir, Long categoryId);
 
+
 }
