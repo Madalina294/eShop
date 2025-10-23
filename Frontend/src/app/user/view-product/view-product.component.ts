@@ -8,6 +8,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {CommonModule} from '@angular/common';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-view-product',
@@ -16,7 +17,8 @@ import {CommonModule} from '@angular/common';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslateModule
   ],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.scss'
@@ -39,7 +41,8 @@ export class ViewProductComponent implements OnInit{
   constructor(private snackBar: MatSnackBar,
                private router: Router,
                private userService: UserService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private translate: TranslateService) {
   }
 
   ngOnInit(){
@@ -57,7 +60,9 @@ export class ViewProductComponent implements OnInit{
     
     if (!productId) {
       this.loading.set(false);
-      this.snackBar.open("ID-ul produsului nu a fost găsit!", "Ok", {duration: 3000});
+      const message = this.translate.instant('viewProduct.errors.productIdNotFound');
+      const action = this.translate.instant('viewProduct.errors.ok');
+      this.snackBar.open(message, action, {duration: 3000});
       this.router.navigate(['/user/all-products']);
       return;
     }
@@ -70,7 +75,9 @@ export class ViewProductComponent implements OnInit{
       error: err => {
         this.loading.set(false);
         console.error('Error loading product:', err);
-        this.snackBar.open("Ceva nu a mers bine la încărcarea produsului!", "Ok", {duration: 3000});
+        const message = this.translate.instant('viewProduct.errors.loadingFailed');
+        const action = this.translate.instant('viewProduct.errors.ok');
+        this.snackBar.open(message, action, {duration: 3000});
       }
     })
   }

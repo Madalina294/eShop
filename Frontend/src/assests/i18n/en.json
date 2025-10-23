@@ -158,6 +158,27 @@
       "retry": "Try Again"
     }
 },
+  "viewProduct": {
+    "loading": "Loading product...",
+    "details": {
+      "color": "Color:",
+      "dimensions": "Dimensions:",
+      "material": "Material:",
+      "weight": "Weight:",
+      "quantityAvailable": "Available quantity:",
+      "pieces": "pieces"
+    },
+    "actions": {
+      "addToCart": "Add to cart",
+      "outOfStock": "Out of stock",
+      "addToWishlist": "Add to wishlist"
+    },
+    "errors": {
+      "productIdNotFound": "Product ID not found!",
+      "loadingFailed": "Something went wrong while loading the product!",
+      "ok": "Ok"
+    }
+  },
   "welcome": {
     "title": "Welcome, {{firstName}} {{lastName}}!",
     "subtitle": "You are successfully logged in to your account.",

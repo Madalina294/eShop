@@ -158,6 +158,27 @@
       "retry": "Încearcă din nou"
     }
   },
+  "viewProduct": {
+    "loading": "Se încarcă produsul...",
+    "details": {
+      "color": "Culoare:",
+      "dimensions": "Dimensiuni:",
+      "material": "Material:",
+      "weight": "Greutate:",
+      "quantityAvailable": "Cantitate disponibilă:",
+      "pieces": "bucăți"
+    },
+    "actions": {
+      "addToCart": "Adaugă în coș",
+      "outOfStock": "Stoc epuizat",
+      "addToWishlist": "Adaugă la lista de dorințe"
+    },
+    "errors": {
+      "productIdNotFound": "ID-ul produsului nu a fost găsit!",
+      "loadingFailed": "Ceva nu a mers bine la încărcarea produsului!",
+      "ok": "Ok"
+    }
+  },
     "welcome": {
     "title": "Bine ai venit, {{firstName}} {{lastName}}!",
     "subtitle": "Te-ai autentificat cu succes în contul tău.",

@@ -46,14 +46,19 @@
           <!-- Color -->
           <div class="detail-section" *ngIf="product().color">
             <p class="detail-value">
-              <span class="detail-label">{{ "viewProduct.details.color" | translate }}</span> {{ product().color }}
+              <span class="detail-label">{{
+                "viewProduct.details.color" | translate
+              }}</span>
+              {{ product().color }}
             </p>
           </div>
 
           <!-- Dimensions -->
           <div class="detail-section" *ngIf="product().dimensions">
             <p class="detail-value">
-              <span class="detail-label">{{ "viewProduct.details.dimensions" | translate }}</span>
+              <span class="detail-label">{{
+                "viewProduct.details.dimensions" | translate
+              }}</span>
               {{ product().dimensions }}
             </p>
           </div>
@@ -61,7 +66,9 @@
           <!-- Material -->
           <div class="detail-section" *ngIf="product().material">
             <p class="detail-value">
-              <span class="detail-label">Material:</span>
+              <span class="detail-label">{{
+                "viewProduct.details.material" | translate
+              }}</span>
               {{ product().material }}
             </p>
           </div>
@@ -69,15 +76,21 @@
           <!-- Weight -->
           <div class="detail-section" *ngIf="product().weight">
             <p class="detail-value">
-              <span class="detail-label">Greutate:</span> {{ product().weight }}
+              <span class="detail-label">{{
+                "viewProduct.details.weight" | translate
+              }}</span>
+              {{ product().weight }}
             </p>
           </div>
 
           <!-- Quantity -->
           <div class="detail-section" *ngIf="product().quantity !== undefined">
             <p class="detail-value">
-              <span class="detail-label">Cantitate disponibilă:</span>
-              {{ product().quantity }} bucăți
+              <span class="detail-label">{{
+                "viewProduct.details.quantityAvailable" | translate
+              }}</span>
+              {{ product().quantity }}
+              {{ "viewProduct.details.pieces" | translate }}
             </p>
           </div>
         </div>
@@ -93,7 +106,11 @@
           [disabled]="product().quantity === 0"
         >
           <mat-icon>shopping_cart</mat-icon>
-          {{ product().quantity === 0 ? "Stoc epuizat" : "Adaugă în coș" }}
+          {{
+            product().quantity === 0
+              ? ("viewProduct.actions.outOfStock" | translate)
+              : ("viewProduct.actions.addToCart" | translate)
+          }}
         </button>
 
         <!-- Add to Wishlist Button -->
@@ -102,7 +119,7 @@
           color="accent"
           class="wishlist-btn"
           (click)="addToWishList(product().id)"
-          matTooltip="Adaugă la lista de dorințe"
+          [matTooltip]="'viewProduct.actions.addToWishlist' | translate"
         >
           <mat-icon class="heart-icon">favorite_border</mat-icon>
         </button>
