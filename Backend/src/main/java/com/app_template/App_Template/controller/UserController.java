@@ -2,19 +2,13 @@ package com.app_template.App_Template.controller;
 
 import java.util.List;
 
+import com.app_template.App_Template.dto.WishlistItemDto;
+import com.app_template.App_Template.service.wishlist.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.app_template.App_Template.auth.UpdateInfosRequest;
 import com.app_template.App_Template.auth.UpdatePasswordRequest;
@@ -47,6 +41,9 @@ public class UserController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private WishlistService wishlistService;
     
 
     @DeleteMapping("/delete/{userId}")
@@ -150,6 +147,77 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
+    }
+
+    @PostMapping("/wishlist/add/{productId}")
+    public ResponseEntity<?> addToWishlist(@PathVariable Long productId,
+                                           org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            WishlistItemDto result = wishlistService.addToWishlist(user.getId(), productId);
+            return ResponseEntity.ok(result);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error adding to wishlist: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/wishlist/remove/{productId}")
+    public ResponseEntity<?> removeFromWishlist(@PathVariable Long productId,
+                                                org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            wishlistService.removeFromWishlist(user.getId(), productId);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error removing from wishlist: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/wishlist")
+    public ResponseEntity<List<WishlistItemDto>> getUserWishlist(org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            List<WishlistItemDto> wishlist = wishlistService.getUserWishlist(user.getId());
+            return ResponseEntity.ok(wishlist);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/wishlist/check/{productId}")
+    public ResponseEntity<Boolean> isInWishlist(@PathVariable Long productId,
+                                                org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            boolean isInWishlist = wishlistService.isInWishlist(user.getId(), productId);
+            return ResponseEntity.ok(isInWishlist);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

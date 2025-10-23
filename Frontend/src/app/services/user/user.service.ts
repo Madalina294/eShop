@@ -81,6 +81,30 @@ export class UserService {
     })
   }
 
+  addToWishlist(productId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/wishlist/add/${productId}`, {}, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  removeFromWishlist(productId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/wishlist/remove/${productId}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getUserWishlist(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/wishlist`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  checkIfInWishlist(productId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/wishlist/check/${productId}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
   createAuthorizationHeader(): HttpHeaders{
     const token = StorageService.getToken();
     if (!token) {

@@ -25,6 +25,7 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 })
 export class ViewProductComponent implements OnInit{
   loading = signal(false);
+  isInWishlist = signal(false);
   product = signal<ProductData> ({
     id: 0,
     name: '',
@@ -52,12 +53,12 @@ export class ViewProductComponent implements OnInit{
   loadProductData(){
     this.loading.set(true);
     const productId = this.route.snapshot.queryParams['id'];
-    
+
     console.log('=== DEBUG: ViewProductComponent ===');
     console.log('Query params:', this.route.snapshot.queryParams);
     console.log('Product ID:', productId);
     console.log('=== END DEBUG ===');
-    
+
     if (!productId) {
       this.loading.set(false);
       const message = this.translate.instant('viewProduct.errors.productIdNotFound');
@@ -66,11 +67,13 @@ export class ViewProductComponent implements OnInit{
       this.router.navigate(['/user/all-products']);
       return;
     }
-    
+
     this.userService.getProduct(productId).subscribe({
       next: value => {
         this.loading.set(false);
         this.product.set(value);
+
+        this.checkWishlistStatus(productId);
       },
       error: err => {
         this.loading.set(false);
@@ -80,6 +83,18 @@ export class ViewProductComponent implements OnInit{
         this.snackBar.open(message, action, {duration: 3000});
       }
     })
+  }
+
+  checkWishlistStatus(productId: number) {
+    this.userService.checkIfInWishlist(productId).subscribe({
+      next: (isInWishlist: boolean) => {
+        this.isInWishlist.set(isInWishlist);
+      },
+      error: (err) => {
+        console.error('Error checking wishlist status:', err);
+        this.isInWishlist.set(false);
+      }
+    });
   }
 
   getProductImage(product: ProductData): string {
@@ -97,6 +112,38 @@ export class ViewProductComponent implements OnInit{
     // TODO: implement the logic of adding a product to the Cart
   }
   addToWishList(productId: number){
-    // TODO: implement the logic of adding a product to the WishList
+    if (this.isInWishlist()) {
+      // Produsul este deja în wishlist, îl eliminăm
+      this.userService.removeFromWishlist(productId).subscribe({
+        next: () => {
+          this.isInWishlist.set(false);
+          const message = this.translate.instant('viewProduct.wishlist.removed');
+          const action = this.translate.instant('viewProduct.errors.ok');
+          this.snackBar.open(message, action, {duration: 3000});
+        },
+        error: (err) => {
+          console.error('Error removing from wishlist:', err);
+          const message = this.translate.instant('viewProduct.wishlist.removeError');
+          const action = this.translate.instant('viewProduct.errors.ok');
+          this.snackBar.open(message, action, {duration: 3000});
+        }
+      });
+    } else {
+      // Produsul nu este în wishlist, îl adăugăm
+      this.userService.addToWishlist(productId).subscribe({
+        next: () => {
+          this.isInWishlist.set(true);
+          const message = this.translate.instant('viewProduct.wishlist.added');
+          const action = this.translate.instant('viewProduct.errors.ok');
+          this.snackBar.open(message, action, {duration: 3000});
+        },
+        error: (err) => {
+          console.error('Error adding to wishlist:', err);
+          const message = this.translate.instant('viewProduct.wishlist.addError');
+          const action = this.translate.instant('viewProduct.errors.ok');
+          this.snackBar.open(message, action, {duration: 3000});
+        }
+      });
+    }
   }
 }
