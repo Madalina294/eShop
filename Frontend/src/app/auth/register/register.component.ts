@@ -137,7 +137,7 @@ export class RegisterComponent {
 
               this.message.success('Account created successfully! Welcome!', { nzDuration: 2000 });
               setTimeout(() => {
-                this.router.navigate(['welcome']);
+                this.router.navigate(['/user/all-products']);
               }, 1000);
             } else {
               this.isSpinning.set(false);
@@ -205,7 +205,7 @@ export class RegisterComponent {
 
           setTimeout(() => {
             this.isVerifying.set(false);
-            this.router.navigate(['welcome']);
+            this.router.navigate(['/user/all-products']);
           }, 1000);
         },
         error: (err) => {

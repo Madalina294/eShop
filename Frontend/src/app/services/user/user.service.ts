@@ -75,6 +75,12 @@ export class UserService {
     })
   }
 
+  getProduct(id: number): Observable<ProductData>{
+    return this.http.get<ProductData>(this.baseUrl + `/get-product/${id}`, {
+      headers: this.createAuthorizationHeader()
+    })
+  }
+
   createAuthorizationHeader(): HttpHeaders{
     const token = StorageService.getToken();
     if (!token) {

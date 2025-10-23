@@ -9,6 +9,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatPaginator, MatPaginatorIntl, PageEvent} from '@angular/material/paginator';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {MatList, MatListItem} from '@angular/material/list';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class CustomPaginatorIntl extends MatPaginatorIntl {
@@ -80,7 +81,8 @@ export class AllProductsComponent implements OnInit{
   constructor(
     private userService: UserService,
     private snackBar: MatSnackBar,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -119,8 +121,8 @@ export class AllProductsComponent implements OnInit{
       error: err => {
         this.loading.set(false);
         this.snackBar.open(
-          this.translate.instant('allProducts.loadError'), 
-          this.translate.instant('allProducts.ok'), 
+          this.translate.instant('allProducts.loadError'),
+          this.translate.instant('allProducts.ok'),
           {duration: 3000}
         );
       }
@@ -157,4 +159,11 @@ export class AllProductsComponent implements OnInit{
     return 'user.png';
   }
 
+  goToViewProduct(id: number) {
+    this.router.navigate(["/user/view-product"], {
+      queryParams: {
+        id: id
+      }
+    });
+  }
 }

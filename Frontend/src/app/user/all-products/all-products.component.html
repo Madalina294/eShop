@@ -32,7 +32,7 @@
         </mat-card-header>
         <mat-card-content>
           <mat-list>
-            <mat-list-item 
+            <mat-list-item
               class="category-item"
               [class.active]="selectedCategoryId() === null"
               (click)="onCategorySelect(null)"
@@ -40,7 +40,7 @@
               <mat-icon matListItemIcon>all_inclusive</mat-icon>
               <span matListItemTitle>{{ "allProducts.allCategories" | translate }}</span>
             </mat-list-item>
-            <mat-list-item 
+            <mat-list-item
               *ngFor="let category of categories()"
               class="category-item"
               [class.active]="selectedCategoryId() === category.id"
@@ -73,17 +73,18 @@
 
       <!-- Products Grid -->
       <div class="products-grid" *ngIf="products().length > 0">
-        <mat-card *ngFor="let product of products()" class="product-card">
+        <mat-card *ngFor="let product of products()" class="product-card"
+        (click) = "goToViewProduct(product.id)">
           <div class="product-image-container">
-            <img 
-              mat-card-image 
-              [src]="getProductImage(product)" 
+            <img
+              mat-card-image
+              [src]="getProductImage(product)"
               [alt]="product.name"
               class="product-image"
             >
           </div>
           <mat-card-content>
-            <h3 class="product-name">{{ product.name }}</h3>
+            <h3 class="product-name" >{{ product.name }}</h3>
             <div class="product-category">
               <mat-icon>label</mat-icon>
               <span>{{ getCategoryName(product.categoryId) }}</span>

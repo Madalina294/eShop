@@ -142,4 +142,14 @@ public class UserController {
         return ResponseEntity.ok(categoryService.getCategories());
     }
 
+    @GetMapping("/get-product/{id}")
+    public ResponseEntity<ProductDto> getProduct(@PathVariable(name = "id") Long id) {
+        try {
+            return new ResponseEntity<>(productService.getProduct(id), HttpStatus.OK);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+
+    }
+
 }

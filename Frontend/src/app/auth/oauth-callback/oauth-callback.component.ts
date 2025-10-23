@@ -72,10 +72,17 @@ export class OAuthCallbackComponent implements OnInit {
               StorageService.saveUser(userData);
               this.userStateService.setUser(userData);
 
-              // Navighează către welcome
+              console.log('=== DEBUG: OAuth Callback - User saved ===');
+              console.log('User data saved:', userData);
+              console.log('UserStateService user:', this.userStateService.user());
+              console.log('Is customer:', this.userStateService.isCustomer());
+              console.log('=== END DEBUG ===');
+
+              // Navighează către welcome cu un delay mai mare pentru a permite actualizarea
               setTimeout(() => {
-                this.router.navigate(['/all-products']);
-              }, 500);
+                console.log('=== DEBUG: Navigating to /user/all-products ===');
+                this.router.navigate(['/user/all-products']);
+              }, 1000);
             },
             error: (error) => {
               console.error('Error fetching OAuth user data:', error);
