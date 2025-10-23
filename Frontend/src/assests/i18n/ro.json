@@ -171,7 +171,14 @@
     "actions": {
       "addToCart": "Adaugă în coș",
       "outOfStock": "Stoc epuizat",
-      "addToWishlist": "Adaugă la lista de dorințe"
+      "addToWishlist": "Adaugă la lista de dorințe",
+      "removeFromWishlist": "Elimină din lista de dorințe"
+    },
+    "wishlist": {
+      "added": "Produs adăugat în lista de dorințe!",
+      "removed": "Produs eliminat din lista de dorințe!",
+      "addError": "Eroare la adăugarea în lista de dorințe!",
+      "removeError": "Eroare la eliminarea din lista de dorințe!"
     },
     "errors": {
       "productIdNotFound": "ID-ul produsului nu a fost găsit!",
@@ -549,6 +556,30 @@
       "firstPage": "Prima pagină",
       "lastPage": "Ultima pagină",
       "ofLabel": "din"
+    }
+  },
+  "wishlist": {
+    "title": "Lista de Dorințe",
+    "subtitle": "Produsele tale favorite",
+    "loading": "Se încarcă lista de dorințe...",
+    "showing": "Afișând",
+    "item": "produs",
+    "items": "produse",
+    "addedOn": "Adăugat pe",
+    "viewProduct": "Vezi Produsul",
+    "addToCart": "Adaugă în Coș",
+    "addToCartSuccess": "Produs adăugat în coș!",
+    "removeFromWishlist": "Elimină din lista de dorințe",
+    "removed": "Produs eliminat din lista de dorințe!",
+    "removeError": "Eroare la eliminarea din lista de dorințe!",
+    "empty": {
+      "title": "Lista ta de dorințe este goală",
+      "message": "Nu ai încă produse în lista de dorințe. Explorează produsele noastre și adaugă-ți favoritele!",
+      "browseProducts": "Explorează Produsele"
+    },
+    "errors": {
+      "loadingFailed": "Ceva nu a mers bine la încărcarea listei de dorințe!",
+      "ok": "Ok"
     }
   }
 }

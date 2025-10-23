@@ -171,7 +171,14 @@
     "actions": {
       "addToCart": "Add to cart",
       "outOfStock": "Out of stock",
-      "addToWishlist": "Add to wishlist"
+      "addToWishlist": "Add to wishlist",
+      "removeFromWishlist": "Remove from wishlist"
+    },
+    "wishlist": {
+      "added": "Product added to wishlist!",
+      "removed": "Product removed from wishlist!",
+      "addError": "Error adding to wishlist!",
+      "removeError": "Error removing from wishlist!"
     },
     "errors": {
       "productIdNotFound": "Product ID not found!",
@@ -550,6 +557,30 @@
       "firstPage": "First page",
       "lastPage": "Last page",
       "ofLabel": "of"
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "subtitle": "Your favorite products",
+    "loading": "Loading wishlist...",
+    "showing": "Showing",
+    "item": "item",
+    "items": "items",
+    "addedOn": "Added on",
+    "viewProduct": "View Product",
+    "addToCart": "Add to Cart",
+    "addToCartSuccess": "Product added to cart!",
+    "removeFromWishlist": "Remove from wishlist",
+    "removed": "Product removed from wishlist!",
+    "removeError": "Error removing from wishlist!",
+    "empty": {
+      "title": "Your wishlist is empty",
+      "message": "You don't have any products in your wishlist yet. Browse our products and add your favorites!",
+      "browseProducts": "Browse Products"
+    },
+    "errors": {
+      "loadingFailed": "Something went wrong while loading the wishlist!",
+      "ok": "Ok"
     }
   }
 }
