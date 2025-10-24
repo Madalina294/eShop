@@ -1,8 +1,10 @@
 package com.app_template.App_Template.controller;
 
 import java.util.List;
+import java.util.Map;
 
-import com.app_template.App_Template.dto.WishlistItemDto;
+import com.app_template.App_Template.dto.*;
+import com.app_template.App_Template.service.cart.CartService;
 import com.app_template.App_Template.service.wishlist.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.app_template.App_Template.auth.UpdateInfosRequest;
 import com.app_template.App_Template.auth.UpdatePasswordRequest;
-import com.app_template.App_Template.dto.CategoryDto;
-import com.app_template.App_Template.dto.ProductDto;
-import com.app_template.App_Template.dto.UserDto;
 import com.app_template.App_Template.entity.User;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.admin.category.CategoryService;
@@ -44,7 +43,9 @@ public class UserController {
 
     @Autowired
     private WishlistService wishlistService;
-    
+
+    @Autowired
+    private CartService cartService;
 
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<?> delete(@PathVariable("userId") Long userId, 
@@ -149,6 +150,8 @@ public class UserController {
 
     }
 
+    // wishlist endpoits
+
     @PostMapping("/wishlist/add/{productId}")
     public ResponseEntity<?> addToWishlist(@PathVariable Long productId,
                                            org.springframework.security.core.Authentication authentication) {
@@ -217,6 +220,104 @@ public class UserController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Cart endpoints
+    @PostMapping("/cart/add/{productId}")
+    public ResponseEntity<?> addToCart(@PathVariable Long productId,
+                                       @RequestBody Map<String, Integer> request,
+                                       org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            Integer quantity = request.getOrDefault("quantity", 1);
+            CartItemDto result = cartService.addToCart(user.getId(), productId, quantity);
+            return ResponseEntity.ok(result);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error adding to cart: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/cart/remove/{productId}")
+    public ResponseEntity<?> removeFromCart(@PathVariable Long productId,
+                                            org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            cartService.removeFromCart(user.getId(), productId);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error removing from cart: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/cart")
+    public ResponseEntity<List<CartItemDto>> getUserCart(org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            List<CartItemDto> cart = cartService.getUserCart(user.getId());
+            return ResponseEntity.ok(cart);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/cart/update/{productId}")
+    public ResponseEntity<?> updateCartItemQuantity(@PathVariable Long productId,
+                                                    @RequestBody Map<String, Integer> request,
+                                                    org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            Integer quantity = request.get("quantity");
+            if (quantity == null) {
+                return ResponseEntity.badRequest().body("Quantity is required");
+            }
+
+            CartItemDto result = cartService.updateQuantity(user.getId(), productId, quantity);
+            return ResponseEntity.ok(result);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating cart item: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/cart/clear")
+    public ResponseEntity<?> clearCart(org.springframework.security.core.Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            cartService.clearCart(user.getId());
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error clearing cart: " + e.getMessage());
         }
     }
 
