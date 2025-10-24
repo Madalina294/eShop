@@ -228,11 +228,12 @@ mat-card-content {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
+    padding: 3px;
 
     mat-icon {
-      font-size: 18px;
+      font-size: 17px;
     }
   }
 
