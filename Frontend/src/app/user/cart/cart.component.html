@@ -1,0 +1,181 @@
+<div class="cart-container">
+  <!-- Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>shopping_cart</mat-icon>
+      </div>
+      <mat-card-title>{{ "cart.title" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+          "cart.subtitle" | translate
+        }}</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>{{ "cart.loading" | translate }}</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading()" class="content-wrapper">
+    <!-- Cart Info -->
+    <div class="cart-info" *ngIf="cartItems().length > 0">
+      {{ "cart.showing" | translate }}
+      {{ cartItems().length }}
+      {{
+        cartItems().length === 1
+          ? ("cart.item" | translate)
+          : ("cart.items" | translate)
+      }}
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div *ngIf="cartItems().length === 0" class="empty-cart">
+      <mat-icon>shopping_cart</mat-icon>
+      <h3>{{ "cart.empty.title" | translate }}</h3>
+      <p>{{ "cart.empty.message" | translate }}</p>
+      <button mat-raised-button color="primary" (click)="goToAllProducts()">
+        <mat-icon>shopping_cart</mat-icon>
+        {{ "cart.empty.browseProducts" | translate }}
+      </button>
+    </div>
+
+    <!-- Cart Items -->
+    <div class="cart-items" *ngIf="cartItems().length > 0">
+      <mat-card *ngFor="let item of cartItems()" class="cart-item-card">
+        <!-- Product Image -->
+        <div class="product-image-container">
+          <img
+            mat-card-image
+            [src]="getProductImage(item)"
+            [alt]="item.productName"
+            class="product-image"
+            (click)="goToViewProduct(item.productId)"
+          />
+        </div>
+
+        <!-- Product Content -->
+        <mat-card-content class="product-content">
+          <h3 class="product-name" (click)="goToViewProduct(item.productId)">
+            {{ item.productName }}
+          </h3>
+
+          <div class="product-price">
+            {{ item.productPrice | currency : "RON" : "symbol" : "1.2-2" }}
+          </div>
+
+          <!-- Quantity Controls -->
+          <div class="quantity-controls">
+            <label>{{ "cart.quantity" | translate }}:</label>
+            <div class="quantity-input-group">
+              <button
+                mat-icon-button
+                (click)="updateQuantity(item.productId, item.quantity - 1)"
+                [disabled]="item.quantity <= 1"
+                class="quantity-btn"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
+
+              <mat-form-field class="quantity-field">
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="item.quantity"
+                  (ngModelChange)="updateQuantity(item.productId, $event)"
+                  min="1"
+                  class="quantity-input"
+                />
+              </mat-form-field>
+
+              <button
+                mat-icon-button
+                (click)="updateQuantity(item.productId, item.quantity + 1)"
+                class="quantity-btn"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Item Total -->
+          <div class="item-total">
+            {{ "cart.itemTotal" | translate }}:
+            {{ (item.productPrice * item.quantity) | currency : "RON" : "symbol" : "1.2-2" }}
+          </div>
+        </mat-card-content>
+
+        <!-- Action Buttons -->
+        <mat-card-actions class="card-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            class="view-product-btn"
+            (click)="goToViewProduct(item.productId)"
+          >
+            <mat-icon>visibility</mat-icon>
+            {{ "cart.viewProduct" | translate }}
+          </button>
+
+          <button
+            mat-stroked-button
+            color="warn"
+            class="remove-from-cart-btn"
+            (click)="removeFromCart(item.productId, $event)"
+          >
+            <mat-icon>delete</mat-icon>
+            {{ "cart.remove" | translate }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary" *ngIf="cartItems().length > 0">
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-card-title>{{ "cart.summary" | translate }}</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="summary-row">
+            <span>{{ "cart.totalItems" | translate }}:</span>
+            <span>{{ totalProducts(cartItems()) }}</span>
+          </div>
+
+          <div class="summary-row total-row">
+            <span>{{ "cart.totalPrice" | translate }}:</span>
+            <span class="total-price">{{ totalPrice() | currency : "RON" : "symbol" : "1.2-2" }}</span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions class="summary-actions">
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="clearCart()"
+            class="clear-cart-btn"
+          >
+            <mat-icon>clear_all</mat-icon>
+            {{ "cart.clearCart" | translate }}
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="proceedToCheckout()"
+            class="checkout-btn"
+          >
+            <mat-icon>payment</mat-icon>
+            {{ "cart.proceedToCheckout" | translate }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

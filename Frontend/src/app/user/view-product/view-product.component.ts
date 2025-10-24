@@ -7,8 +7,11 @@ import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 import {CommonModule} from '@angular/common';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-view-product',
@@ -18,7 +21,10 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    TranslateModule
+    MatFormFieldModule,
+    MatInputModule,
+    TranslateModule,
+    FormsModule
   ],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.scss'
@@ -26,6 +32,7 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 export class ViewProductComponent implements OnInit{
   loading = signal(false);
   isInWishlist = signal(false);
+  selectedQuantity = 1;
   product = signal<ProductData> ({
     id: 0,
     name: '',
@@ -108,9 +115,46 @@ export class ViewProductComponent implements OnInit{
     return 'user.png';
   }
 
-  addToCart(productId: number){
-    // TODO: implement the logic of adding a product to the Cart
+  addToCart(productId: number, quantity: number = this.selectedQuantity) {
+    if (quantity <= 0) {
+      const message = this.translate.instant('cart.invalidQuantity');
+      const action = this.translate.instant('cart.errors.ok');
+      this.snackBar.open(message, action, {duration: 3000});
+      return;
+    }
+
+    if (quantity > this.product().quantity) {
+      const message = this.translate.instant('cart.quantityExceedsStock');
+      const action = this.translate.instant('cart.errors.ok');
+      this.snackBar.open(message, action, {duration: 3000});
+      return;
+    }
+
+    this.userService.addToCart(productId, quantity).subscribe({
+      next: () => {
+        const message = this.translate.instant('cart.addedToCart');
+        const action = this.translate.instant('cart.errors.ok');
+        this.snackBar.open(message, action, {duration: 3000});
+      },
+      error: (err) => {
+        console.error('Error adding to cart:', err);
+        const message = this.translate.instant('cart.addError');
+        const action = this.translate.instant('cart.errors.ok');
+        this.snackBar.open(message, action, {duration: 3000});
+      }
+    });
   }
+
+  updateQuantity(quantity: number) {
+    if (quantity < 1) {
+      this.selectedQuantity = 1;
+    } else if (quantity > this.product().quantity) {
+      this.selectedQuantity = this.product().quantity;
+    } else {
+      this.selectedQuantity = quantity;
+    }
+  }
+
   addToWishList(productId: number){
     if (this.isInWishlist()) {
       // Produsul este deja în wishlist, îl eliminăm

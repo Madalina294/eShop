@@ -6,7 +6,9 @@
         <mat-icon>shopping_cart</mat-icon>
       </div>
       <mat-card-title>{{ "allProducts.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ "allProducts.subtitle" | translate }}</mat-card-subtitle>
+      <mat-card-subtitle>{{
+        "allProducts.subtitle" | translate
+      }}</mat-card-subtitle>
     </mat-card-header>
   </mat-card>
 
@@ -38,7 +40,9 @@
               (click)="onCategorySelect(null)"
             >
               <mat-icon matListItemIcon>all_inclusive</mat-icon>
-              <span matListItemTitle>{{ "allProducts.allCategories" | translate }}</span>
+              <span matListItemTitle>{{
+                "allProducts.allCategories" | translate
+              }}</span>
             </mat-list-item>
             <mat-list-item
               *ngFor="let category of categories()"
@@ -73,18 +77,21 @@
 
       <!-- Products Grid -->
       <div class="products-grid" *ngIf="products().length > 0">
-        <mat-card *ngFor="let product of products()" class="product-card"
-        (click) = "goToViewProduct(product.id)">
+        <mat-card
+          *ngFor="let product of products()"
+          class="product-card"
+          (click)="goToViewProduct(product.id)"
+        >
           <div class="product-image-container">
             <img
               mat-card-image
               [src]="getProductImage(product)"
               [alt]="product.name"
               class="product-image"
-            >
+            />
           </div>
           <mat-card-content>
-            <h3 class="product-name" >{{ product.name }}</h3>
+            <h3 class="product-name">{{ product.name }}</h3>
             <div class="product-category">
               <mat-icon>label</mat-icon>
               <span>{{ getCategoryName(product.categoryId) }}</span>

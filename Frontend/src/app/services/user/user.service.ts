@@ -105,6 +105,42 @@ export class UserService {
     });
   }
 
+  // Cart methods
+  addToCart(productId: number, quantity: number = 1): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cart/add/${productId}`, { quantity }, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  removeFromCart(productId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/remove/${productId}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getUserCart(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/cart`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  updateCartItemQuantity(productId: number, quantity: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cart/update/${productId}`, { quantity }, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  clearCart(): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/clear`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  checkIfInCart(productId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/cart/check/${productId}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
   createAuthorizationHeader(): HttpHeaders{
     const token = StorageService.getToken();
     if (!token) {

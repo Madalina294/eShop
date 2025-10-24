@@ -97,6 +97,22 @@
       </mat-card-content>
 
       <mat-card-actions class="action-buttons">
+        <!-- Quantity Selection -->
+        <div class="quantity-section" *ngIf="product().quantity > 0">
+          <mat-form-field class="quantity-field">
+            <mat-label>{{ "viewProduct.quantity" | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="selectedQuantity"
+              (ngModelChange)="updateQuantity($event)"
+              min="1"
+              [max]="product().quantity"
+              class="quantity-input"
+            />
+          </mat-form-field>
+        </div>
+
         <!-- Add to Cart Button -->
         <button
           mat-raised-button
@@ -111,6 +127,7 @@
               ? ("viewProduct.actions.outOfStock" | translate)
               : ("viewProduct.actions.addToCart" | translate)
           }}
+          <span *ngIf="product().quantity > 0">({{ selectedQuantity }})</span>
         </button>
 
         <!-- Add to Wishlist Button -->

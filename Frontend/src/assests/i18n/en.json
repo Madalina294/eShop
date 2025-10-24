@@ -174,6 +174,7 @@
       "addToWishlist": "Add to wishlist",
       "removeFromWishlist": "Remove from wishlist"
     },
+    "quantity": "Quantity",
     "wishlist": {
       "added": "Product added to wishlist!",
       "removed": "Product removed from wishlist!",
@@ -549,6 +550,8 @@
     "products": "products",
     "noProductsFound": "No products found",
     "loadError": "Error loading products",
+    "viewProduct": "View Product",
+    "addToCart": "Add to Cart",
     "ok": "Ok",
     "paginator": {
       "itemsPerPage": "Items per page",
@@ -580,6 +583,43 @@
     },
     "errors": {
       "loadingFailed": "Something went wrong while loading the wishlist!",
+      "ok": "Ok"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "subtitle": "Items in your cart",
+    "loading": "Loading cart...",
+    "showing": "Showing",
+    "item": "item",
+    "items": "items",
+    "quantity": "Quantity",
+    "itemTotal": "Item total",
+    "totalItems": "Total items",
+    "totalPrice": "Total price",
+    "viewProduct": "View Product",
+    "remove": "Remove",
+    "clearCart": "Clear Cart",
+    "proceedToCheckout": "Proceed to Checkout",
+    "addedToCart": "Product added to cart!",
+    "removed": "Product removed from cart!",
+    "quantityUpdated": "Quantity updated!",
+    "cleared": "Cart cleared!",
+    "summary": "Summary",
+    "invalidQuantity": "Invalid quantity!",
+    "quantityExceedsStock": "Quantity exceeds available stock!",
+    "checkoutNotImplemented": "Checkout functionality is not yet implemented!",
+    "empty": {
+      "title": "Your cart is empty",
+      "message": "You don't have any products in your cart yet. Browse our products and add your favorites!",
+      "browseProducts": "Browse Products"
+    },
+    "errors": {
+      "loadingFailed": "Something went wrong while loading the cart!",
+      "addError": "Error adding to cart!",
+      "removeError": "Error removing from cart!",
+      "updateError": "Error updating quantity!",
+      "clearError": "Error clearing cart!",
       "ok": "Ok"
     }
   }
