@@ -241,3 +241,15 @@
     }
   }
 }
+
+::ng-deep .dark-mode {
+  .cart-info{
+    background: #1f1f1f;
+    color: white;
+  }
+
+  .summary-card{
+    background: #1f1f1f !important;
+    color: white;
+  }
+}

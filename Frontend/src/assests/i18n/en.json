@@ -597,6 +597,11 @@
     "itemTotal": "Item total",
     "totalItems": "Total items",
     "totalPrice": "Total price",
+    "selectQuantity": "Select Quantity",
+    "maxAvailable": "Available stock",
+    "enterQuantity": "Enter desired quantity",
+    "addToCart": "Add to Cart",
+    "cancel": "Cancel",
     "viewProduct": "View Product",
     "remove": "Remove",
     "clearCart": "Clear Cart",
@@ -620,6 +625,7 @@
       "removeError": "Error removing from cart!",
       "updateError": "Error updating quantity!",
       "clearError": "Error clearing cart!",
+      "productNotFound": "Product not found!",
       "ok": "Ok"
     }
   }

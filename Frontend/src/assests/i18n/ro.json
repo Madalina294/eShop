@@ -596,6 +596,11 @@
     "itemTotal": "Total produs",
     "totalItems": "Total produse",
     "totalPrice": "Preț total",
+    "selectQuantity": "Selectează Cantitatea",
+    "maxAvailable": "Stoc disponibil",
+    "enterQuantity": "Introdu cantitatea dorită",
+    "addToCart": "Adaugă în Coș",
+    "cancel": "Anulează",
     "viewProduct": "Vezi Produsul",
     "remove": "Elimină",
     "clearCart": "Golește Coșul",
@@ -619,6 +624,7 @@
       "removeError": "Eroare la eliminarea din coș!",
       "updateError": "Eroare la actualizarea cantității!",
       "clearError": "Eroare la golirea coșului!",
+      "productNotFound": "Produsul nu a fost găsit!",
       "ok": "Ok"
     }
   }

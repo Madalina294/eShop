@@ -7,8 +7,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatDialog} from '@angular/material/dialog';
 import {CommonModule} from '@angular/common';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {QuantityDialogComponent, QuantityDialogData} from '../../shared/quantity-dialog/quantity-dialog.component';
 
 @Component({
   selector: 'app-wishlist',
@@ -32,7 +34,8 @@ export class WishlistComponent implements OnInit{
     private userService: UserService,
     private snackBar: MatSnackBar,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -68,11 +71,11 @@ export class WishlistComponent implements OnInit{
 
   removeFromWishlist(productId: number, event: Event) {
     event.stopPropagation(); // Previne navigarea către produs când apesi pe buton
-    
+
     this.userService.removeFromWishlist(productId).subscribe({
       next: () => {
         // Actualizează lista locală prin eliminarea produsului
-        this.wishlistItems.update(items => 
+        this.wishlistItems.update(items =>
           items.filter(item => item.productId !== productId)
         );
         const message = this.translate.instant('wishlist.removed');
@@ -98,12 +101,53 @@ export class WishlistComponent implements OnInit{
     this.router.navigate(['/user/all-products']);
   }
 
-  addToCart(productId: number, event: Event) {
+  addToCartWithQuantity(productId: number, event: Event) {
     event.stopPropagation(); // Previne navigarea către produs când apesi pe buton
-    
-    // TODO: implement the logic of adding a product to the Cart
-    const message = this.translate.instant('wishlist.addToCartSuccess');
-    const action = this.translate.instant('wishlist.errors.ok');
-    this.snackBar.open(message, action, {duration: 3000});
+
+    // Găsește produsul pentru a obține numele și stocul
+    const product = this.wishlistItems().find(item => item.productId === productId);
+
+    if (!product) {
+      const message = this.translate.instant('cart.errors.productNotFound');
+      const action = this.translate.instant('cart.errors.ok');
+      this.snackBar.open(message, action, {duration: 3000});
+      return;
+    }
+
+    const dialogData: QuantityDialogData = {
+      productId: productId,
+      productName: product.productName,
+      maxQuantity: product.productQuantity || 99
+    };
+
+    const dialogRef = this.dialog.open(QuantityDialogComponent, {
+      width: '450px',
+      maxWidth: '90vw',
+      data: dialogData,
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.quantity > 0) {
+        this.addToCart(productId, result.quantity);
+      }
+    });
+  }
+
+  private addToCart(productId: number, quantity: number) {
+    this.userService.addToCart(productId, quantity).subscribe({
+      next: () => {
+        const message = this.translate.instant('cart.addedToCart');
+        const action = this.translate.instant('cart.errors.ok');
+        this.snackBar.open(message, action, {duration: 3000});
+      },
+      error: (err) => {
+        console.error('Error adding to cart:', err);
+        const message = this.translate.instant('cart.addError');
+        const action = this.translate.instant('cart.errors.ok');
+        this.snackBar.open(message, action, {duration: 3000});
+      }
+    });
   }
 }

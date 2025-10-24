@@ -176,11 +176,10 @@
 .action-buttons {
   display: flex;
   gap: 1rem;
-  padding: 1.5rem 1rem 1rem 1rem;
+  padding: 0.5rem 1rem 1rem 1rem;
   align-items: center;
   justify-content: flex-start;
   border-top: 1px solid #eee;
-  margin-top: 1rem;
   flex-wrap: wrap;
 }
 
@@ -189,10 +188,11 @@
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
-  
+  margin-top: 2rem;
+
   .quantity-field {
     width: 120px;
-    
+
     .quantity-input {
       text-align: center;
       font-weight: 600;

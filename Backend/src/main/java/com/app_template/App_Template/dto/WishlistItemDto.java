@@ -11,5 +11,6 @@ public class WishlistItemDto {
     private String productName;
     private double productPrice;
     private String productImage;
+    private int productQuantity;
     private LocalDateTime addedAt;
 }

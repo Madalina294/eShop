@@ -104,7 +104,7 @@
             mat-stroked-button
             color="accent"
             class="add-to-cart-btn"
-            (click)="addToCart(item.productId, $event)"
+            (click)="addToCartWithQuantity(item.productId, $event)"
           >
             <mat-icon>shopping_cart</mat-icon>
             {{ "wishlist.addToCart" | translate }}
