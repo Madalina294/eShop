@@ -41,6 +41,15 @@
         <input matInput [value]="user()?.email || ''" readonly />
       </mat-form-field>
 
+      <!-- Phone Number field -->
+      <mat-form-field appearance="outline">
+        <mat-label>{{ "profile.phoneNumber" | translate }}</mat-label>
+        <input matInput formControlName="phoneNumber" type="tel" />
+        <mat-error *ngIf="updateForm.get('phoneNumber')?.hasError('pattern')">
+          {{ "profile.phoneInvalid" | translate }}
+        </mat-error>
+      </mat-form-field>
+
       <!-- 2FA checkbox - NU afișa pentru utilizatorii Google (Google are deja 2FA) -->
       <mat-checkbox formControlName="mfaEnabled" *ngIf="!isGoogleUser()">
         {{ "profile.enable2FA" | translate }}

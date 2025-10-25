@@ -6,6 +6,7 @@ export interface UserState {
   firstname: string;
   lastname: string;
   email: string;
+  phoneNumber?: string;
   role: string;
   image: string | null;
   preferredTheme: string | "dark";

@@ -37,6 +37,7 @@ public class User implements UserDetails {
     private String firstname;
     private String lastname;
     private String email;
+    private String phoneNumber;
     private String password;
     private String imageUrl;
     private String googleId;
@@ -54,6 +55,7 @@ public class User implements UserDetails {
         userDto.setFirstName(firstname);
         userDto.setLastName(lastname);
         userDto.setEmail(email);
+        userDto.setPhoneNumber(phoneNumber);
         userDto.setCreatedAt(createdAt);
         userDto.setImageUrl(imageUrl);
         userDto.setPreferredTheme(preferredTheme);
@@ -99,5 +101,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    // Convenience methods pentru Order
+    public String getFullName() {
+        return firstname + " " + lastname;
     }
 }

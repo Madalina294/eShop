@@ -87,6 +87,7 @@ public class AuthenticationService {
                 .firstname(registerRequest.getFirstname())
                 .lastname(registerRequest.getLastname())
                 .email(registerRequest.getEmail())
+                .phoneNumber(registerRequest.getPhoneNumber())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(registerRequest.getRole() != null ? registerRequest.getRole() : Role.USER)
                 .imageUrl(null)

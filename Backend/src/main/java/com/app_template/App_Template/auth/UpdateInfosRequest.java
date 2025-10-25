@@ -9,6 +9,7 @@ public class UpdateInfosRequest {
     private String firstName;
     private String lastName;
     private String email;
+    private String phoneNumber;
     private MultipartFile image;
     private boolean mfaEnabled;
 }

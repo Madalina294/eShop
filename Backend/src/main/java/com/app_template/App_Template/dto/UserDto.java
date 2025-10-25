@@ -10,6 +10,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
+    private String phoneNumber;
     private String imageUrl;
     private String googleId;
     private boolean mfaEnabled;

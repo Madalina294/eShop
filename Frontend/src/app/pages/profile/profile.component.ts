@@ -89,6 +89,7 @@ export class ProfileComponent implements OnInit {
       firstName: [''],
       lastName: [''],
       email: ['', Validators.email],
+      phoneNumber: ['', Validators.pattern(/^[0-9+\-\s()]+$/)],
       mfaEnabled: [false]
     });
 

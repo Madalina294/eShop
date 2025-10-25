@@ -3,6 +3,7 @@ export interface AuthenticationResponse{
   userFirstName: string;
   userLastName: string;
   userRole: string;
+  phoneNumber?: string;
   image?: string;
   preferredTheme?: string;
   preferredLanguage?: string;

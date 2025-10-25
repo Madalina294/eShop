@@ -71,6 +71,9 @@ public class UserServiceImpl implements UserService {
         // Update username
         presentUser.setFirstname(request.getFirstName());
         presentUser.setLastname(request.getLastName());
+        
+        // Update phone number
+        presentUser.setPhoneNumber(request.getPhoneNumber());
 
         // Update 2fa feature
         if(request.isMfaEnabled()){

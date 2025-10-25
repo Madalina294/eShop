@@ -84,6 +84,31 @@
           </nz-form-control>
         </nz-form-item>
 
+        <!-- Phone Number -->
+        <nz-form-item>
+          <nz-form-control
+            nzHasFeedback
+            [nzErrorTip]="phoneErrorTpl"
+            [nzValidateStatus]="registerForm.controls['phoneNumber']"
+          >
+            <input
+              nz-input
+              placeholder="{{ 'register.phoneNumber' | translate }}"
+              formControlName="phoneNumber"
+              type="tel"
+              class="form-input"
+            />
+            <ng-template #phoneErrorTpl let-control>
+              <ng-container *ngIf="control.hasError('required')">
+                {{ "register.phoneRequired" | translate }}
+              </ng-container>
+              <ng-container *ngIf="control.hasError('pattern')">
+                {{ "register.phoneInvalid" | translate }}
+              </ng-container>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+
         <!-- Password -->
         <nz-form-item>
           <nz-form-control
