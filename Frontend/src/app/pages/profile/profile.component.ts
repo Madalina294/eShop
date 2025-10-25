@@ -104,6 +104,7 @@ export class ProfileComponent implements OnInit {
           firstName: currentUser.firstname,
           lastName: currentUser.lastname,
           email: currentUser.email,
+          phoneNumber: currentUser.phoneNumber,
           mfaEnabled: currentUser.mfaEnabled
         });
       }
@@ -207,6 +208,7 @@ export class ProfileComponent implements OnInit {
     updateData.append('firstName', formData.firstName);
     updateData.append('lastName', formData.lastName);
     updateData.append('email', formData.email);
+    updateData.append('phoneNumber', formData.phoneNumber)
     updateData.append('mfaEnabled', currentUser.googleId ? "false" : formData.mfaEnabled.toString());
 
     // Append image only if selected
@@ -234,6 +236,7 @@ export class ProfileComponent implements OnInit {
           lastname: response.lastname || formData.lastName,
           email: response.email || formData.email,
           image: finalImage,
+          phoneNumber: response.phoneNumber,
           mfaEnabled: response.mfaEnabled ?? formData.mfaEnabled
         });
 

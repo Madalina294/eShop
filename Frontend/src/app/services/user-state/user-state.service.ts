@@ -57,6 +57,7 @@ export class UserStateService {
         email: userData.email,
         role: userData.role,
         image: userData.image,
+        phoneNumber: userData.phoneNumber,
         preferredTheme: userData.preferredTheme,
         preferredLanguage: userData.preferredLanguage,
         mfaEnabled: userData.mfaEnabled || false,

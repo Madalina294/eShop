@@ -19,6 +19,7 @@ public class AuthenticationResponse {
     private String userLastName;
     private Role userRole;
     private String image;
+    private String phoneNumber;
     private String preferredTheme;
     private String preferredLanguage;
     private String googleId;
