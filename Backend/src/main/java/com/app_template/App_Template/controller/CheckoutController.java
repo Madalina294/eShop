@@ -1,16 +1,29 @@
 package com.app_template.App_Template.controller;
 
-import com.app_template.App_Template.dto.*;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.app_template.App_Template.dto.CreateOrderRequest;
+import com.app_template.App_Template.dto.OrderDto;
+import com.app_template.App_Template.dto.OrderResponse;
+import com.app_template.App_Template.dto.PaymentIntentResponse;
 import com.app_template.App_Template.entity.Order;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.cart.CartService;
 import com.app_template.App_Template.service.order.OrderService;
 import com.app_template.App_Template.service.stripe.StripeService;
 import com.stripe.model.PaymentIntent;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/checkout")
@@ -24,7 +37,7 @@ public class CheckoutController {
 
     @PostMapping("/create-payment-intent")
     public ResponseEntity<PaymentIntentResponse> createPaymentIntent(
-            @RequestBody CheckoutRequest request,
+            @RequestBody Map<String, Object> request,
             Authentication authentication) {
 
         try {
@@ -40,6 +53,8 @@ public class CheckoutController {
                     paymentIntent.getClientSecret()
             ));
         } catch (Exception e) {
+            System.err.println("Error creating payment intent: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
@@ -67,9 +82,14 @@ public class CheckoutController {
     public ResponseEntity<?> getUserOrders(Authentication authentication) {
         try {
             Long userId = getCurrentUserId(authentication);
-            return ResponseEntity.ok(orderService.getUserOrders(userId));
+            System.out.println("Getting orders for user " + userId);
+            List<OrderDto> orders = orderService.getUserOrders(userId);
+            System.out.println("Found " + orders.size() + " orders for user " + userId);
+            return ResponseEntity.ok(orders);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            System.err.println("Error getting user orders: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error retrieving orders: " + e.getMessage());
         }
     }
 
@@ -77,9 +97,22 @@ public class CheckoutController {
     public ResponseEntity<?> getOrder(@PathVariable Long orderId, Authentication authentication) {
         try {
             Long userId = getCurrentUserId(authentication);
-            return ResponseEntity.ok(orderService.getOrderById(orderId));
+            System.out.println("Getting order " + orderId + " for user " + userId);
+            
+            OrderDto order = orderService.getOrderById(orderId);
+            System.out.println("Order found: " + order.getId() + " for user " + order.getUserId());
+            
+            // Verifică dacă comanda aparține utilizatorului curent
+            if (order.getUserId().equals(userId)) {
+                return ResponseEntity.ok(order);
+            } else {
+                System.out.println("Access denied: Order " + orderId + " belongs to user " + order.getUserId() + " but current user is " + userId);
+                return ResponseEntity.status(403).body("Access denied: Order does not belong to current user");
+            }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            System.err.println("Error getting order: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error retrieving order: " + e.getMessage());
         }
     }
 

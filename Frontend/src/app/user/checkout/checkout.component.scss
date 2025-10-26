@@ -146,3 +146,27 @@
   text-align: center;
   padding: 50px;
 }
+
+// Stripe Elements styling
+.stripe-payment {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
+
+  #card-element {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 10px;
+  }
+
+  #card-errors {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    min-height: 20px;
+  }
+}

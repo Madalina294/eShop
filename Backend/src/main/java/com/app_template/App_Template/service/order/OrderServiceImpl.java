@@ -1,18 +1,28 @@
 package com.app_template.App_Template.service.order;
 
-import com.app_template.App_Template.dto.CreateOrderRequest;
-import com.app_template.App_Template.dto.OrderDto;
-import com.app_template.App_Template.dto.OrderItemDto;
-import com.app_template.App_Template.entity.*;
-import com.app_template.App_Template.enums.OrderStatus;
-import com.app_template.App_Template.repository.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app_template.App_Template.dto.CreateOrderRequest;
+import com.app_template.App_Template.dto.OrderDto;
+import com.app_template.App_Template.dto.OrderItemDto;
+import com.app_template.App_Template.entity.CartItem;
+import com.app_template.App_Template.entity.Order;
+import com.app_template.App_Template.entity.OrderItem;
+import com.app_template.App_Template.entity.Product;
+import com.app_template.App_Template.entity.User;
+import com.app_template.App_Template.enums.OrderStatus;
+import com.app_template.App_Template.repository.CartRepository;
+import com.app_template.App_Template.repository.OrderItemRepository;
+import com.app_template.App_Template.repository.OrderRepository;
+import com.app_template.App_Template.repository.ProductRepository;
+import com.app_template.App_Template.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +86,14 @@ public class OrderServiceImpl implements OrderService{
     public OrderDto getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        return convertToDto(order);    }
+        
+        // Încarcă OrderItems explicit
+        if (order.getOrderItems() != null) {
+            order.getOrderItems().size(); // Forțează încărcarea
+        }
+        
+        return convertToDto(order);
+    }
 
     @Override
     public List<OrderDto> getUserOrders(Long userId) {

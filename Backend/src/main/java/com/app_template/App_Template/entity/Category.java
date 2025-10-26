@@ -1,7 +1,13 @@
 package com.app_template.App_Template.entity;
 
 import com.app_template.App_Template.dto.CategoryDto;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
@@ -14,7 +20,7 @@ public class Category {
 
     private String name;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     public CategoryDto getCategoryDto() {

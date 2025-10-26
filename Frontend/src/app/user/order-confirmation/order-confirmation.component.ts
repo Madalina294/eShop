@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { CheckoutService } from '../../services/checkout/checkout.service';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-order-confirmation',
@@ -14,7 +15,8 @@ import { CheckoutService } from '../../services/checkout/checkout.service';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    TranslateModule
+    TranslateModule,
+    MatProgressSpinner
   ],
   templateUrl: './order-confirmation.component.html',
   styleUrl: './order-confirmation.component.scss'

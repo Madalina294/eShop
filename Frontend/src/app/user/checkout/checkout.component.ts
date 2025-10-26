@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -33,12 +33,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, AfterViewInit {
   checkoutForm!: FormGroup;
   cartItems = signal<any[]>([]);
   loading = signal(false);
   processing = signal(false);
   stripeInitialized = signal(false);
+  
+  @ViewChild('cardElement', { static: false }) cardElementRef!: ElementRef;
 
   // Computed pentru calcule
   subtotal = computed(() => {
@@ -74,6 +76,20 @@ export class CheckoutComponent implements OnInit {
   ngOnInit() {
     this.loadCartItems();
     this.initializeStripe();
+    
+    // Ascultă schimbările în metoda de plată
+    this.checkoutForm.get('paymentMethod')?.valueChanges.subscribe(value => {
+      if (value === 'CARD_ONLINE' && this.stripeInitialized()) {
+        // Folosește requestAnimationFrame pentru a se asigura că DOM-ul este gata
+        requestAnimationFrame(() => {
+          this.setupStripeCardElement();
+        });
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    // ViewChild este disponibil aici
   }
 
   private initializeForm() {
@@ -108,6 +124,47 @@ export class CheckoutComponent implements OnInit {
       this.stripeInitialized.set(true);
     } catch (error) {
       console.error('Error initializing Stripe:', error);
+    }
+  }
+
+  private setupStripeCardElement() {
+    // Verifică dacă elementul există deja
+    const existingElement = document.querySelector('#card-element .StripeElement');
+    if (existingElement) {
+      existingElement.remove();
+    }
+    
+    const cardElement = this.stripeService.createCardElement();
+    
+    if (cardElement) {
+      const cardElementDiv = this.cardElementRef?.nativeElement;
+      
+      if (cardElementDiv) {
+        // Golește complet containerul
+        cardElementDiv.innerHTML = '';
+        
+        try {
+          cardElement.mount(cardElementDiv);
+          
+          // Adaugă event listeners pentru erori
+          cardElement.on('change', (event) => {
+            const displayError = document.getElementById('card-errors');
+            if (displayError) {
+              if (event.error) {
+                displayError.textContent = event.error.message;
+              } else {
+                displayError.textContent = '';
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error mounting card element:', error);
+        }
+      } else {
+        console.error('Card element div not found');
+      }
+    } else {
+      console.error('Failed to create card element');
     }
   }
 

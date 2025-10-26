@@ -11,25 +11,43 @@ export class StripeService {
   private cardElement: StripeCardElement | null = null;
 
   async initializeStripe(): Promise<void> {
-    this.stripe = await loadStripe(environment.stripePublishableKey);
-    if (this.stripe) {
-      this.elements = this.stripe.elements();
+    if (!environment.stripePublishableKey || environment.stripePublishableKey.length < 10) {
+      console.error('Invalid Stripe publishable key');
+      return;
+    }
+    
+    try {
+      this.stripe = await loadStripe(environment.stripePublishableKey);
+      
+      if (this.stripe) {
+        this.elements = this.stripe.elements();
+      } else {
+        console.error('Failed to load Stripe');
+      }
+    } catch (error) {
+      console.error('Error loading Stripe:', error);
     }
   }
 
   createCardElement(): StripeCardElement | null {
     if (this.elements) {
-      this.cardElement = this.elements.create('card', {
-        style: {
-          base: {
-            fontSize: '16px',
-            color: '#424770',
-            '::placeholder': {
-              color: '#aab7c4',
+      try {
+        this.cardElement = this.elements.create('card', {
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': {
+                color: '#aab7c4',
+              },
             },
           },
-        },
-      });
+        });
+      } catch (error) {
+        console.error('Error creating card element:', error);
+      }
+    } else {
+      console.error('Stripe elements not available');
     }
     return this.cardElement;
   }

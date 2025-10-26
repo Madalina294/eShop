@@ -49,6 +49,7 @@ public class SecurityConfigurations {
                                 "/api/auth/**",
                                  "/uploads/**"
                         ).permitAll()
+                        .requestMatchers("/api/checkout/**").authenticated()
                         .requestMatchers("/login/oauth2/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/api/admin/**").hasAnyRole(ADMIN.name())
