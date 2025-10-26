@@ -161,10 +161,7 @@ export class CartComponent implements OnInit{
   }
 
   proceedToCheckout() {
-    // TODO: Implement checkout functionality
-    const message = this.translate.instant('cart.checkoutNotImplemented');
-    const action = this.translate.instant('cart.errors.ok');
-    this.snackBar.open(message, action, {duration: 3000});
+    this.router.navigate(['/user/checkout']);
   }
 
   totalProducts(cartItems: any[]) {

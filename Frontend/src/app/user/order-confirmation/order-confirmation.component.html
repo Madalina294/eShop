@@ -1,0 +1,159 @@
+<div class="confirmation-container">
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>{{ "checkout.loading" | translate }}</p>
+  </div>
+
+  <!-- Order Confirmation -->
+  <div *ngIf="!loading() && order" class="confirmation-content">
+    <!-- Success Header -->
+    <mat-card class="success-card">
+      <mat-card-content class="success-content">
+        <div class="success-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <h1>{{ "checkout.orderConfirmed" | translate }}</h1>
+        <p class="success-message">
+          {{ "checkout.orderSuccessMessage" | translate }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Order Details -->
+    <mat-card class="order-details-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>receipt</mat-icon>
+          {{ "checkout.orderDetails" | translate }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="order-info">
+          <div class="info-row">
+            <span class="label">{{ "checkout.orderNumber" | translate }}:</span>
+            <span class="value">#{{ order.id }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ "checkout.status" | translate }}:</span>
+            <span
+              class="value status"
+              [class]="'status-' + order.status.toLowerCase()"
+            >
+              {{ order.status }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ "checkout.orderDate" | translate }}:</span>
+            <span class="value">{{ order.orderDate | date : "medium" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label"
+              >{{ "checkout.paymentMethod" | translate }}:</span
+            >
+            <span class="value">{{ order.paymentMethod }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label"
+              >{{ "checkout.shippingMethod" | translate }}:</span
+            >
+            <span class="value">{{ order.shippingMethod }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ "checkout.total" | translate }}:</span>
+            <span class="value total-amount">{{
+              order.totalAmount | currency : "RON"
+            }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Shipping Address -->
+    <mat-card class="shipping-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>local_shipping</mat-icon>
+          {{ "checkout.shippingAddress" | translate }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="address-content">
+          <p>
+            <strong>{{ order.customerName }}</strong>
+          </p>
+          <p>{{ order.customerPhone }}</p>
+          <p>{{ order.customerEmail }}</p>
+          <p class="address">{{ order.shippingAddress }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Order Items -->
+    <mat-card
+      class="items-card"
+      *ngIf="order.orderItems && order.orderItems.length > 0"
+    >
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_bag</mat-icon>
+          {{ "checkout.orderItems" | translate }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="order-items">
+          <div *ngFor="let item of order.orderItems" class="order-item">
+            <img
+              [src]="item.productImage"
+              [alt]="item.productName"
+              class="product-image"
+            />
+            <div class="item-details">
+              <h4>{{ item.productName }}</h4>
+              <p class="quantity">
+                {{ "checkout.quantity" | translate }}: {{ item.quantity }}
+              </p>
+              <p class="unit-price">
+                {{ "checkout.unitPrice" | translate }}:
+                {{ item.unitPrice | currency : "RON" }}
+              </p>
+            </div>
+            <div class="item-total">
+              {{ item.totalPrice | currency : "RON" }}
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button mat-button (click)="continueShopping()" class="continue-btn">
+        <mat-icon>shopping_cart</mat-icon>
+        {{ "checkout.continueShopping" | translate }}
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="viewOrder()"
+        class="view-order-btn"
+      >
+        <mat-icon>visibility</mat-icon>
+        {{ "checkout.viewOrder" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading() && !order" class="error-container">
+    <mat-icon>error</mat-icon>
+    <h3>{{ "checkout.orderNotFound" | translate }}</h3>
+    <p>{{ "checkout.orderNotFoundMessage" | translate }}</p>
+    <button mat-raised-button color="primary" (click)="continueShopping()">
+      {{ "checkout.continueShopping" | translate }}
+    </button>
+  </div>
+</div>

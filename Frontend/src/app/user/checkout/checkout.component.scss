@@ -1,0 +1,148 @@
+.checkout-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.checkout-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+
+  .back-button {
+    margin-right: 15px;
+  }
+
+  h1 {
+    margin: 0;
+    color: #1976d2;
+  }
+}
+
+.checkout-section {
+  margin-bottom: 20px;
+
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1976d2;
+    }
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.shipping-option, .payment-option {
+  margin-bottom: 15px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+
+  .option-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .price {
+      margin-left: auto;
+      font-weight: bold;
+      color: #1976d2;
+    }
+
+    small {
+      display: block;
+      color: #666;
+      margin-top: 5px;
+    }
+  }
+}
+
+.stripe-payment {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.order-items {
+  .order-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .item-details {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 5px 0;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+      }
+
+      .price {
+        font-weight: bold;
+        color: #1976d2;
+      }
+    }
+  }
+}
+
+.order-totals {
+  border-top: 2px solid #e0e0e0;
+  padding-top: 15px;
+
+  .total-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    &.total {
+      font-weight: bold;
+      font-size: 1.2em;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 10px;
+    }
+  }
+}
+
+.checkout-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+
+  button[type="submit"] {
+    min-width: 200px;
+  }
+}
+
+.loading-container {
+  text-align: center;
+  padding: 50px;
+}

@@ -5,6 +5,8 @@ import {userGuard} from '../auth/guard/user.guard';
 import {ViewProductComponent} from './view-product/view-product.component';
 import {WishlistComponent} from './wishlist/wishlist.component';
 import {CartComponent} from './cart/cart.component';
+import {CheckoutComponent} from './checkout/checkout.component';
+import {OrderConfirmationComponent} from './order-confirmation/order-confirmation.component';
 
 
 const routes: Routes = [
@@ -12,7 +14,9 @@ const routes: Routes = [
   {path: "all-products", component: AllProductsComponent, canActivate: [userGuard]},
   {path: "view-product", component: ViewProductComponent, canActivate: [userGuard]},
   {path: "wishlist", component: WishlistComponent, canActivate: [userGuard]},
-  {path: "cart", component: CartComponent, canActivate: [userGuard]}
+  {path: "cart", component: CartComponent, canActivate: [userGuard]},
+  {path: "checkout", component: CheckoutComponent, canActivate: [userGuard]},
+  {path: "order-confirmation/:id", component: OrderConfirmationComponent, canActivate: [userGuard]}
 
 ]
 @NgModule({
