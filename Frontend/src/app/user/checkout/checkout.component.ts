@@ -202,7 +202,8 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
 
   private async processCardPayment() {
     // Implementare pentru plată cu cardul
-    const clientSecret = await this.checkoutService.createPaymentIntent(this.totalAmount()).toPromise();
+    const shippingMethod = this.checkoutForm.get('shippingMethod')?.value;
+    const clientSecret = await this.checkoutService.createPaymentIntent(shippingMethod).toPromise();
 
     if (this.stripeService && clientSecret !== undefined) {
       const result = await this.stripeService.confirmPayment(clientSecret.clientSecret);

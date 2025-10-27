@@ -18,7 +18,7 @@ import com.app_template.App_Template.auth.ResetPasswordRequest;
 import com.app_template.App_Template.auth.VerificationRequest;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.auth.AuthenticationService;
-import com.app_template.App_Template.service.auth.EmailService;
+import com.app_template.App_Template.service.email.EmailService;
 import com.app_template.App_Template.tfa.TwoFactorAuthenticationService;
 
 import jakarta.persistence.EntityNotFoundException;

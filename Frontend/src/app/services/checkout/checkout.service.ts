@@ -15,8 +15,10 @@ export class CheckoutService {
 
   constructor(private http: HttpClient) {}
 
-  createPaymentIntent(amount: number): Observable<PaymentIntentResponse> {
-    return this.http.post<PaymentIntentResponse>(`${this.apiUrl}/create-payment-intent`, { amount }, {
+  createPaymentIntent(shippingMethod: string): Observable<PaymentIntentResponse> {
+    return this.http.post<PaymentIntentResponse>(`${this.apiUrl}/create-payment-intent`, { 
+      shippingMethod 
+    }, {
       headers: this.createAuthorizationHeader()
     });
   }
