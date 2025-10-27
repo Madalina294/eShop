@@ -17,6 +17,7 @@ import com.app_template.App_Template.dto.OrderDto;
 import com.app_template.App_Template.dto.OrderResponse;
 import com.app_template.App_Template.dto.PaymentIntentResponse;
 import com.app_template.App_Template.entity.Order;
+import com.app_template.App_Template.enums.ShippingMethod;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.cart.CartService;
 import com.app_template.App_Template.service.order.OrderService;
@@ -42,7 +43,17 @@ public class CheckoutController {
 
         try {
             Long userId = getCurrentUserId(authentication);
-            Double totalAmount = orderService.calculateTotalAmount(userId);
+            
+            // Calculează subtotalul din coș
+            Double subtotal = orderService.calculateTotalAmount(userId);
+            
+            // Calculează costul de transport
+            String shippingMethodStr = (String) request.get("shippingMethod");
+            ShippingMethod shippingMethod = ShippingMethod.valueOf(shippingMethodStr);
+            double shippingCost = calculateShippingCost(shippingMethod);
+            
+            // Calculează totalul final
+            Double totalAmount = subtotal + shippingCost;
 
             PaymentIntent paymentIntent = stripeService.createPaymentIntent(
                     (long)(totalAmount * 100), // Stripe folosește cenți
@@ -121,5 +132,14 @@ public class CheckoutController {
         return userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getId();
+    }
+
+    private double calculateShippingCost(ShippingMethod shippingMethod) {
+        return switch (shippingMethod) {
+            case FAN_COURIER -> 18.0;
+            case SAME_DAY -> 20.0;
+            case URGENT -> 35.0;
+            default -> 15.0; // Cost implicit
+        };
     }
 }

@@ -16,6 +16,7 @@ import com.app_template.App_Template.entity.OrderItem;
 import com.app_template.App_Template.entity.Product;
 import com.app_template.App_Template.entity.User;
 import com.app_template.App_Template.enums.OrderStatus;
+import com.app_template.App_Template.enums.ShippingMethod;
 import com.app_template.App_Template.repository.CartRepository;
 import com.app_template.App_Template.repository.OrderItemRepository;
 import com.app_template.App_Template.repository.OrderRepository;
@@ -40,8 +41,12 @@ public class OrderServiceImpl implements OrderService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Calculează totalul din coș
-        Double totalAmount = calculateTotalAmount(userId);
+        // Calculează costul de transport
+        double shippingCost = calculateShippingCost(request.getShippingMethod());
+        
+        // Calculează totalul din coș plus transportul
+        Double subtotal = calculateTotalAmount(userId);
+        Double totalAmount = subtotal + shippingCost;
 
         // Creează comanda
         Order order = new Order();
@@ -171,5 +176,14 @@ public class OrderServiceImpl implements OrderService{
         dto.setCreatedAt(orderItem.getOrder().getCreatedAt());
         dto.setUpdatedAt(orderItem.getOrder().getUpdatedAt());
         return dto;
+    }
+
+    private double calculateShippingCost(ShippingMethod shippingMethod) {
+        return switch (shippingMethod) {
+            case FAN_COURIER -> 18.0;
+            case SAME_DAY -> 20.0;
+            case URGENT -> 35.0;
+            default -> 15.0; // Cost implicit
+        };
     }
 }

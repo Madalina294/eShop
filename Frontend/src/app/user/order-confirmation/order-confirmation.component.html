@@ -107,7 +107,7 @@
         <div class="order-items">
           <div *ngFor="let item of order.orderItems" class="order-item">
             <img
-              [src]="item.productImage"
+              [src]="'http://localhost:8080' + item.productImage"
               [alt]="item.productName"
               class="product-image"
             />
