@@ -668,6 +668,11 @@
     "orderItems": "Produse Comandate",
     "unitPrice": "Preț unitar",
     "orderNotFound": "Comanda nu a fost găsită",
-    "orderNotFoundMessage": "Comanda solicitată nu există sau nu ai permisiunea să o vizualizezi."
+    "orderNotFoundMessage": "Comanda solicitată nu există sau nu ai permisiunea să o vizualizezi.",
+    "shippingDescriptions": {
+      "FAN_COURIER": "Livrare în 2-3 zile lucrătoare",
+      "SAME_DAY": "Livrare în aceeași zi",
+      "URGENT": "Livrare în 2-4 ore"
+    }
   }
 }

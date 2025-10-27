@@ -15,6 +15,7 @@ import { CheckoutService } from '../../services/checkout/checkout.service';
 import { StripeService } from '../../services/stripe/stripe.service';
 import { UserService } from '../../services/user/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {ProductData} from '../../services/admin/admin.service';
 
 @Component({
   selector: 'app-checkout',
@@ -39,8 +40,17 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   loading = signal(false);
   processing = signal(false);
   stripeInitialized = signal(false);
-  
+  selectedShippingMethod = signal<string>('FAN_COURIER');
+
   @ViewChild('cardElement', { static: false }) cardElementRef!: ElementRef;
+
+  // Map pentru metodele de shipping cu costurile lor
+  shippingMethods = new Map<string, number>([
+    ['FAN_COURIER', 18],
+    ['SAME_DAY', 20],
+    ['URGENT', 35],
+    ['STANDARD', 15]
+  ]);
 
   // Computed pentru calcule
   subtotal = computed(() => {
@@ -50,13 +60,8 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   });
 
   shippingCost = computed(() => {
-    const method = this.checkoutForm?.get('shippingMethod')?.value;
-    switch(method) {
-      case 'FAN_COURIER': return 18;
-      case 'SAME_DAY': return 20;
-      case 'URGENT': return 35;
-      default: return 15;
-    }
+    const method = this.selectedShippingMethod();
+    return this.shippingMethods.get(method) || this.shippingMethods.get('STANDARD') || 15;
   });
 
   totalAmount = computed(() => this.subtotal() + this.shippingCost());
@@ -76,7 +81,12 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadCartItems();
     this.initializeStripe();
-    
+
+    // Ascultă schimbările în metoda de livrare
+    this.checkoutForm.get('shippingMethod')?.valueChanges.subscribe(value => {
+      this.selectedShippingMethod.set(value);
+    });
+
     // Ascultă schimbările în metoda de plată
     this.checkoutForm.get('paymentMethod')?.valueChanges.subscribe(value => {
       if (value === 'CARD_ONLINE' && this.stripeInitialized()) {
@@ -109,6 +119,7 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     this.loading.set(true);
     try {
       const items = await this.userService.getUserCart().toPromise();
+      console.log('Cart items loaded:', items);
       this.cartItems.set(items || []);
     } catch (error) {
       console.error('Error loading cart:', error);
@@ -133,19 +144,19 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     if (existingElement) {
       existingElement.remove();
     }
-    
+
     const cardElement = this.stripeService.createCardElement();
-    
+
     if (cardElement) {
       const cardElementDiv = this.cardElementRef?.nativeElement;
-      
+
       if (cardElementDiv) {
         // Golește complet containerul
         cardElementDiv.innerHTML = '';
-        
+
         try {
           cardElement.mount(cardElementDiv);
-          
+
           // Adaugă event listeners pentru erori
           cardElement.on('change', (event) => {
             const displayError = document.getElementById('card-errors');
@@ -247,4 +258,5 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   goBack() {
     this.router.navigate(['/user/cart']);
   }
+
 }

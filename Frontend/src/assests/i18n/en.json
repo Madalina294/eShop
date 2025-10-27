@@ -669,6 +669,11 @@
     "orderItems": "Ordered Items",
     "unitPrice": "Unit Price",
     "orderNotFound": "Order Not Found",
-    "orderNotFoundMessage": "The requested order does not exist or you don't have permission to view it."
+    "orderNotFoundMessage": "The requested order does not exist or you don't have permission to view it.",
+    "shippingDescriptions": {
+      "FAN_COURIER": "Delivery in 2-3 business days",
+      "SAME_DAY": "Same day delivery",
+      "URGENT": "Delivery in 2-4 hours"
+    }
   }
 }

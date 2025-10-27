@@ -92,8 +92,12 @@
               <mat-radio-button value="FAN_COURIER">
                 <div class="option-content">
                   <strong>Fan Courier</strong>
-                  <span class="price">15 RON</span>
-                  <small>Livrare în 2-3 zile lucrătoare</small>
+                  <span class="price">{{
+                    shippingMethods.get("FAN_COURIER") | currency : "RON"
+                  }}</span>
+                  <small>{{
+                    "checkout.shippingDescriptions.FAN_COURIER" | translate
+                  }}</small>
                 </div>
               </mat-radio-button>
             </div>
@@ -102,8 +106,12 @@
               <mat-radio-button value="SAME_DAY">
                 <div class="option-content">
                   <strong>Same Day Delivery</strong>
-                  <span class="price">25 RON</span>
-                  <small>Livrare în aceeași zi</small>
+                  <span class="price">{{
+                    shippingMethods.get("SAME_DAY") | currency : "RON"
+                  }}</span>
+                  <small>{{
+                    "checkout.shippingDescriptions.SAME_DAY" | translate
+                  }}</small>
                 </div>
               </mat-radio-button>
             </div>
@@ -112,8 +120,12 @@
               <mat-radio-button value="URGENT">
                 <div class="option-content">
                   <strong>Urgent Delivery</strong>
-                  <span class="price">35 RON</span>
-                  <small>Livrare în 2-4 ore</small>
+                  <span class="price">{{
+                    shippingMethods.get("URGENT") | currency : "RON"
+                  }}</span>
+                  <small>{{
+                    "checkout.shippingDescriptions.URGENT" | translate
+                  }}</small>
                 </div>
               </mat-radio-button>
             </div>
@@ -179,7 +191,10 @@
         <mat-card-content>
           <div class="order-items">
             <div *ngFor="let item of cartItems()" class="order-item">
-              <img [src]="item.productImage" [alt]="item.productName" />
+              <img
+                [src]="'http://localhost:8080' + item.productImage"
+                [alt]="item.productName"
+              />
               <div class="item-details">
                 <h4>{{ item.productName }}</h4>
                 <p>
