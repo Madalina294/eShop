@@ -96,12 +96,14 @@
 
       .value {
         font-weight: 600;
+        color: #cce5ff !important;
 
         &.status {
           padding: 4px 12px;
           border-radius: 20px;
           font-size: 0.9em;
           text-transform: uppercase;
+          color: #000000 !important;
 
           &.status-pending {
             background: #fff3cd;
@@ -161,13 +163,13 @@
 
       strong {
         font-size: 1.1em;
-        color: #333;
+        color: #cce5ff !important;
       }
 
       &.address {
         margin-top: 10px;
         padding: 15px;
-        background: #f8f9fa;
+        background: #151515;
         border-radius: 8px;
         border-left: 4px solid #1976d2;
         font-style: italic;

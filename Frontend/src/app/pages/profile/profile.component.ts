@@ -53,7 +53,7 @@ export class ProfileComponent implements OnInit {
     if (image && image.startsWith('/uploads/')) {
       return 'http://localhost:8080' + image;
     }
-    return image || 'assets/default-avatar.png';
+    return image || 'public/user.png';
   });
 
   // Computed signal pentru a verifica dacă utilizatorul este conectat prin Google
@@ -232,10 +232,10 @@ export class ProfileComponent implements OnInit {
 
         //  Update state immediately
         this.userStateService.updateUser({
-          firstname: response.firstname || formData.firstName,
-          lastname: response.lastname || formData.lastName,
-          email: response.email || formData.email,
-          image: finalImage,
+          firstname: updatedFirstName,
+          lastname: updatedLastName,
+          email: updatedEmail,
+          image: backendImage,
           phoneNumber: response.phoneNumber,
           mfaEnabled: response.mfaEnabled ?? formData.mfaEnabled
         });
