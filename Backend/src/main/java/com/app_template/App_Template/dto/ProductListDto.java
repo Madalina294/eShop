@@ -14,6 +14,7 @@ public class ProductListDto {
     private String image;
     private Long categoryId;
     private String color;
+    private String description;
     private String dimensions;
     private String material;
     private String weight;

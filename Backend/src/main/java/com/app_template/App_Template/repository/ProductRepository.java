@@ -12,7 +12,7 @@ import com.app_template.App_Template.entity.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     
     @Query("SELECT new com.app_template.App_Template.dto.ProductListDto(" +
-           "p.id, p.name, p.price, p.image, p.category.id, p.color, " +
+           "p.id, p.name, p.price, p.image, p.category.id, p.color, p.description, " +
            "p.dimensions, p.material, p.weight, p.quantity) " +
            "FROM Product p WHERE p.category.id = :categoryId")
     Page<ProductListDto> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);

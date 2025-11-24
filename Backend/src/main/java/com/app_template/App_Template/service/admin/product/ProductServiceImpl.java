@@ -150,11 +150,11 @@ public class ProductServiceImpl implements ProductService {
         productDto.setImage(listDto.getImage());
         productDto.setCategoryId(listDto.getCategoryId());
         productDto.setColor(listDto.getColor());
+        productDto.setDescription(listDto.getDescription());
         productDto.setDimensions(listDto.getDimensions());
         productDto.setMaterial(listDto.getMaterial());
         productDto.setWeight(listDto.getWeight());
         productDto.setQuantity(listDto.getQuantity());
-        productDto.setDescription(""); // Set empty description to avoid LOB issues
         return productDto;
     }
 }
