@@ -1,0 +1,165 @@
+<div class="statistics-container">
+  <app-breadcrumb></app-breadcrumb>
+
+  <div class="header-section">
+    <h1>{{ "adminStatistics.title" | translate }}</h1>
+    <button mat-raised-button color="primary" (click)="refreshStatistics()">
+      <mat-icon>refresh</mat-icon>
+      {{ "adminStatistics.refresh" | translate }}
+    </button>
+  </div>
+
+  <!-- Average Cart Statistics Card -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>shopping_cart</mat-icon>
+        {{ "adminStatistics.averageCart.title" | translate }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loadingAverageCart()" class="loading-spinner">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+      <div *ngIf="!loadingAverageCart() && hasAverageCart()" class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">
+            {{ "adminStatistics.averageCart.averageValue" | translate }}
+          </div>
+          <div class="stat-value">
+            {{ formatCurrency(averageCart()!.averageCartValue) }}
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">
+            {{ "adminStatistics.averageCart.totalOrders" | translate }}
+          </div>
+          <div class="stat-value">{{ averageCart()!.totalOrders }}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">
+            {{ "adminStatistics.averageCart.totalRevenue" | translate }}
+          </div>
+          <div class="stat-value">
+            {{ formatCurrency(averageCart()!.totalRevenue) }}
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!loadingAverageCart() && !hasAverageCart()" class="no-data">
+        {{ "adminStatistics.noData" | translate }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Top Customers Card -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>star</mat-icon>
+        {{ "adminStatistics.topCustomers.title" | translate }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loadingTopCustomers()" class="loading-spinner">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+      <div *ngIf="!loadingTopCustomers() && hasTopCustomers()">
+        <table mat-table [dataSource]="topCustomers()" class="statistics-table">
+          <ng-container matColumnDef="userName">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.topCustomers.userName" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let customer">{{ customer.userName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="userEmail">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.topCustomers.email" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let customer">
+              {{ customer.userEmail }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="orderCount">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.topCustomers.orderCount" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let customer">
+              {{ customer.orderCount }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalSpent">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.topCustomers.totalSpent" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let customer">
+              {{ formatCurrency(customer.totalSpent) }}
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumnsTopCustomers"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumnsTopCustomers"
+          ></tr>
+        </table>
+      </div>
+      <div *ngIf="!loadingTopCustomers() && !hasTopCustomers()" class="no-data">
+        {{ "adminStatistics.noData" | translate }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Orders by User Card -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>assignment</mat-icon>
+        {{ "adminStatistics.ordersByUser.title" | translate }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loadingOrdersByUser()" class="loading-spinner">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+      <div *ngIf="!loadingOrdersByUser() && hasOrdersByUser()">
+        <table mat-table [dataSource]="ordersByUser()" class="statistics-table">
+          <ng-container matColumnDef="userName">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.ordersByUser.userName" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let user">{{ user.userName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="userEmail">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.ordersByUser.email" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let user">{{ user.userEmail }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="orderCount">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "adminStatistics.ordersByUser.orderCount" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let user">{{ user.orderCount }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsOrders"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumnsOrders"
+          ></tr>
+        </table>
+      </div>
+      <div *ngIf="!loadingOrdersByUser() && !hasOrdersByUser()" class="no-data">
+        {{ "adminStatistics.noData" | translate }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

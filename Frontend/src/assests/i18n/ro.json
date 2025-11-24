@@ -324,6 +324,30 @@
         "ofLabel": "din"
     }
   },
+  "adminStatistics": {
+    "title": "Statistici și Rapoarte",
+    "refresh": "Reîncarcă",
+    "noData": "Nu sunt date disponibile",
+    "averageCart": {
+      "title": "Valoarea Medie a Coșului",
+      "averageValue": "Valoare Medie Coș",
+      "totalOrders": "Total Comenzi",
+      "totalRevenue": "Venit Total"
+    },
+    "topCustomers": {
+      "title": "Top 10 Clienți",
+      "userName": "Nume Client",
+      "email": "Email",
+      "orderCount": "Comenzi",
+      "totalSpent": "Total Cheltuit"
+    },
+    "ordersByUser": {
+      "title": "Comenzi pe Utilizator",
+      "userName": "Nume Utilizator",
+      "email": "Email",
+      "orderCount": "Număr Comenzi"
+    }
+  },
   "viewUserAccount": {
     "loadingUserInfo": "Se încarcă informațiile utilizatorului...",
     "id": "ID",

@@ -2,10 +2,8 @@ package com.app_template.App_Template.service.admin;
 
 import java.util.List;
 
-import com.app_template.App_Template.dto.ProductDto;
+import com.app_template.App_Template.dto.*;
 import org.springframework.data.domain.Page;
-
-import com.app_template.App_Template.dto.UserDto;
 
 public interface AdminService {
 
@@ -15,4 +13,9 @@ public interface AdminService {
     public void sendEmail(String toEmail, String subject, String body);
     public UserDto getUserById(Long userId);
     public Page<ProductDto> getProductsPaginated(int page, int size, String sortBy, String sortDir);
+    
+    // Statistici
+    public List<UserOrderCountDto> getOrdersCountByUser();
+    public List<TopCustomerDto> getTopCustomers(int limit);
+    public AverageCartDto getAverageCartValue();
 }

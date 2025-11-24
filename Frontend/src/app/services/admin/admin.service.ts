@@ -49,6 +49,27 @@ export interface ProductPaginatedResponse {
   numberOfElements: number;
 }
 
+export interface UserOrderCount {
+  userId: number;
+  userName: string;
+  userEmail: string;
+  orderCount: number;
+}
+
+export interface TopCustomer {
+  userId: number;
+  userName: string;
+  userEmail: string;
+  totalSpent: number;
+  orderCount: number;
+}
+
+export interface AverageCart {
+  averageCartValue: number;
+  totalOrders: number;
+  totalRevenue: number;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -163,6 +184,28 @@ export class AdminService {
     return this.http.post(`${this.baseUrl}/product/add-product`, data,  {
       headers: this.createAuthorizationHeader()
     })
+  }
+
+  // Statistici
+  getOrdersCountByUser(): Observable<UserOrderCount[]> {
+    return this.http.get<UserOrderCount[]>(`${this.baseUrl}/statistics/orders-by-user`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getTopCustomers(limit: number = 10): Observable<TopCustomer[]> {
+    const params = new URLSearchParams({
+      limit: limit.toString()
+    });
+    return this.http.get<TopCustomer[]>(`${this.baseUrl}/statistics/top-customers?${params}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
+  getAverageCartValue(): Observable<AverageCart> {
+    return this.http.get<AverageCart>(`${this.baseUrl}/statistics/average-cart`, {
+      headers: this.createAuthorizationHeader()
+    });
   }
 
   private createAuthorizationHeader(): HttpHeaders {

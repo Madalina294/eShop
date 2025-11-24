@@ -324,6 +324,30 @@
         "ofLabel": "of"
       }
     },
+  "adminStatistics": {
+    "title": "Statistics & Reports",
+    "refresh": "Refresh",
+    "noData": "No data available",
+    "averageCart": {
+      "title": "Average Cart Value",
+      "averageValue": "Average Cart Value",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue"
+    },
+    "topCustomers": {
+      "title": "Top 10 Customers",
+      "userName": "Customer Name",
+      "email": "Email",
+      "orderCount": "Orders",
+      "totalSpent": "Total Spent"
+    },
+    "ordersByUser": {
+      "title": "Orders by User",
+      "userName": "User Name",
+      "email": "Email",
+      "orderCount": "Order Count"
+    }
+  },
   "viewUserAccount": {
     "loadingUserInfo": "Loading user info...",
     "id": "ID",

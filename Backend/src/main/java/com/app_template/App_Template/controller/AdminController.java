@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app_template.App_Template.dto.AverageCartDto;
+import com.app_template.App_Template.dto.TopCustomerDto;
 import com.app_template.App_Template.dto.UserDto;
+import com.app_template.App_Template.dto.UserOrderCountDto;
 import com.app_template.App_Template.service.admin.AdminService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -92,6 +95,44 @@ public class AdminController {
             return ResponseEntity.ok(adminService.getUserById(userId));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    // Endpoint-uri pentru statistici
+    @GetMapping("/statistics/orders-by-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getOrdersCountByUser() {
+        try {
+            List<UserOrderCountDto> statistics = adminService.getOrdersCountByUser();
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving statistics: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistics/top-customers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTopCustomers(
+            @RequestParam(defaultValue = "10") int limit) {
+        try {
+            List<TopCustomerDto> topCustomers = adminService.getTopCustomers(limit);
+            return ResponseEntity.ok(topCustomers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving top customers: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistics/average-cart")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAverageCartValue() {
+        try {
+            AverageCartDto averageCart = adminService.getAverageCartValue();
+            return ResponseEntity.ok(averageCart);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving average cart value: " + e.getMessage());
         }
     }
 }

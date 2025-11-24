@@ -11,6 +11,7 @@ import {EditCategoryComponent} from './edit-category/edit-category.component';
 import {AddProductComponent} from './add-product/add-product.component';
 import {ViewProductsComponent} from './view-products/view-products.component';
 import {EditProductComponent} from './edit-product/edit-product.component';
+import {StatisticsComponent} from './statistics/statistics.component';
 
 const routes: Routes = [
   {path: "", component: AdminDashboardComponent, canActivate: [adminGuard]},
@@ -23,7 +24,8 @@ const routes: Routes = [
   {path: "edit-category", component: EditCategoryComponent, canActivate: [adminGuard]},
   {path: "view-products", component: ViewProductsComponent, canActivate: [adminGuard]},
   {path: "edit-product", component: EditProductComponent, canActivate: [adminGuard]},
-  {path: "view-user-account", component: ViewUserAccountComponent, canActivate: [adminGuard]}
+  {path: "view-user-account", component: ViewUserAccountComponent, canActivate: [adminGuard]},
+  {path: "statistics", component: StatisticsComponent, canActivate: [adminGuard]}
 ]
 @NgModule({
   imports: [RouterModule.forChild(routes)],

@@ -220,15 +220,22 @@ export class ProfileComponent implements OnInit {
       next: (response: any) => {
         this.snackBar.open(this.translate.instant('profile.profileUpdated'), this.translate.instant('profile.ok'), { duration: 2000 });
 
-        //  Backend-ul returnează acum imageUrl (URL-ul imaginii), nu base64
-        let finalImage: string | null = null;
-        if (response.image) {
-          // Backend-ul returnează URL-ul imaginii
-          finalImage = response.image;
-        } else {
-          // Păstrează imaginea existentă dacă nu s-a uploadat una nouă
-          finalImage = currentUser.image;
-        }
+        const backendImage =
+          response.imageUrl ??
+          response.image ??
+          currentUser.image ??
+          null;
+        const updatedFirstName =
+          response.firstName ??
+          response.firstname ??
+          formData.firstName;
+        const updatedLastName =
+          response.lastName ??
+          response.lastname ??
+          formData.lastName;
+        const updatedEmail =
+          response.email ??
+          formData.email;
 
         //  Update state immediately
         this.userStateService.updateUser({
