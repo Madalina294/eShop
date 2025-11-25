@@ -24,9 +24,15 @@ import com.app_template.App_Template.repository.OrderRepository;
 import com.app_template.App_Template.repository.ProductRepository;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.email.EmailService;
+import com.app_template.App_Template.service.activity.ActivityLogService;
+import com.app_template.App_Template.dto.ActivityLogDto;
+import com.app_template.App_Template.enums.ActionType;
+import com.app_template.App_Template.enums.LogStatus;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +42,7 @@ public class AdminServiceImpl implements AdminService {
     private final EmailService emailService;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final ActivityLogService activityLogService;
     
     @Override
     public List<UserDto> getAllUsers() {
@@ -189,5 +196,31 @@ public class AdminServiceImpl implements AdminService {
                 (long) validOrders.size(),
                 Math.round(totalRevenue * 100.0) / 100.0
         );
+    }
+
+    @Override
+    public Page<ActivityLogDto> getActivityLogs(int page, int size, String sortBy, String sortDir,
+                                                Long userId, String actionType, String status,
+                                                LocalDateTime startDate, LocalDateTime endDate) {
+        ActionType actionTypeEnum = null;
+        if (actionType != null && !actionType.isEmpty()) {
+            try {
+                actionTypeEnum = ActionType.valueOf(actionType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignoră dacă actionType nu este valid
+            }
+        }
+
+        LogStatus statusEnum = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                statusEnum = LogStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignoră dacă status nu este valid
+            }
+        }
+
+        return activityLogService.getActivityLogs(
+                page, size, sortBy, sortDir, userId, actionTypeEnum, statusEnum, startDate, endDate);
     }
 }

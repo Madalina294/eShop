@@ -208,6 +208,12 @@ export class AdminService {
     });
   }
 
+  getActivityLogs(queryParams: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/activity-logs?${queryParams}`, {
+      headers: this.createAuthorizationHeader()
+    });
+  }
+
   private createAuthorizationHeader(): HttpHeaders {
     const token = StorageService.getToken();
     if (!token) {

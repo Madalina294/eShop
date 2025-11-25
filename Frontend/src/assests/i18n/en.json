@@ -404,7 +404,8 @@
     "createProduct": "Create Product",
     "editProduct": "Edit Product",
     "sendEmail": "Send Email",
-    "viewUserAccount": "View User Account"
+    "viewUserAccount": "View User Account",
+    "activityLogs": "Activity Logs"
   },
   "editCategory": {
     "title": "Edit Category",
@@ -566,6 +567,32 @@
       "firstPage": "First page",
       "lastPage": "Last page",
       "ofLabel": "of"
+    }
+  },
+  "activityLogs": {
+    "title": "User Activity Logs",
+    "filters": {
+      "title": "Filters",
+      "user": "User",
+      "allUsers": "All Users",
+      "actionType": "Action Type",
+      "allActions": "All Actions",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "clear": "Clear Filters"
+    },
+    "logs": {
+      "title": "Activity Logs",
+      "timestamp": "Timestamp",
+      "user": "User",
+      "guest": "Guest",
+      "actionType": "Action Type",
+      "description": "Description",
+      "status": "Status",
+      "ipAddress": "IP Address",
+      "noLogs": "No activity logs found"
     }
   },
   "allProducts": {

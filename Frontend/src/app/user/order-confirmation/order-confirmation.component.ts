@@ -58,9 +58,4 @@ export class OrderConfirmationComponent implements OnInit {
     this.router.navigate(['/user/all-products']);
   }
 
-  viewOrder() {
-    // Pentru moment, redirecționează la all-products
-    // În viitor, poți adăuga o pagină dedicată pentru vizualizarea comenzilor
-    this.router.navigate(['/user/all-products']);
-  }
 }

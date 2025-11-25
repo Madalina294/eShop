@@ -404,7 +404,8 @@
     "createProduct": "Creează Produs",
     "editProduct": "Editează Produs",
     "sendEmail": "Trimite Email",
-    "viewUserAccount": "Vezi Cont Utilizator"
+    "viewUserAccount": "Vezi Cont Utilizator",
+    "activityLogs": "Jurnale de Activitate"
   },
   "editCategory": {
     "title": "Editează Categoria",
@@ -565,6 +566,32 @@
       "firstPage": "Prima pagină",
       "lastPage": "Ultima pagină",
       "ofLabel": "din"
+    }
+  },
+  "activityLogs": {
+    "title": "Jurnale de Activitate Utilizatori",
+    "filters": {
+      "title": "Filtre",
+      "user": "Utilizator",
+      "allUsers": "Toți Utilizatorii",
+      "actionType": "Tip Acțiune",
+      "allActions": "Toate Acțiunile",
+      "status": "Status",
+      "allStatuses": "Toate Statusurile",
+      "startDate": "Data Început",
+      "endDate": "Data Sfârșit",
+      "clear": "Șterge Filtrele"
+    },
+    "logs": {
+      "title": "Jurnale de Activitate",
+      "timestamp": "Data și Ora",
+      "user": "Utilizator",
+      "guest": "Vizitator",
+      "actionType": "Tip Acțiune",
+      "description": "Descriere",
+      "status": "Status",
+      "ipAddress": "Adresă IP",
+      "noLogs": "Nu s-au găsit jurnale de activitate"
     }
   },
   "allProducts": {

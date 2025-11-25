@@ -1,0 +1,173 @@
+.activity-logs-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+  }
+}
+
+.filters-card {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    margin-bottom: 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.clear-filters {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.logs-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    margin-bottom: 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+}
+
+.activity-logs-table {
+  width: 100%;
+  margin-top: 16px;
+
+  th {
+    font-weight: 600;
+    color: #333;
+  }
+
+  td, th {
+    padding: 12px 16px;
+  }
+
+  tr:hover {
+    background-color: #f5f5f5;
+  }
+
+  .description-cell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .no-user {
+    color: #999;
+    font-style: italic;
+  }
+
+  .status-success {
+    color: #4caf50;
+    font-weight: 500;
+  }
+
+  .status-error {
+    color: #f44336;
+    font-weight: 500;
+  }
+
+  .status-warning {
+    color: #ff9800;
+    font-weight: 500;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    font-style: italic;
+  }
+}
+
+.pagination-controls {
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .activity-logs-container {
+    padding: 16px;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-logs-table {
+    font-size: 12px;
+
+    td, th {
+      padding: 8px 12px;
+    }
+  }
+}
+

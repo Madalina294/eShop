@@ -17,13 +17,17 @@ import com.app_template.App_Template.dto.OrderDto;
 import com.app_template.App_Template.dto.OrderResponse;
 import com.app_template.App_Template.dto.PaymentIntentResponse;
 import com.app_template.App_Template.entity.Order;
+import com.app_template.App_Template.enums.ActionType;
+import com.app_template.App_Template.enums.LogStatus;
 import com.app_template.App_Template.enums.ShippingMethod;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.cart.CartService;
 import com.app_template.App_Template.service.order.OrderService;
 import com.app_template.App_Template.service.stripe.StripeService;
+import com.app_template.App_Template.util.ActivityLogHelper;
 import com.stripe.model.PaymentIntent;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,11 +39,13 @@ public class CheckoutController {
     private final StripeService stripeService;
     private final CartService cartService;
     private final UserRepository userRepository;
+    private final ActivityLogHelper activityLogHelper;
 
     @PostMapping("/create-payment-intent")
     public ResponseEntity<PaymentIntentResponse> createPaymentIntent(
             @RequestBody Map<String, Object> request,
-            Authentication authentication) {
+            Authentication authentication,
+            HttpServletRequest httpRequest) {
 
         try {
             Long userId = getCurrentUserId(authentication);
@@ -72,6 +78,15 @@ public class CheckoutController {
                     "ron"
             );
 
+            // Log checkout started
+            activityLogHelper.logActivity(
+                    userId,
+                    ActionType.CHECKOUT_STARTED,
+                    "Checkout started - Total: " + totalAmount + " RON (Shipping: " + shippingMethod + ")",
+                    httpRequest,
+                    LogStatus.SUCCESS
+            );
+
             return ResponseEntity.ok(new PaymentIntentResponse(
                     paymentIntent.getClientSecret()
             ));
@@ -85,11 +100,33 @@ public class CheckoutController {
     @PostMapping("/create-order")
     public ResponseEntity<OrderResponse> createOrder(
             @RequestBody CreateOrderRequest request,
-            Authentication authentication) {
+            Authentication authentication,
+            HttpServletRequest httpRequest) {
 
         try {
             Long userId = getCurrentUserId(authentication);
             Order order = orderService.createOrder(userId, request);
+
+            // Log order creation
+            String orderDescription = "Order created - ID: " + order.getId() + 
+                    ", Total: " + order.getTotalAmount() + " RON" +
+                    ", Status: " + order.getStatus();
+            activityLogHelper.logActivity(
+                    userId,
+                    ActionType.CREATE_ORDER,
+                    orderDescription,
+                    httpRequest,
+                    LogStatus.SUCCESS
+            );
+            
+            // Log checkout completed
+            activityLogHelper.logActivity(
+                    userId,
+                    ActionType.CHECKOUT_COMPLETED,
+                    "Checkout completed - Order ID: " + order.getId(),
+                    httpRequest,
+                    LogStatus.SUCCESS
+            );
 
             return ResponseEntity.ok(new OrderResponse(
                     order.getId(),
@@ -97,6 +134,19 @@ public class CheckoutController {
                     "Comanda a fost creată cu succes!"
             ));
         } catch (Exception e) {
+            // Log failed order creation
+            try {
+                Long userId = getCurrentUserId(authentication);
+                activityLogHelper.logActivity(
+                        userId,
+                        ActionType.CREATE_ORDER,
+                        "Failed to create order: " + e.getMessage(),
+                        httpRequest,
+                        LogStatus.ERROR
+                );
+            } catch (Exception logError) {
+                // Ignore logging errors
+            }
             return ResponseEntity.badRequest().build();
         }
     }
@@ -117,7 +167,10 @@ public class CheckoutController {
     }
 
     @GetMapping("/orders/{orderId}")
-    public ResponseEntity<?> getOrder(@PathVariable Long orderId, Authentication authentication) {
+    public ResponseEntity<?> getOrder(
+            @PathVariable Long orderId,
+            Authentication authentication,
+            HttpServletRequest httpRequest) {
         try {
             Long userId = getCurrentUserId(authentication);
             System.out.println("Getting order " + orderId + " for user " + userId);
@@ -127,6 +180,14 @@ public class CheckoutController {
             
             // Verifică dacă comanda aparține utilizatorului curent
             if (order.getUserId().equals(userId)) {
+                // Log view order
+                activityLogHelper.logActivity(
+                        userId,
+                        ActionType.VIEW_ORDER,
+                        "Viewed order: ID " + orderId,
+                        httpRequest,
+                        LogStatus.SUCCESS
+                );
                 return ResponseEntity.ok(order);
             } else {
                 System.out.println("Access denied: Order " + orderId + " belongs to user " + order.getUserId() + " but current user is " + userId);

@@ -16,10 +16,13 @@ import com.app_template.App_Template.auth.ForgotPasswordResponse;
 import com.app_template.App_Template.auth.RegisterRequest;
 import com.app_template.App_Template.auth.ResetPasswordRequest;
 import com.app_template.App_Template.auth.VerificationRequest;
+import com.app_template.App_Template.enums.ActionType;
+import com.app_template.App_Template.enums.LogStatus;
 import com.app_template.App_Template.repository.UserRepository;
 import com.app_template.App_Template.service.auth.AuthenticationService;
 import com.app_template.App_Template.service.email.EmailService;
 import com.app_template.App_Template.tfa.TwoFactorAuthenticationService;
+import com.app_template.App_Template.util.ActivityLogHelper;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,16 +39,66 @@ public class AuthenticationController {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final TwoFactorAuthenticationService tfaService;
+    private final ActivityLogHelper activityLogHelper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) throws IOException {
-        var response = authenticationService.register(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthenticationResponse> register(
+            @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest) throws IOException {
+        try {
+            var response = authenticationService.register(request);
+            
+            // Log registration
+            activityLogHelper.logActivity(
+                    response.getUserId(),
+                    ActionType.REGISTER,
+                    "User registered: " + request.getEmail(),
+                    httpRequest,
+                    LogStatus.SUCCESS
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Log failed registration
+            activityLogHelper.logActivity(
+                    null,
+                    ActionType.REGISTER,
+                    "Failed registration attempt: " + request.getEmail() + " - " + e.getMessage(),
+                    httpRequest,
+                    LogStatus.ERROR
+            );
+            throw e;
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request,
+            HttpServletRequest httpRequest) {
+        try {
+            var response = authenticationService.authenticate(request);
+            
+            // Log successful login
+            activityLogHelper.logActivity(
+                    response.getUserId(),
+                    ActionType.LOGIN,
+                    "User logged in: " + request.getEmail(),
+                    httpRequest,
+                    LogStatus.SUCCESS
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Log failed login
+            activityLogHelper.logActivity(
+                    null,
+                    ActionType.LOGIN,
+                    "Failed login attempt: " + request.getEmail() + " - " + e.getMessage(),
+                    httpRequest,
+                    LogStatus.ERROR
+            );
+            throw e;
+        }
     }
 
     @PostMapping("/refresh-token")

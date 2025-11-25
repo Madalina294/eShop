@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app_template.App_Template.dto.AverageCartDto;
-import com.app_template.App_Template.dto.TopCustomerDto;
-import com.app_template.App_Template.dto.UserDto;
-import com.app_template.App_Template.dto.UserOrderCountDto;
+import com.app_template.App_Template.dto.*;
 import com.app_template.App_Template.service.admin.AdminService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -133,6 +133,50 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error retrieving average cart value: " + e.getMessage());
+        }
+    }
+
+    // Activity Logs endpoints
+    @GetMapping("/activity-logs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getActivityLogs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String actionType,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        try {
+            LocalDateTime startDateTime = null;
+            LocalDateTime endDateTime = null;
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            if (startDate != null && !startDate.isEmpty()) {
+                try {
+                    startDateTime = LocalDateTime.parse(startDate, formatter);
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest()
+                            .body("Invalid startDate format. Use ISO format: yyyy-MM-ddTHH:mm:ss");
+                }
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                try {
+                    endDateTime = LocalDateTime.parse(endDate, formatter);
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest()
+                            .body("Invalid endDate format. Use ISO format: yyyy-MM-ddTHH:mm:ss");
+                }
+            }
+            
+            org.springframework.data.domain.Page<ActivityLogDto> logs = adminService.getActivityLogs(
+                    page, size, sortBy, sortDir, userId, actionType, status, startDateTime, endDateTime);
+            return ResponseEntity.ok(logs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving activity logs: " + e.getMessage());
         }
     }
 }
