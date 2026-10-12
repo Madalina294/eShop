@@ -870,5 +870,16 @@
   },
   "confirm": {
     "defaultTitle": "Are you sure?"
+  },
+  "orderStatus": {
+    "PENDING": "Pending",
+    "CONFIRMED": "Confirmed",
+    "SHIPPED": "Shipped",
+    "DELIVERED": "Delivered",
+    "CANCELLED": "This order was cancelled"
+  },
+  "orderConfirmation": {
+    "cancelledTitle": "Order cancelled",
+    "cancelledMessage": "This order is no longer being processed. Any payment taken will be refunded."
   }
 }

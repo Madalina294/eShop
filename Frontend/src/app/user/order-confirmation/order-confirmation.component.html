@@ -1,150 +1,225 @@
-<div class="confirmation-container">
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "checkout.loading" | translate }}</p>
-  </div>
-
-  <!-- Order Confirmation -->
-  <div *ngIf="!loading() && order" class="confirmation-content">
-    <!-- Success Header -->
-    <mat-card class="success-card">
-      <mat-card-content class="success-content">
-        <div class="success-icon">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <h1>{{ "checkout.orderConfirmed" | translate }}</h1>
-        <p class="success-message">
-          {{ "checkout.orderSuccessMessage" | translate }}
-        </p>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Order Details -->
-    <mat-card class="order-details-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>receipt</mat-icon>
-          {{ "checkout.orderDetails" | translate }}
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="order-info">
-          <div class="info-row">
-            <span class="label">{{ "checkout.orderNumber" | translate }}:</span>
-            <span class="value">#{{ order.id }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ "checkout.status" | translate }}:</span>
-            <span
-              class="value status"
-              [class]="'status-' + order.status.toLowerCase()"
-            >
-              {{ order.status }}
-            </span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ "checkout.orderDate" | translate }}:</span>
-            <span class="value">{{ order.orderDate | date : "medium" }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label"
-              >{{ "checkout.paymentMethod" | translate }}:</span
-            >
-            <span class="value">{{ order.paymentMethod }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label"
-              >{{ "checkout.shippingMethod" | translate }}:</span
-            >
-            <span class="value">{{ order.shippingMethod }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ "checkout.total" | translate }}:</span>
-            <span class="value total-amount">{{
-              order.totalAmount | currency : "RON"
-            }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Shipping Address -->
-    <mat-card class="shipping-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>local_shipping</mat-icon>
-          {{ "checkout.shippingAddress" | translate }}
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="address-content">
-          <p>
-            <strong>{{ order.customerName }}</strong>
-          </p>
-          <p>{{ order.customerPhone }}</p>
-          <p>{{ order.customerEmail }}</p>
-          <p class="address">{{ order.shippingAddress }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Order Items -->
-    <mat-card
-      class="items-card"
-      *ngIf="order.orderItems && order.orderItems.length > 0"
-    >
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>shopping_bag</mat-icon>
-          {{ "checkout.orderItems" | translate }}
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="order-items">
-          <div *ngFor="let item of order.orderItems" class="order-item">
-            <img
-              [src]="'http://localhost:8080' + item.productImage"
-              [alt]="item.productName"
-              class="product-image"
-            />
-            <div class="item-details">
-              <h4>{{ item.productName }}</h4>
-              <p class="quantity">
-                {{ "checkout.quantity" | translate }}: {{ item.quantity }}
-              </p>
-              <p class="unit-price">
-                {{ "checkout.unitPrice" | translate }}:
-                {{ item.unitPrice | currency : "RON" }}
-              </p>
-            </div>
-            <div class="item-total">
-              {{ item.totalPrice | currency : "RON" }}
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button mat-button (click)="continueShopping()" class="continue-btn">
-        <mat-icon>shopping_cart</mat-icon>
-        {{ "checkout.continueShopping" | translate }}
-      </button>
+@switch (state()) {
+  @case ("loading") {
+    <div class="page">
+      <app-loading-state [label]="'checkout.loading' | translate" />
     </div>
-  </div>
+  }
 
-  <!-- Error State -->
-  <div *ngIf="!loading() && !order" class="error-container">
-    <mat-icon>error</mat-icon>
-    <h3>{{ "checkout.orderNotFound" | translate }}</h3>
-    <p>{{ "checkout.orderNotFoundMessage" | translate }}</p>
-    <button mat-raised-button color="primary" (click)="continueShopping()">
-      {{ "checkout.continueShopping" | translate }}
-    </button>
-  </div>
-</div>
+  @case ("error") {
+    <div class="page">
+      <app-error-state
+        [title]="'errors.loadFailedTitle' | translate"
+        [description]="'errors.loadFailedDescription' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    </div>
+  }
+
+  @case ("empty") {
+    <div class="page">
+      <app-empty-state
+        icon="receipt_long"
+        [title]="'checkout.orderNotFound' | translate"
+        [description]="'checkout.orderNotFoundMessage' | translate"
+      >
+        <a mat-flat-button color="primary" routerLink="/user/all-products">
+          <mat-icon>storefront</mat-icon>
+          {{ "checkout.continueShopping" | translate }}
+        </a>
+      </app-empty-state>
+    </div>
+  }
+
+  @default {
+    @if (order(); as item) {
+      <!-- The brand gradient is reserved for hero bands like this one. -->
+      <section class="hero-gradient confirm-hero">
+        <div class="confirm-hero__inner">
+          <span class="confirm-hero__badge" aria-hidden="true">
+            <mat-icon>{{ cancelled() ? "cancel" : "check_circle" }}</mat-icon>
+          </span>
+
+          <h1 class="confirm-hero__title">
+            {{ (cancelled() ? "orderConfirmation.cancelledTitle" : "checkout.orderConfirmed") | translate }}
+          </h1>
+
+          <p class="confirm-hero__message">
+            {{ (cancelled() ? "orderConfirmation.cancelledMessage" : "checkout.orderSuccessMessage") | translate }}
+          </p>
+
+          <p class="confirm-hero__number">
+            {{ "checkout.orderNumber" | translate }}
+            <strong>#{{ item.id }}</strong>
+          </p>
+        </div>
+      </section>
+
+      <div class="page confirm">
+        <!-- Status timeline -->
+        @if (timeline().length) {
+          <section class="timeline" [attr.aria-label]="'checkout.status' | translate">
+            <ol class="timeline__list">
+              @for (step of timeline(); track step.status) {
+                <li
+                  class="timeline__step"
+                  [class.is-done]="step.done"
+                  [class.is-current]="step.current"
+                  [attr.aria-current]="step.current ? 'step' : null"
+                >
+                  <span class="timeline__dot" aria-hidden="true">
+                    <mat-icon>{{ step.done ? "check" : step.icon }}</mat-icon>
+                  </span>
+                  <span class="timeline__label">
+                    {{ "orderStatus." + step.status | translate }}
+                  </span>
+                </li>
+              }
+            </ol>
+          </section>
+        } @else {
+          <p class="confirm__cancelled-note" role="status">
+            <mat-icon aria-hidden="true">cancel</mat-icon>
+            {{ "orderStatus.CANCELLED" | translate }}
+          </p>
+        }
+
+        <div class="confirm__layout">
+          <!-- ---------------------------------------------------------- -->
+          <!--  Items + addresses                                          -->
+          <!-- ---------------------------------------------------------- -->
+          <div class="confirm__main">
+            @if (item.orderItems.length) {
+              <section class="panel">
+                <h2 class="panel__title">
+                  <mat-icon aria-hidden="true">shopping_bag</mat-icon>
+                  {{ "checkout.orderItems" | translate }}
+                </h2>
+
+                <ul class="order-items">
+                  @for (line of item.orderItems; track line.id) {
+                    <li class="order-items__row">
+                      <span class="order-items__thumb">
+                        <img
+                          [src]="itemImage(line)"
+                          [alt]="line.productName"
+                          loading="lazy"
+                          decoding="async"
+                          width="64"
+                          height="64"
+                        />
+                      </span>
+
+                      <span class="order-items__info">
+                        <a
+                          class="order-items__name"
+                          routerLink="/user/view-product"
+                          [queryParams]="{ id: line.productId }"
+                        >
+                          {{ line.productName }}
+                        </a>
+                        <span class="order-items__meta">
+                          {{ line.quantity }} &times;
+                          {{ line.unitPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                        </span>
+                      </span>
+
+                      <span class="order-items__total">
+                        {{ line.totalPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                      </span>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+
+            <section class="panel">
+              <h2 class="panel__title">
+                <mat-icon aria-hidden="true">local_shipping</mat-icon>
+                {{ "checkout.shippingAddress" | translate }}
+              </h2>
+
+              <address class="address">
+                <strong>{{ item.customerName }}</strong>
+                <span>{{ item.shippingAddress }}</span>
+                <span>{{ item.customerPhone }}</span>
+                <span>{{ item.customerEmail }}</span>
+              </address>
+
+              @if (item.billingAddress && item.billingAddress !== item.shippingAddress) {
+                <mat-divider />
+                <h3 class="panel__subtitle">{{ "checkout.billingAddress" | translate }}</h3>
+                <address class="address">
+                  <span>{{ item.billingAddress }}</span>
+                </address>
+              }
+            </section>
+          </div>
+
+          <!-- ---------------------------------------------------------- -->
+          <!--  Summary                                                    -->
+          <!-- ---------------------------------------------------------- -->
+          <aside class="sticky-aside" [attr.aria-label]="'checkout.orderDetails' | translate">
+            <h2 class="panel__title">
+              <mat-icon aria-hidden="true">receipt_long</mat-icon>
+              {{ "checkout.orderDetails" | translate }}
+            </h2>
+
+            <dl class="data-rows">
+              <div class="data-rows__row">
+                <dt>{{ "checkout.orderDate" | translate }}</dt>
+                <dd>{{ item.orderDate | date: "medium" }}</dd>
+              </div>
+              <div class="data-rows__row">
+                <dt>{{ "checkout.paymentMethod" | translate }}</dt>
+                <dd>
+                  {{
+                    (item.paymentMethod === "CARD_ONLINE"
+                      ? "checkout.cardPayment"
+                      : "checkout.cashOnDelivery") | translate
+                  }}
+                </dd>
+              </div>
+              <div class="data-rows__row">
+                <dt>{{ "checkout.shippingMethod" | translate }}</dt>
+                <dd>{{ "checkout.shippingOptions." + item.shippingMethod | translate }}</dd>
+              </div>
+              @if (item.deliveryDate) {
+                <div class="data-rows__row">
+                  <dt>{{ "checkout.estimatedDelivery" | translate }}</dt>
+                  <dd>{{ item.deliveryDate | date: "mediumDate" }}</dd>
+                </div>
+              }
+            </dl>
+
+            <mat-divider />
+
+            <dl class="data-rows data-rows--total">
+              <div class="data-rows__row">
+                <dt>{{ "cart.totalItems" | translate }}</dt>
+                <dd>{{ totalUnits() }}</dd>
+              </div>
+              <div class="data-rows__row">
+                <dt>{{ "checkout.subtotal" | translate }}</dt>
+                <dd>{{ itemsSubtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              </div>
+              <div class="data-rows__row">
+                <dt>{{ "checkout.shipping" | translate }}</dt>
+                <dd>{{ shippingCost() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              </div>
+              <div class="data-rows__row">
+                <dt>{{ "checkout.total" | translate }}</dt>
+                <dd>{{ item.totalAmount | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              </div>
+            </dl>
+
+            <a mat-flat-button color="primary" class="sticky-aside__cta" routerLink="/user/all-products">
+              <mat-icon>storefront</mat-icon>
+              {{ "checkout.continueShopping" | translate }}
+            </a>
+          </aside>
+        </div>
+      </div>
+    }
+  }
+}

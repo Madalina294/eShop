@@ -870,5 +870,16 @@
   },
   "confirm": {
     "defaultTitle": "Ești sigur?"
+  },
+  "orderStatus": {
+    "PENDING": "În așteptare",
+    "CONFIRMED": "Confirmată",
+    "SHIPPED": "Expediată",
+    "DELIVERED": "Livrată",
+    "CANCELLED": "Această comandă a fost anulată"
+  },
+  "orderConfirmation": {
+    "cancelledTitle": "Comandă anulată",
+    "cancelledMessage": "Această comandă nu mai este procesată. Orice sumă reținută va fi returnată."
   }
 }

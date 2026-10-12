@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {environment} from '../../../environments/environments';
 import {OrderResponse, PaymentIntentResponse} from '../../models/order-response';
 import {CheckoutRequest} from '../../models/checkout-request';
+import {Order} from '../../models/order';
 
 
 @Injectable({
@@ -24,12 +25,12 @@ export class CheckoutService {
     return this.http.post<OrderResponse>(`${this.apiUrl}/create-order`, orderData);
   }
 
-  getUserOrders(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/orders`);
+  getUserOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/orders`);
   }
 
-  getOrder(orderId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/orders/${orderId}`);
+  getOrder(orderId: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/orders/${orderId}`);
   }
 
 }
