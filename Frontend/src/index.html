@@ -1,16 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark-mode">
 <head>
   <meta charset="utf-8">
-  <title>2faAngular</title>
+  <title>eShop</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="eShop — browse the catalogue, manage your cart and check out securely.">
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script src="https://js.stripe.com/v3/"></script>
+
+  <script src="https://js.stripe.com/v3/" defer></script>
 </head>
-<body class="mat-typography">
+<body class="mat-typography dark-mode">
   <app-root></app-root>
 </body>
 </html>

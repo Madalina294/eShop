@@ -1,0 +1,204 @@
+// ============================================================================
+//  DESIGN TOKENS
+//  Single source of truth for color, spacing, radius, elevation & motion.
+//  Never hardcode a hex / px value in a component — always reference a token.
+//  Dark mode works for free: tokens are redefined under `.dark-mode`.
+// ============================================================================
+
+:root {
+  // --- Brand (indigo) -------------------------------------------------------
+  --brand-50:  #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+  --brand-800: #3730a3;
+  --brand-900: #312e81;
+
+  // --- Accent (amber) — prices, promos, highlights --------------------------
+  --accent-50:  #fffbeb;
+  --accent-300: #fcd34d;
+  --accent-400: #fbbf24;
+  --accent-500: #f59e0b;
+  --accent-600: #d97706;
+
+  // --- Neutrals (slate) -----------------------------------------------------
+  --neutral-50:  #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #020617;
+
+  // --- Semantic status ------------------------------------------------------
+  --success-50:  #ecfdf5;
+  --success-500: #10b981;
+  --success-600: #059669;
+  --warning-50:  #fffbeb;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --error-50:    #fef2f2;
+  --error-500:   #ef4444;
+  --error-600:   #dc2626;
+  --info-50:     #eff6ff;
+  --info-500:    #3b82f6;
+  --info-600:    #2563eb;
+
+  // --- Spacing scale (4px base) --------------------------------------------
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  // --- Radius ---------------------------------------------------------------
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 999px;
+
+  // --- Typography scale -----------------------------------------------------
+  --font-sans: Roboto, "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --text-xs:   0.75rem;   // 12
+  --text-sm:   0.875rem;  // 14
+  --text-base: 1rem;      // 16
+  --text-lg:   1.125rem;  // 18
+  --text-xl:   1.25rem;   // 20
+  --text-2xl:  1.5rem;    // 24
+  --text-3xl:  1.875rem;  // 30
+  --text-4xl:  2.25rem;   // 36
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  // --- Motion ---------------------------------------------------------------
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   140ms;
+  --duration-normal: 220ms;
+  --duration-slow:   360ms;
+
+  // --- Layout ---------------------------------------------------------------
+  --header-height: 64px;
+  --container-max: 1280px;
+  --z-header:   100;
+  --z-dropdown: 200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+
+  // ==========================================================================
+  //  LIGHT THEME (default)
+  // ==========================================================================
+  --brand:          var(--brand-600);
+  --brand-hover:    var(--brand-700);
+  --brand-soft:     var(--brand-50);
+  --on-brand:       #ffffff;
+  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #a855f7 100%);
+
+  --accent:      var(--accent-600);
+  --accent-soft: var(--accent-50);
+
+  --success:      var(--success-600);
+  --success-soft: var(--success-50);
+  --warning:      var(--warning-600);
+  --warning-soft: var(--warning-50);
+  --error:        var(--error-600);
+  --error-soft:   var(--error-50);
+  --info:         var(--info-600);
+  --info-soft:    var(--info-50);
+
+  --surface-0: #f8fafc;   // page background
+  --surface-1: #ffffff;   // cards, panels
+  --surface-2: #f1f5f9;   // hover / nested / subtle fills
+  --surface-3: #e2e8f0;   // skeletons, dividing bands
+  --surface-inverse: var(--neutral-900);
+
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary:  #64748b;
+  --text-disabled:  #94a3b8;
+  --text-on-inverse: #f1f5f9;
+
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-brand:  var(--brand-500);
+
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-2: 0 4px 6px -2px rgba(15, 23, 42, 0.06), 0 10px 20px -4px rgba(15, 23, 42, 0.10);
+  --shadow-3: 0 12px 20px -6px rgba(15, 23, 42, 0.10), 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+  --shadow-brand: 0 8px 20px -6px rgba(99, 102, 241, 0.45);
+
+  --overlay: rgba(15, 23, 42, 0.48);
+  --skeleton-base:  #e2e8f0;
+  --skeleton-shine: #f1f5f9;
+
+  color-scheme: light;
+}
+
+// ============================================================================
+//  DARK THEME
+// ============================================================================
+.dark-mode {
+  --brand:       var(--brand-400);
+  --brand-hover: var(--brand-300);
+  --brand-soft:  rgba(99, 102, 241, 0.16);
+  --on-brand:    #0b1120;
+  --brand-gradient: linear-gradient(135deg, #4338ca 0%, #6d28d9 55%, #7e22ce 100%);
+
+  --accent:      var(--accent-400);
+  --accent-soft: rgba(245, 158, 11, 0.16);
+
+  --success:      var(--success-500);
+  --success-soft: rgba(16, 185, 129, 0.16);
+  --warning:      var(--warning-500);
+  --warning-soft: rgba(245, 158, 11, 0.16);
+  --error:        var(--error-500);
+  --error-soft:   rgba(239, 68, 68, 0.16);
+  --info:         var(--info-500);
+  --info-soft:    rgba(59, 130, 246, 0.16);
+
+  --surface-0: #0b1120;
+  --surface-1: #151e32;
+  --surface-2: #1e293b;
+  --surface-3: #334155;
+  --surface-inverse: var(--neutral-50);
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #a8b6ca;
+  --text-tertiary:  #8094ad;
+  --text-disabled:  #64748b;
+  --text-on-inverse: #0f172a;
+
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
+  --border-brand:  var(--brand-400);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.32);
+  --shadow-2: 0 4px 6px -2px rgba(0, 0, 0, 0.36), 0 10px 20px -4px rgba(0, 0, 0, 0.44);
+  --shadow-3: 0 12px 20px -6px rgba(0, 0, 0, 0.44), 0 24px 48px -12px rgba(0, 0, 0, 0.60);
+  --shadow-brand: 0 8px 20px -6px rgba(129, 140, 248, 0.40);
+
+  --overlay: rgba(2, 6, 23, 0.68);
+  --skeleton-base:  #1e293b;
+  --skeleton-shine: #334155;
+
+  color-scheme: dark;
+}

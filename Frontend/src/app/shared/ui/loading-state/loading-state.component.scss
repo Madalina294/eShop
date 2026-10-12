@@ -1,0 +1,83 @@
+@use "mixins" as m;
+
+.loading {
+  width: 100%;
+
+  &__spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-7) var(--space-4);
+  }
+
+  &__label {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  &__grid {
+    @include m.auto-grid(260px);
+  }
+
+  &__list,
+  &__table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+.skeleton-line {
+  @include m.skeleton;
+  height: 12px;
+
+  &--title { width: 72%; height: 16px; }
+  &--meta  { width: 46%; }
+  &--price { width: 32%; height: 18px; }
+  &--table { width: 100%; height: 44px; border-radius: var(--radius-sm); }
+}
+
+.skeleton-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  &__media {
+    @include m.skeleton(0);
+    aspect-ratio: 4 / 3;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+  }
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+
+  &__avatar {
+    @include m.skeleton(var(--radius-full));
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}

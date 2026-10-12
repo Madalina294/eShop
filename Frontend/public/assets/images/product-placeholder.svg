@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="No product image available">
+  <rect width="400" height="300" fill="#f1f5f9"/>
+  <g fill="none" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="132" y="104" width="136" height="104" rx="10"/>
+    <path d="M132 176l34-30 28 24 26-22 48 40"/>
+  </g>
+  <circle cx="176" cy="134" r="11" fill="#cbd5e1"/>
+  <text x="200" y="244" font-family="Roboto, Helvetica, sans-serif" font-size="17" fill="#94a3b8" text-anchor="middle">No image</text>
+</svg>

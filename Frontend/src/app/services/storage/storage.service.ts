@@ -18,18 +18,14 @@ export class StorageService {
 
   static saveToken(token: string): void{
     if (!this.isBrowser()) return;
-    console.log('Saving token to localStorage:', token);
     window.localStorage.removeItem(TOKEN);
     window.localStorage.setItem(TOKEN, token);
-    console.log('Token saved successfully');
   }
 
   static saveRefreshToken(refreshToken: string): void{
     if (!this.isBrowser()) return;
-    console.log('Saving refresh token to localStorage:', refreshToken);
     window.localStorage.removeItem(REFRESH_TOKEN);
     window.localStorage.setItem(REFRESH_TOKEN, refreshToken);
-    console.log('Refresh token saved successfully');
   }
 
   static saveUser(user: any): void{
@@ -40,14 +36,12 @@ export class StorageService {
   static getToken(): string | null{
     if (!this.isBrowser()) return null;
     const token = window.localStorage.getItem(TOKEN);
-    console.log('Retrieved token from localStorage:', token);
     return token;
   }
 
   static getRefreshToken(): string | null{
     if (!this.isBrowser()) return null;
     const refreshToken = window.localStorage.getItem(REFRESH_TOKEN);
-    console.log('Retrieved refresh token from localStorage:', refreshToken);
     return refreshToken;
   }
 

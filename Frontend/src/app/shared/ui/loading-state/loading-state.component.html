@@ -1,0 +1,53 @@
+<div class="loading" role="status" aria-live="polite" [attr.aria-label]="label() || null">
+  @switch (variant()) {
+    @case ('grid') {
+      <div class="loading__grid">
+        @for (i of placeholders(); track i) {
+          <div class="skeleton-card" aria-hidden="true">
+            <div class="skeleton-card__media"></div>
+            <div class="skeleton-card__body">
+              <div class="skeleton-line skeleton-line--title"></div>
+              <div class="skeleton-line skeleton-line--meta"></div>
+              <div class="skeleton-line skeleton-line--price"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('list') {
+      <div class="loading__list">
+        @for (i of placeholders(); track i) {
+          <div class="skeleton-row" aria-hidden="true">
+            <div class="skeleton-row__avatar"></div>
+            <div class="skeleton-row__body">
+              <div class="skeleton-line skeleton-line--title"></div>
+              <div class="skeleton-line skeleton-line--meta"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('table') {
+      <div class="loading__table">
+        @for (i of placeholders(); track i) {
+          <div class="skeleton-line skeleton-line--table" aria-hidden="true"></div>
+        }
+      </div>
+    }
+
+    @default {
+      <div class="loading__spinner">
+        <mat-progress-spinner mode="indeterminate" diameter="44" />
+        @if (label()) {
+          <p class="loading__label">{{ label() }}</p>
+        }
+      </div>
+    }
+  }
+
+  @if (label() && variant() !== 'spinner') {
+    <span class="sr-only">{{ label() }}</span>
+  }
+</div>

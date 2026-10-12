@@ -41,8 +41,6 @@ export class UserService {
 
   updatePassword(data: any): Observable<any>{
     const headers = this.createAuthorizationHeader();
-    console.log('Update password request:', data);
-    console.log('Headers:', headers.keys());
     return this.http.put(this.baseUrl + `/update-password`, data, {headers: headers});
   }
 

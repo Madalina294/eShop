@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Șablon Aplicație"
+    "name": "eShop"
   },
   "header": {
     "title": "Panou de control",
@@ -90,7 +90,24 @@
     "search": "Caută",
     "yes": "Da",
     "no": "Nu",
-    "close": "Închide"
+    "close": "Închide",
+    "retry": "Încearcă din nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "confirm": "Confirmă",
+    "loading": "Se încarcă…",
+    "actions": "Acțiuni",
+    "all": "Toate",
+    "clear": "Golește",
+    "clearFilters": "Șterge filtrele",
+    "skipToContent": "Sari la conținutul principal",
+    "openMenu": "Deschide meniul",
+    "closeMenu": "Închide meniul",
+    "required": "Acest câmp este obligatoriu"
   },
   "login": {
     "title": "Bine ai revenit",
@@ -192,7 +209,7 @@
       "ok": "Ok"
     }
   },
-    "welcome": {
+  "welcome": {
     "title": "Bine ai venit, {{firstName}} {{lastName}}!",
     "subtitle": "Te-ai autentificat cu succes în contul tău.",
     "profile": {
@@ -312,16 +329,16 @@
     "confirmDelete": "Ești sigur că vrei să ștergi acest utilizator? Această acțiune nu poate fi anulată.",
     "userDeletedSuccess": "Utilizatorul a fost șters cu succes!",
     "deleteError": "Ceva nu a mers bine. Te rugăm încearcă din nou!",
-      "loadError": "Eroare la încărcarea utilizatorilor",
-      "ok": "Ok",
-      "close": "Închide",
-      "paginator": {
-        "itemsPerPage": "Utilizatori per pagină",
-        "nextPage": "Pagina următoare",
-        "previousPage": "Pagina anterioară",
-        "firstPage": "Prima pagină",
-        "lastPage": "Ultima pagină",
-        "ofLabel": "din"
+    "loadError": "Eroare la încărcarea utilizatorilor",
+    "ok": "Ok",
+    "close": "Închide",
+    "paginator": {
+      "itemsPerPage": "Utilizatori per pagină",
+      "nextPage": "Pagina următoare",
+      "previousPage": "Pagina anterioară",
+      "firstPage": "Prima pagină",
+      "lastPage": "Ultima pagină",
+      "ofLabel": "din"
     }
   },
   "adminStatistics": {
@@ -404,8 +421,7 @@
     "createProduct": "Creează Produs",
     "editProduct": "Editează Produs",
     "sendEmail": "Trimite Email",
-    "viewUserAccount": "Vezi Cont Utilizator",
-    "activityLogs": "Jurnale de Activitate"
+    "viewUserAccount": "Vezi Cont Utilizator"
   },
   "editCategory": {
     "title": "Editează Categoria",
@@ -437,7 +453,8 @@
     "confirmDelete": "Ești sigur că vrei să ștergi această categorie? Această acțiune nu poate fi anulată.",
     "categoryDeletedSuccess": "Categorie ștearsă cu succes!",
     "loadError": "Eroare la încărcarea categoriilor!",
-    "ok": "Ok"
+    "ok": "Ok",
+    "deleteError": "Categoria nu a putut fi ștearsă. Încearcă din nou."
   },
   "createProduct": {
     "title": "Creează Produs",
@@ -725,5 +742,48 @@
       "SAME_DAY": "Livrare în aceeași zi",
       "URGENT": "Livrare în 2-4 ore"
     }
+  },
+  "errors": {
+    "network": "Nu există conexiune cu serverul. Verifică internetul și încearcă din nou.",
+    "badRequest": "Cererea nu a putut fi procesată. Verifică datele introduse.",
+    "forbidden": "Nu ai permisiunea să efectuezi această acțiune.",
+    "notFound": "Resursa cerută nu a fost găsită.",
+    "conflict": "Această acțiune intră în conflict cu date existente.",
+    "payloadTooLarge": "Fișierul selectat este prea mare.",
+    "validation": "Unele dintre datele introduse nu sunt valide.",
+    "tooManyRequests": "Prea multe cereri. Așteaptă un moment și încearcă din nou.",
+    "server": "Ceva a mers prost la noi. Te rugăm să încerci mai târziu.",
+    "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în scurt timp.",
+    "unexpected": "A apărut o eroare neașteptată.",
+    "loadFailedTitle": "Nu am putut încărca acest conținut",
+    "loadFailedDescription": "Cererea nu a reușit. Verifică conexiunea și încearcă din nou.",
+    "sessionExpired": "Sesiunea ta a expirat. Te rugăm să te autentifici din nou."
+  },
+  "product": {
+    "addToCart": "Adaugă în coș",
+    "outOfStock": "Stoc epuizat",
+    "inStock": "În stoc",
+    "addToWishlist": "Adaugă la favorite",
+    "removeFromWishlist": "Scoate din favorite",
+    "addedToCart": "Produsul a fost adăugat în coș",
+    "addedToWishlist": "Produsul a fost adăugat la favorite",
+    "removedFromWishlist": "Produsul a fost scos din favorite"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "description": "Pagina pe care o cauți nu există sau a fost mutată.",
+    "backHome": "Înapoi la pagina principală",
+    "browseProducts": "Vezi produsele"
+  },
+  "titles": {
+    "login": "Autentificare",
+    "register": "Creează cont",
+    "resetPassword": "Resetare parolă",
+    "enterEmail": "Parolă uitată",
+    "welcome": "Acasă",
+    "profile": "Profilul meu",
+    "updatePassword": "Schimbă parola",
+    "preferences": "Preferințe",
+    "notFound": "Pagina nu a fost găsită"
   }
 }

@@ -1,0 +1,23 @@
+@if (link()) {
+  <a class="stat-card stat-card--link" [class]="'stat-card--' + tone()" [routerLink]="link()">
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <div class="stat-card" [class]="'stat-card--' + tone()">
+    <ng-container [ngTemplateOutlet]="content" />
+  </div>
+}
+
+<ng-template #content>
+  <span class="stat-card__icon" aria-hidden="true">
+    <mat-icon>{{ icon() }}</mat-icon>
+  </span>
+
+  <span class="stat-card__text">
+    <span class="stat-card__value">{{ value() }}</span>
+    <span class="stat-card__label">{{ label() }}</span>
+    @if (hint()) {
+      <span class="stat-card__hint">{{ hint() }}</span>
+    }
+  </span>
+</ng-template>

@@ -1,0 +1,72 @@
+@use "mixins" as m;
+
+:host { display: block; }
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  height: 100%;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--tone, var(--brand));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  color: inherit;
+  text-decoration: none;
+
+  &--link {
+    @include m.card-interactive;
+    @include m.focus-ring;
+
+    &:hover { text-decoration: none; }
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--tone-soft, var(--brand-soft));
+    color: var(--tone, var(--brand));
+
+    mat-icon { width: 26px; height: 26px; font-size: 26px; }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__value {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    @include m.truncate;
+  }
+
+  &__label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  &__hint {
+    margin-top: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
+
+  // Tones only remap two custom properties; everything else is shared.
+  &--brand   { --tone: var(--brand);   --tone-soft: var(--brand-soft); }
+  &--success { --tone: var(--success); --tone-soft: var(--success-soft); }
+  &--warning { --tone: var(--warning); --tone-soft: var(--warning-soft); }
+  &--error   { --tone: var(--error);   --tone-soft: var(--error-soft); }
+  &--info    { --tone: var(--info);    --tone-soft: var(--info-soft); }
+  &--neutral { --tone: var(--text-secondary); --tone-soft: var(--surface-2); }
+}

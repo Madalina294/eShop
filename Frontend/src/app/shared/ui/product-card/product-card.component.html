@@ -1,0 +1,79 @@
+<article class="product-card" [class.product-card--out]="outOfStock()">
+  <!-- The clickable surface is a real link when we have a route, a real
+       button otherwise — never a div, so it is always keyboard reachable. -->
+  @if (link()) {
+    <a class="product-card__link" [routerLink]="link()">
+      <ng-container [ngTemplateOutlet]="cardBody" />
+    </a>
+  } @else {
+    <button class="product-card__link" type="button" (click)="open.emit(product())">
+      <ng-container [ngTemplateOutlet]="cardBody" />
+    </button>
+  }
+
+  @if (showAddToCart()) {
+    <div class="product-card__actions">
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="product-card__cart-btn"
+        [disabled]="outOfStock()"
+        (click)="onAction($event, 'cart')"
+      >
+        <mat-icon>add_shopping_cart</mat-icon>
+        {{ "product.addToCart" | translate }}
+      </button>
+    </div>
+  }
+</article>
+
+<ng-template #cardBody>
+  <span class="product-card__media">
+    <img
+      class="product-card__image"
+      [src]="imageUrl()"
+      [alt]="product().name"
+      [loading]="eager() ? 'eager' : 'lazy'"
+      [attr.fetchpriority]="eager() ? 'high' : null"
+      decoding="async"
+      width="400"
+      height="300"
+    />
+
+    @if (outOfStock()) {
+      <span class="product-card__badge product-card__badge--out">
+        {{ "product.outOfStock" | translate }}
+      </span>
+    }
+  </span>
+
+  <span class="product-card__body">
+    @if (categoryName()) {
+      <span class="product-card__category">{{ categoryName() }}</span>
+    }
+
+    <span class="product-card__name">{{ product().name }}</span>
+
+    <span class="product-card__price">
+      {{ product().price | currency: currency() : "symbol" : "1.2-2" }}
+    </span>
+  </span>
+</ng-template>
+
+<!-- Outside the link so it is its own tab stop, not nested interactive content. -->
+@if (showWishlist()) {
+  <button
+    mat-mini-fab
+    type="button"
+    class="product-card__wishlist"
+    [class.is-active]="inWishlist()"
+    [attr.aria-label]="
+      (inWishlist() ? 'product.removeFromWishlist' : 'product.addToWishlist') | translate
+    "
+    [attr.aria-pressed]="inWishlist()"
+    (click)="onAction($event, 'wishlist')"
+  >
+    <mat-icon>{{ inWishlist() ? "favorite" : "favorite_border" }}</mat-icon>
+  </button>
+}

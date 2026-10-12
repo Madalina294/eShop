@@ -1,0 +1,13 @@
+<main class="not-found">
+  <p class="not-found__code" aria-hidden="true">404</p>
+
+  <h1 class="not-found__title">{{ "notFound.title" | translate }}</h1>
+  <p class="not-found__description">{{ "notFound.description" | translate }}</p>
+
+  <div class="not-found__actions">
+    <a mat-flat-button color="primary" [routerLink]="homeLink">
+      <mat-icon>home</mat-icon>
+      {{ "notFound.backHome" | translate }}
+    </a>
+  </div>
+</main>

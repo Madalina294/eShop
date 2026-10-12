@@ -44,10 +44,6 @@ export class UserStateService {
    */
   loadUserFromStorage(): void {
     const userData = StorageService.getUser();
-    console.log('=== DEBUG: UserStateService loadUserFromStorage ===');
-    console.log('UserData from storage:', userData);
-    console.log('GoogleId from storage:', userData?.googleId);
-    console.log('=== END DEBUG ===');
 
     if (userData) {
       this.userSignal.set({
