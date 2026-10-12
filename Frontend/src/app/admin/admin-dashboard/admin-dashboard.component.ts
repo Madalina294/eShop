@@ -1,77 +1,109 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
+import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { BreadcrumbComponent } from '../../shared/breadcrumb/breadcrumb.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AdminService } from '../../services/admin/admin.service';
+import { AverageCart } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { StatCardComponent } from '../../shared/ui/stat-card/stat-card.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+
+interface Tile {
+  readonly title: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly route: string;
+}
+
+/**
+ * Quick-access tiles. Previously built by a `get dashboardItems()` getter that
+ * called `translate.instant()` twelve times on every change-detection cycle;
+ * the keys are now constants and the template translates them once each.
+ *
+ * The `/admin/settings` tile is gone: the route never existed, so it 404ed.
+ */
+const TILES: readonly Tile[] = [
+  {
+    title: 'adminDashboard.manageUsers.title',
+    description: 'adminDashboard.manageUsers.description',
+    icon: 'supervisor_account',
+    route: '/admin/all-users',
+  },
+  {
+    title: 'adminDashboard.manageCategories.title',
+    description: 'adminDashboard.manageCategories.description',
+    icon: 'category',
+    route: '/admin/view-categories',
+  },
+  {
+    title: 'adminDashboard.manageProducts.title',
+    description: 'adminDashboard.manageProducts.description',
+    icon: 'inventory_2',
+    route: '/admin/view-products',
+  },
+  {
+    title: 'adminDashboard.statistics.title',
+    description: 'adminDashboard.statistics.description',
+    icon: 'insights',
+    route: '/admin/statistics',
+  },
+  {
+    title: 'adminDashboard.activityLogs.title',
+    description: 'adminDashboard.activityLogs.description',
+    icon: 'history',
+    route: '/admin/activity-logs',
+  },
+];
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterModule,
-    MatCardModule,
-    MatButtonModule,
+    RouterLink,
+    PricePipe,
     MatIconModule,
-    MatGridListModule,
-    BreadcrumbComponent,
-    TranslateModule
+    TranslateModule,
+    PageHeaderComponent,
+    StatCardComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss'
+  styleUrl: './admin-dashboard.component.scss',
 })
 export class AdminDashboardComponent {
+  private readonly adminService = inject(AdminService);
 
-  constructor(private translate: TranslateService) {}
+  protected readonly tiles = TILES;
+  protected readonly state = signal<ViewState>('loading');
 
-  get dashboardItems() {
-    return [
-      {
-        title: this.translate.instant('adminDashboard.manageUsers.title'),
-        description: this.translate.instant('adminDashboard.manageUsers.description'),
-        icon: 'supervisor_account',
-        route: '/admin/all-users',
-        color: 'primary'
+  protected readonly cart = signal<AverageCart | null>(null);
+  protected readonly customerCount = signal(0);
+
+  constructor() {
+    this.load();
+  }
+
+  protected load(): void {
+    this.state.set('loading');
+
+    // The only statistics the frozen backend exposes.
+    forkJoin({
+      cart: this.adminService.getAverageCartValue(),
+      byUser: this.adminService.getOrdersCountByUser(),
+    }).subscribe({
+      next: ({ cart, byUser }) => {
+        this.cart.set(cart);
+        this.customerCount.set(byUser.length);
+        this.state.set('ready');
       },
-      {
-        title: this.translate.instant('adminDashboard.manageCategories.title'),
-        description: this.translate.instant('adminDashboard.manageCategories.description'),
-        icon: 'category',
-        route: '/admin/view-categories',
-        color: 'primary'
-      },
-      {
-        title: this.translate.instant('adminDashboard.manageProducts.title'),
-        description: this.translate.instant('adminDashboard.manageProducts.description'),
-        icon: 'category',
-        route: '/admin/view-products',
-        color: 'primary'
-      },
-      {
-        title: this.translate.instant('adminDashboard.statistics.title'),
-        description: this.translate.instant('adminDashboard.statistics.description'),
-        icon: 'analytics',
-        route: '/admin/statistics',
-        color: 'accent'
-      },
-      {
-        title: this.translate.instant('adminDashboard.systemSettings.title'),
-        description: this.translate.instant('adminDashboard.systemSettings.description'),
-        icon: 'settings',
-        route: '/admin/settings',
-        color: 'warn'
-      },
-      {
-        title: this.translate.instant('adminDashboard.activityLogs.title'),
-        description: this.translate.instant('adminDashboard.activityLogs.description'),
-        icon: 'history',
-        route: '/admin/activity-logs',
-        color: 'primary'
-      }
-    ];
+      error: () => this.state.set('error'),
+    });
   }
 }

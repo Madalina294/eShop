@@ -1,291 +1,63 @@
-.categories-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+@use "mixins" as m;
 
-.categories-header-card {
-  margin-bottom: 24px;
-
-  mat-card-header {
-    padding: 16px;
-
-    div[mat-card-avatar] {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #1976d2;
-      margin-right: 20px;
-
-      mat-icon {
-        color: white;
-        font-size: 24px;
-      }
-    }
-  }
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px;
-
-  p {
-    margin-top: 16px;
-    color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-.no-categories {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px;
-
-  mat-icon {
-    font-size: 48px;
-    width: fit-content;
-    height: fit-content;
-    color: #ccc;
-    margin-bottom: 16px;
-  }
-
-  p {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 1.1rem;
-  }
-}
-
-.categories-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.category-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  }
-
-  mat-card-content {
-    padding: 20px;
-  }
-
-  .category-info {
+.cats {
+  &__list {
     display: flex;
-    gap: 16px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .category-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+  &__item {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    flex-shrink: 0;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
 
-    mat-icon {
-      font-size: 28px;
-      color: white;
-      width: 28px;
-      height: 28px;
+    @include m.respond-to(sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
     }
   }
 
-  .category-details {
-    flex: 1;
+  &__text {
+    min-width: 0;
+  }
 
-    h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.3rem;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.87);
-    }
+  &__name {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
 
-    .description {
-      margin: 8px 0;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
+  &__description {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
 
-    .category-meta {
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  &__id {
+    display: inline-block;
+    margin-top: var(--space-2);
+    color: var(--text-tertiary);
+    font-size: var(--text-xs);
+  }
 
-    .category-id {
+  &__actions {
+    display: flex;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+
+    button {
       display: inline-flex;
       align-items: center;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      background-color: rgba(100, 181, 246, 0.2);
-      color: #64b5f6;
-      border: 1px solid rgba(100, 181, 246, 0.3);
+      gap: var(--space-1);
     }
   }
 
-  mat-card-actions {
-    padding: 16px 20px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-
-    button {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-
-      mat-icon {
-        font-size: 18px;
-      }
-    }
+  &__delete {
+    color: var(--error);
   }
 }
-
-// Dark theme specific styles
-.categories-container {
-  background-color: transparent;
-}
-
-// Ensure cards have proper dark theme styling
-.category-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
-
-  mat-card-content {
-    color: rgba(255, 255, 255, 0.87);
-  }
-
-  mat-card-actions {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-
-    button {
-      color: rgba(255, 255, 255, 0.87);
-
-      &[color="primary"] {
-        color: #64b5f6;
-      }
-
-      &[color="warn"] {
-        color: #f48fb1;
-      }
-    }
-  }
-}
-
-// Light theme specific styles
-:host-context(.light-mode) {
-  .loading-container p {
-    color: rgba(0, 0, 0, 0.6);
-  }
-
-  .no-categories {
-    mat-icon {
-      color: #999;
-    }
-
-    p {
-      color: rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  .category-card {
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 0.87);
-
-    .category-details {
-      h3 {
-        color: rgba(0, 0, 0, 0.87);
-      }
-
-      .description {
-        color: rgba(0, 0, 0, 0.6);
-      }
-    }
-
-    mat-card-content {
-      color: rgba(0, 0, 0, 0.87);
-    }
-
-    mat-card-actions {
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
-
-      button {
-        color: rgba(0, 0, 0, 0.87);
-
-        &[color="primary"] {
-          color: #1976d2;
-        }
-
-        &[color="warn"] {
-          color: #d32f2f;
-        }
-      }
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .categories-container {
-    padding: 16px;
-  }
-
-  .categories-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .category-card {
-    .category-info {
-      flex-direction: row;
-    }
-
-    mat-card-actions {
-      justify-content: center;
-
-      button {
-        flex: 1;
-        min-width: 120px;
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .category-card {
-    mat-card-actions {
-      flex-direction: column;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
-}
-

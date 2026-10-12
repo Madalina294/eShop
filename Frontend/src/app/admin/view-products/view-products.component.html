@@ -1,194 +1,171 @@
-<div class="products-container" (click)="closeMenu()">
-  <mat-card class="products-header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>category</mat-icon>
-      </div>
-      <mat-card-title>{{ "viewProducts.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-        "viewProducts.subtitle" | translate
-      }}</mat-card-subtitle>
-    </mat-card-header>
-    <button
-      mat-button
-      routerLink="/admin/add-product"
-      style="
-        background-color: #6b46c1;
-        color: white;
-        align-content: flex-end;
-        border-radius: 10px;
-      "
-    >
+<div class="page page--wide">
+  <app-page-header
+    icon="inventory_2"
+    [title]="'viewProducts.title' | translate"
+    [subtitle]="'viewProducts.subtitle' | translate"
+  >
+    <a mat-flat-button color="primary" routerLink="/admin/add-product">
       <mat-icon>add</mat-icon>
       <span>{{ "viewProducts.addProduct" | translate }}</span>
-    </button>
-  </mat-card>
+    </a>
+  </app-page-header>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "viewProducts.loadingProducts" | translate }}</p>
+  <div class="listing__toolbar">
+    <label class="listing__search">
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <span class="sr-only">{{ "common.search" | translate }}</span>
+      <input
+        type="search"
+        [value]="search()"
+        [placeholder]="'common.search' | translate"
+        (input)="search.set($any($event.target).value)"
+      />
+    </label>
   </div>
 
-  <!-- Error Message -->
-  <div *ngIf="error() && !loading()" class="error-container">
-    <mat-icon color="warn">error</mat-icon>
-    <p>{{ error() }}</p>
-    <button mat-raised-button color="primary" (click)="loadProducts()">
-      <mat-icon>refresh</mat-icon>
-      {{ "viewProducts.loadAgain" | translate }}
-    </button>
-  </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="table" [count]="8" />
+    }
 
-  <!-- Products List -->
-  <div *ngIf="!loading() && !error()" class="user-list">
-    <!-- Controls -->
-    <div class="controls-section">
-      <div class="sort-controls">
-        <mat-form-field appearance="outline">
-          <mat-label>{{ "viewProducts.sortBy" | translate }}</mat-label>
-          <mat-select
-            [value]="sortBy()"
-            (selectionChange)="onSortChange($event.value)"
-          >
-            <mat-option value="id">{{
-              "viewProducts.sortOptions.id" | translate
-            }}</mat-option>
-            <mat-option value="name">{{
-              "viewProducts.sortOptions.name" | translate
-            }}</mat-option>
-            <mat-option value="price">{{
-              "viewProducts.sortOptions.price" | translate
-            }}</mat-option>
-            <mat-option value="color">{{
-              "viewProducts.sortOptions.color" | translate
-            }}</mat-option>
-            <mat-option value="material">{{
-              "viewProducts.sortOptions.material" | translate
-            }}</mat-option>
-            <mat-option value="weight">{{
-              "viewProducts.sortOptions.weight" | translate
-            }}</mat-option>
-            <mat-option value="dimensions">{{
-              "viewProducts.sortOptions.dimension" | translate
-            }}</mat-option>
-            <mat-option value="category">{{
-              "viewProducts.sortOptions.category" | translate
-            }}</mat-option>
-            <mat-option value="quantity">{{
-              "viewProducts.sortOptions.quantity" | translate
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+    @case ("empty") {
+      <app-empty-state
+        icon="inventory_2"
+        [title]="'viewProducts.noProductsFound' | translate"
+        [actionLabel]="'viewProducts.addProduct' | translate"
+        actionIcon="add"
+        (action)="goToAdd()"
+      />
+    }
 
-        <button
-          mat-icon-button
-          (click)="onSortDirectionChange()"
-          [title]="
-            sortDir() === 'asc'
-              ? ('viewProducts.sortAscending' | translate)
-              : ('viewProducts.sortDescending' | translate)
-          "
-        >
-          <mat-icon>{{
-            sortDir() === "asc" ? "arrow_upward" : "arrow_downward"
-          }}</mat-icon>
-        </button>
+    @case ("error") {
+      <app-error-state
+        [title]="'viewProducts.loadError' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
+
+    @default {
+      <div class="data-table-wrap panel">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <button type="button" [class.is-sorted]="sortBy() === 'id'" (click)="sort('id')">
+                  {{ "viewProducts.sortOptions.id" | translate }}
+                  <mat-icon aria-hidden="true">{{
+                    sortBy() === "id" && sortDir() === "desc" ? "arrow_downward" : "arrow_upward"
+                  }}</mat-icon>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" [class.is-sorted]="sortBy() === 'name'" (click)="sort('name')">
+                  {{ "viewProducts.name" | translate }}
+                  <mat-icon aria-hidden="true">{{
+                    sortBy() === "name" && sortDir() === "desc" ? "arrow_downward" : "arrow_upward"
+                  }}</mat-icon>
+                </button>
+              </th>
+              <th scope="col">{{ "viewProducts.category" | translate }}</th>
+              <th scope="col" class="is-numeric">
+                <button
+                  type="button"
+                  [class.is-sorted]="sortBy() === 'price'"
+                  (click)="sort('price')"
+                >
+                  {{ "viewProducts.price" | translate }}
+                  <mat-icon aria-hidden="true">{{
+                    sortBy() === "price" && sortDir() === "desc" ? "arrow_downward" : "arrow_upward"
+                  }}</mat-icon>
+                </button>
+              </th>
+              <th scope="col" class="is-numeric">
+                <button
+                  type="button"
+                  [class.is-sorted]="sortBy() === 'quantity'"
+                  (click)="sort('quantity')"
+                >
+                  {{ "viewProducts.quantity" | translate }}
+                  <mat-icon aria-hidden="true">{{
+                    sortBy() === "quantity" && sortDir() === "desc"
+                      ? "arrow_downward"
+                      : "arrow_upward"
+                  }}</mat-icon>
+                </button>
+              </th>
+              <th scope="col">
+                <span class="sr-only">{{ "viewProducts.actions" | translate }}</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (product of visible(); track product.id) {
+              <tr>
+                <td class="is-muted">{{ product.id }}</td>
+                <td>
+                  <span class="listing__product">
+                    <img
+                      [src]="imageFor(product)"
+                      alt=""
+                      width="36"
+                      height="36"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span>{{ product.name }}</span>
+                  </span>
+                </td>
+                <td class="is-muted">{{ product.categoryName ?? "—" }}</td>
+                <td class="is-numeric">
+                  {{ product.price | price }}
+                </td>
+                <td class="is-numeric">{{ product.quantity }}</td>
+                <td>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [matMenuTriggerFor]="rowMenu"
+                    [attr.aria-label]="'viewProducts.actions' | translate"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #rowMenu="matMenu" xPosition="before">
+                    <a
+                      mat-menu-item
+                      routerLink="/admin/edit-product"
+                      [queryParams]="{ productId: product.id }"
+                    >
+                      <mat-icon>edit</mat-icon>
+                      <span>{{ "viewProducts.editProduct" | translate }}</span>
+                    </a>
+                    <button mat-menu-item type="button" (click)="confirmDelete(product)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{ "viewProducts.deleteProduct" | translate }}</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="is-muted">
+                  {{ "viewProducts.noProductsFound" | translate }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
 
-      <div class="pagination-info">
-        {{ "viewProducts.showing" | translate }}
-        {{ currentPage() * pageSize() + 1 }} -
-        {{ Math.min((currentPage() + 1) * pageSize(), totalElements()) }}
-        {{ "viewProducts.of" | translate }} {{ totalElements() }}
-        {{ "viewProducts.products" | translate }}
-      </div>
-    </div>
-
-    <div *ngIf="products().length === 0" class="no-users">
-      <mat-icon>find_replace</mat-icon>
-      <p>{{ "viewProducts.noProductsFound" | translate }}</p>
-    </div>
-
-    <div class="products-table">
-      <!-- Table Header -->
-      <div class="table-header">
-        <div class="table-cell">ID</div>
-        <div class="table-cell">{{ "viewProducts.name" | translate }}</div>
-        <div class="table-cell">{{ "viewProducts.price" | translate }}</div>
-        <div class="table-cell">{{ "viewProducts.category" | translate }}</div>
-        <div class="table-cell">{{ "viewProducts.color" | translate }}</div>
-        <div class="table-cell">
-          {{ "viewProducts.dimensions" | translate }}
-        </div>
-        <div class="table-cell">{{ "viewProducts.material" | translate }}</div>
-        <div class="table-cell">{{ "viewProducts.quantity" | translate }}</div>
-        <div class="table-cell actions-header">
-          {{ "viewProducts.actions" | translate }}
-        </div>
-      </div>
-
-      <!-- Table Rows -->
-      <div *ngFor="let product of products()" class="product-row">
-        <div class="table-cell">{{ product.id }}</div>
-        <div class="table-cell">{{ product.name }}</div>
-        <div class="table-cell">{{ product.price }} $</div>
-        <div class="table-cell">{{ getCategoryName(product.categoryId) }}</div>
-        <div class="table-cell">{{ product.color }}</div>
-        <div class="table-cell">{{ product.dimensions }}</div>
-        <div class="table-cell">{{ product.material }}</div>
-        <div class="table-cell">{{ product.quantity }}</div>
-        <div class="table-cell actions-cell">
-          <button
-            mat-icon-button
-            class="menu-button"
-            (click)="handleMenuClick(product.id, $event)"
-            [attr.aria-label]="'Open menu for product ' + product.name"
-          >
-            <mat-icon>more_vert</mat-icon>
-          </button>
-
-          <!-- Popup Menu -->
-          <div
-            *ngIf="activeMenuId() === product.id"
-            class="menu-popup"
-            (click)="$event.stopPropagation()"
-          >
-            <button
-              mat-menu-item
-              class="menu-item edit-item"
-              (click)="onEditProduct(product)"
-            >
-              <mat-icon>edit</mat-icon>
-              <span>{{ "viewProducts.editProduct" | translate }}</span>
-            </button>
-            <button
-              mat-menu-item
-              class="menu-item delete-item"
-              (click)="onDeleteProduct(product)"
-            >
-              <mat-icon>delete</mat-icon>
-              <span>{{ "viewProducts.deleteProduct" | translate }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pagination -->
-    <mat-paginator
-      *ngIf="totalElements() > 0"
-      [length]="totalElements()"
-      [pageSize]="pageSize()"
-      [pageIndex]="currentPage()"
-      [pageSizeOptions]="pageSizeOptions"
-      [showFirstLastButtons]="true"
-      (page)="onPageChange($event)"
-      class="pagination-controls"
-    >
-    </mat-paginator>
-  </div>
+      <mat-paginator
+        [length]="total()"
+        [pageIndex]="page()"
+        [pageSize]="size()"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPage($event)"
+      />
+    }
+  }
 </div>

@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ "editCategory.title" | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="cat-dialog__content">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "editCategory.nameLabel" | translate }}</mat-label>
+      <input matInput formControlName="name" [placeholder]="'editCategory.namePlaceholder' | translate" />
+      @if (form.controls.name.hasError("required")) {
+        <mat-error>{{ "editCategory.nameRequired" | translate }}</mat-error>
+      } @else if (form.controls.name.hasError("minlength")) {
+        <mat-error>{{ "editCategory.nameMinLength" | translate }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "editCategory.descriptionLabel" | translate }}</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        formControlName="description"
+        [placeholder]="'editCategory.descriptionPlaceholder' | translate"
+      ></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">
+      {{ "editCategory.cancelButton" | translate }}
+    </button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) {
+        <mat-progress-spinner mode="indeterminate" diameter="18" />
+      } @else {
+        <mat-icon>save</mat-icon>
+      }
+      <span>{{ "editCategory.saveButton" | translate }}</span>
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -6,7 +6,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { registerLocaleData } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateLoader, TranslateModule, TranslationObject } from '@ngx-translate/core';
-import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import en from '@angular/common/locales/en';
 import ro from '@angular/common/locales/ro';
 
@@ -60,9 +59,5 @@ export const appConfig: ApplicationConfig = {
         },
       })
     ),
-
-    // TEMPORARY: ng-zorro is still used by the auth pages. Removed once those
-    // are migrated to Material.
-    provideNzI18n(en_US),
   ],
 };

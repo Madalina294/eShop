@@ -1,42 +1,57 @@
-<div class="welcome-container">
-  <div class="welcome-header">
-    <h1>
-      {{
-        "welcome.title"
-          | translate : { firstName: user?.firstname, lastName: user?.lastname }
-      }}
-    </h1>
-    <p>{{ "welcome.subtitle" | translate }}</p>
-  </div>
+<div class="page page--narrow">
+  <app-page-header
+    icon="waving_hand"
+    [title]="
+      'welcome.title'
+        | translate: { firstName: user()?.firstname ?? '', lastName: user()?.lastname ?? '' }
+    "
+    [subtitle]="'welcome.subtitle' | translate"
+  />
 
-  <div class="user-profile-section" *ngIf="user">
-    <div class="profile-card">
-      <div class="profile-avatar">
-        <img
-          *ngIf="userImage"
-          [src]="getFullImageUrl(userImage)"
-          alt="User Avatar"
-          class="user-image"
-        />
-        <div *ngIf="!userImage" class="default-avatar">
-          {{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }}
-        </div>
+  @if (user(); as account) {
+    <section class="welcome__card surface">
+      <span class="welcome__avatar">
+        @if (avatar(); as src) {
+          <img [src]="src" alt="" width="72" height="72" />
+        } @else {
+          <span aria-hidden="true">{{ initials() || "?" }}</span>
+        }
+      </span>
+
+      <div class="welcome__identity">
+        <h2 class="welcome__name">{{ account.firstname }} {{ account.lastname }}</h2>
+        <p class="welcome__email">{{ account.email }}</p>
+
+        <dl class="welcome__facts">
+          <div>
+            <dt>{{ "welcome.profile.role" | translate }}</dt>
+            <dd>{{ account.role }}</dd>
+          </div>
+          <div>
+            <dt>{{ "welcome.profile.userId" | translate }}</dt>
+            <dd>{{ account.id }}</dd>
+          </div>
+        </dl>
       </div>
-      <div class="profile-info">
-        <h2>{{ user.firstname }} {{ user.lastname }}</h2>
-        <p class="user-role">
-          {{ "welcome.profile.role" | translate }}: {{ user.role }}
-        </p>
-        <p class="user-id">
-          {{ "welcome.profile.userId" | translate }}: {{ user.id }}
-        </p>
-      </div>
+    </section>
+
+    <div class="welcome__actions">
+      <a mat-flat-button color="primary" routerLink="/profile">
+        <mat-icon>account_circle</mat-icon>
+        <span>{{ "header.myAccount" | translate }}</span>
+      </a>
+
+      @if (isCustomer()) {
+        <a mat-stroked-button routerLink="/user/orders">
+          <mat-icon>receipt_long</mat-icon>
+          <span>{{ "orders.title" | translate }}</span>
+        </a>
+      }
+
+      <button mat-button type="button" class="welcome__logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>{{ "welcome.actions.logout" | translate }}</span>
+      </button>
     </div>
-  </div>
-
-  <div class="actions">
-    <button (click)="logout()" class="logout-btn">
-      {{ "welcome.actions.logout" | translate }}
-    </button>
-  </div>
+  }
 </div>

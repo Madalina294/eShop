@@ -1,39 +1,74 @@
-<app-breadcrumb></app-breadcrumb>
-<div class="admin-dashboard">
-  <div class="dashboard-header">
-    <h1>{{ "adminDashboard.title" | translate }}</h1>
-    <p>
-      {{ "adminDashboard.subtitle" | translate }}
-    </p>
-  </div>
+<div class="page">
+  <app-page-header
+    icon="dashboard"
+    [title]="'adminDashboard.title' | translate"
+    [subtitle]="'adminDashboard.subtitle' | translate"
+  />
 
-  <div class="dashboard-grid">
-    <mat-grid-list cols="2" rowHeight="200px" gutterSize="16px">
-      <mat-grid-tile *ngFor="let item of dashboardItems">
-        <mat-card class="dashboard-card" [ngClass]="'card-' + item.color">
-          <mat-card-header>
-            <div mat-card-avatar>
-              <mat-icon>{{ item.icon }}</mat-icon>
-            </div>
-            <mat-card-title>{{ item.title }}</mat-card-title>
-          </mat-card-header>
+  <!-- Metrics -->
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="grid" [count]="3" />
+    }
 
-          <mat-card-content>
-            <p>{{ item.description }}</p>
-          </mat-card-content>
+    @case ("error") {
+      <app-error-state
+        [title]="'adminStatistics.noData' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
 
-          <mat-card-actions align="end">
-            <button
-              mat-raised-button
-              [color]="item.color"
-              [routerLink]="item.route"
-            >
-              <mat-icon>arrow_forward</mat-icon>
-              {{ "adminDashboard.accessButton" | translate }}
-            </button>
-          </mat-card-actions>
-        </mat-card>
-      </mat-grid-tile>
-    </mat-grid-list>
+    @default {
+      @if (cart(); as metrics) {
+        <div class="dash__stats">
+          <app-stat-card
+            icon="receipt_long"
+            tone="brand"
+            [label]="'adminStatistics.averageCart.totalOrders' | translate"
+            [value]="metrics.totalOrders"
+            [link]="'/admin/statistics'"
+          />
+          <app-stat-card
+            icon="payments"
+            tone="success"
+            [label]="'adminStatistics.averageCart.totalRevenue' | translate"
+            [value]="metrics.totalRevenue | price"
+            [link]="'/admin/statistics'"
+          />
+          <app-stat-card
+            icon="shopping_cart"
+            tone="info"
+            [label]="'adminStatistics.averageCart.averageValue' | translate"
+            [value]="metrics.averageCartValue | price"
+            [link]="'/admin/statistics'"
+          />
+          <app-stat-card
+            icon="group"
+            tone="warning"
+            [label]="'adminStatistics.ordersByUser.title' | translate"
+            [value]="customerCount()"
+            [link]="'/admin/statistics'"
+          />
+        </div>
+      }
+    }
+  }
+
+  <!-- Quick access -->
+  <div class="dash__tiles">
+    @for (tile of tiles; track tile.route) {
+      <a class="dash__tile surface surface--interactive" [routerLink]="tile.route">
+        <span class="dash__tile-icon">
+          <mat-icon aria-hidden="true">{{ tile.icon }}</mat-icon>
+        </span>
+        <h2 class="dash__tile-title">{{ tile.title | translate }}</h2>
+        <p class="dash__tile-text">{{ tile.description | translate }}</p>
+        <span class="dash__tile-cta">
+          {{ "adminDashboard.accessButton" | translate }}
+          <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+        </span>
+      </a>
+    }
   </div>
 </div>

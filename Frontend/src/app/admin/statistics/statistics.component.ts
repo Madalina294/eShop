@@ -1,120 +1,74 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
+import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
-import { AdminService, UserOrderCount, TopCustomer, AverageCart } from '../../services/admin/admin.service';
-import { BreadcrumbComponent } from '../../shared/breadcrumb/breadcrumb.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
+import { AdminService } from '../../services/admin/admin.service';
+import { AverageCart, TopCustomer, UserOrderCount } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { StatCardComponent } from '../../shared/ui/stat-card/stat-card.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+
+/**
+ * Admin statistics.
+ *
+ * The three endpoints are now loaded as one `forkJoin` behind a single
+ * `ViewState` instead of three independent requests with three booleans — and
+ * its error messages were hardcoded English strings straight into `MatSnackBar`
+ * while the rest of the app was translated.
+ */
 @Component({
   selector: 'app-statistics',
   standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
-    MatTableModule,
-    MatProgressSpinnerModule,
-    MatIconModule,
+    PricePipe,
     MatButtonModule,
+    MatIconModule,
     TranslateModule,
-    BreadcrumbComponent
+    PageHeaderComponent,
+    StatCardComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './statistics.component.html',
-  styleUrl: './statistics.component.scss'
+  styleUrl: './statistics.component.scss',
 })
-export class StatisticsComponent implements OnInit {
-  // Signals pentru date
-  ordersByUser = signal<UserOrderCount[]>([]);
-  topCustomers = signal<TopCustomer[]>([]);
-  averageCart = signal<AverageCart | null>(null);
-  
-  // Signals pentru loading states
-  loadingOrdersByUser = signal<boolean>(false);
-  loadingTopCustomers = signal<boolean>(false);
-  loadingAverageCart = signal<boolean>(false);
+export class StatisticsComponent {
+  private readonly adminService = inject(AdminService);
 
-  // Computed signal pentru a verifica dacă există date
-  hasOrdersByUser = computed(() => this.ordersByUser().length > 0);
-  hasTopCustomers = computed(() => this.topCustomers().length > 0);
-  hasAverageCart = computed(() => this.averageCart() !== null);
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly ordersByUser = signal<readonly UserOrderCount[]>([]);
+  protected readonly topCustomers = signal<readonly TopCustomer[]>([]);
+  protected readonly averageCart = signal<AverageCart | null>(null);
 
-  // Coloane pentru tabele
-  displayedColumnsOrders: string[] = ['userName', 'userEmail', 'orderCount'];
-  displayedColumnsTopCustomers: string[] = ['userName', 'userEmail', 'orderCount', 'totalSpent'];
-
-  constructor(
-    private adminService: AdminService,
-    private snackBar: MatSnackBar
-  ) {}
-
-  ngOnInit() {
-    this.loadAllStatistics();
+  constructor() {
+    this.load();
   }
 
-  loadAllStatistics() {
-    this.loadOrdersByUser();
-    this.loadTopCustomers();
-    this.loadAverageCart();
-  }
+  protected load(): void {
+    this.state.set('loading');
 
-  loadOrdersByUser() {
-    this.loadingOrdersByUser.set(true);
-    this.adminService.getOrdersCountByUser().subscribe({
-      next: (data) => {
-        this.ordersByUser.set(data);
-        this.loadingOrdersByUser.set(false);
+    forkJoin({
+      ordersByUser: this.adminService.getOrdersCountByUser(),
+      topCustomers: this.adminService.getTopCustomers(10),
+      averageCart: this.adminService.getAverageCartValue(),
+    }).subscribe({
+      next: ({ ordersByUser, topCustomers, averageCart }) => {
+        this.ordersByUser.set(ordersByUser);
+        this.topCustomers.set(topCustomers);
+        this.averageCart.set(averageCart);
+
+        const hasAnything = ordersByUser.length > 0 || topCustomers.length > 0 || !!averageCart;
+        this.state.set(hasAnything ? 'ready' : 'empty');
       },
-      error: (error) => {
-        console.error('Error loading orders by user:', error);
-        this.snackBar.open('Error loading orders statistics', 'Close', { duration: 3000 });
-        this.loadingOrdersByUser.set(false);
-      }
+      error: () => this.state.set('error'),
     });
-  }
-
-  loadTopCustomers() {
-    this.loadingTopCustomers.set(true);
-    this.adminService.getTopCustomers(10).subscribe({
-      next: (data) => {
-        this.topCustomers.set(data);
-        this.loadingTopCustomers.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading top customers:', error);
-        this.snackBar.open('Error loading top customers', 'Close', { duration: 3000 });
-        this.loadingTopCustomers.set(false);
-      }
-    });
-  }
-
-  loadAverageCart() {
-    this.loadingAverageCart.set(true);
-    this.adminService.getAverageCartValue().subscribe({
-      next: (data) => {
-        this.averageCart.set(data);
-        this.loadingAverageCart.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading average cart:', error);
-        this.snackBar.open('Error loading average cart statistics', 'Close', { duration: 3000 });
-        this.loadingAverageCart.set(false);
-      }
-    });
-  }
-
-  refreshStatistics() {
-    this.loadAllStatistics();
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('ro-RO', {
-      style: 'currency',
-      currency: 'RON'
-    }).format(value);
   }
 }
-

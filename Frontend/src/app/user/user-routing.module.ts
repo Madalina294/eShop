@@ -16,6 +16,8 @@ const routes: Routes = [
   {path: "wishlist", component: WishlistComponent, canActivate: [userGuard]},
   {path: "cart", component: CartComponent, canActivate: [userGuard]},
   {path: "checkout", component: CheckoutComponent, canActivate: [userGuard]},
+  {path: "orders", title: "titles.orders", canActivate: [userGuard],
+    loadComponent: () => import('./orders/orders.component').then(m => m.OrdersComponent)},
   {path: "order-confirmation/:id", component: OrderConfirmationComponent, canActivate: [userGuard]}
 
 ]

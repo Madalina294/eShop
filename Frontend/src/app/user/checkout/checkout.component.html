@@ -131,7 +131,7 @@
                           <span class="option__hint">{{ option.descriptionKey | translate }}</span>
                         </span>
                         <span class="option__price">
-                          {{ option.cost | currency: "RON" : "symbol" : "1.2-2" }}
+                          {{ option.cost | price }}
                         </span>
                       </span>
                     </mat-radio-button>
@@ -252,7 +252,7 @@
                 <span class="summary-lines__qty" aria-hidden="true">{{ item.quantity }}&times;</span>
                 <span class="summary-lines__name">{{ item.productName }}</span>
                 <span class="summary-lines__price">
-                  {{ item.productPrice * item.quantity | currency: "RON" : "symbol" : "1.2-2" }}
+                  {{ item.productPrice * item.quantity | price }}
                 </span>
               </li>
             }
@@ -265,15 +265,15 @@
             </div>
             <div class="data-rows__row">
               <dt>{{ "checkout.subtotal" | translate }}</dt>
-              <dd>{{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              <dd>{{ subtotal() | price }}</dd>
             </div>
             <div class="data-rows__row">
               <dt>{{ "checkout.shipping" | translate }}</dt>
-              <dd>{{ shippingCost() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              <dd>{{ shippingCost() | price }}</dd>
             </div>
             <div class="data-rows__row">
               <dt>{{ "checkout.total" | translate }}</dt>
-              <dd>{{ totalAmount() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              <dd>{{ totalAmount() | price }}</dd>
             </div>
           </dl>
         </aside>

@@ -1,239 +1,158 @@
-import {Component, Injectable, OnInit, signal} from '@angular/core';
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatCard, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
-import {Router, RouterLink} from "@angular/router";
-import {TranslatePipe, TranslateService} from "@ngx-translate/core";
-import {MatIcon} from '@angular/material/icon';
-import {NgForOf, NgIf} from '@angular/common';
-import {
-  AdminService,
-  PaginatedResponse,
-  ProductData,
-  ProductPaginatedResponse
-} from '../../services/admin/admin.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatDialog} from '@angular/material/dialog';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatPaginator, MatPaginatorIntl, PageEvent} from '@angular/material/paginator';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatSelect} from '@angular/material/select';
-import {MatOption} from '@angular/material/core';
-import {MatMenuItem} from '@angular/material/menu';
-import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
-@Injectable()
-export class CustomPaginatorIntl extends MatPaginatorIntl {
-  constructor(private translate: TranslateService) {
-    super();
-    this.translate.onLangChange.subscribe(() => {
-      this.getTranslations();
-    });
-    this.getTranslations();
-  }
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-  getTranslations() {
-    this.itemsPerPageLabel = this.translate.instant('viewProducts.paginator.itemsPerPage');
-    this.nextPageLabel = this.translate.instant('viewProducts.paginator.nextPage');
-    this.previousPageLabel = this.translate.instant('viewProducts.paginator.previousPage');
-    this.firstPageLabel = this.translate.instant('viewProducts.paginator.firstPage');
-    this.lastPageLabel = this.translate.instant('viewProducts.paginator.lastPage');
-    this.changes.next();
-  }
+import { AdminService } from '../../services/admin/admin.service';
+import { ProductData } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { productImageUrl } from '../../core/http/image-url';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { ConfirmDeleteComponent } from '../../shared/confirm-delete/confirm-delete.component';
+import { TranslatedPaginatorIntl } from '../../shared/paginator/translated-paginator-intl';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
 
-  override getRangeLabel = (page: number, pageSize: number, length: number): string => {
-    if (length === 0 || pageSize === 0) {
-      return this.translate.instant('viewProducts.showing') + ` 0 ` + this.translate.instant('viewProducts.paginator.ofLabel') + ` ${length}`;
-    }
-    const startIndex = page * pageSize;
-    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
-    return `${startIndex + 1} - ${endIndex} ` + this.translate.instant('viewProducts.paginator.ofLabel') + ` ${length}`;
-  };
-}
+type SortKey = 'id' | 'name' | 'price' | 'quantity';
+
+/**
+ * Product listing.
+ *
+ * The old version declared a second, private copy of `CustomPaginatorIntl` that
+ * it never provided — so the paginator stayed in English — hand-rolled its row
+ * menu with an `activeMenuId` signal, and exposed `Math` on the class so the
+ * template could call it.
+ */
 @Component({
   selector: 'app-view-products',
+  standalone: true,
   imports: [
-    MatButton,
-    MatCard,
-    MatCardHeader,
-    MatCardSubtitle,
-    MatCardTitle,
-    MatIcon,
     RouterLink,
-    TranslatePipe,
-    MatProgressSpinner,
-    NgIf,
-    MatFormField,
-    MatLabel,
-    MatOption,
-    MatSelect,
-    MatIconButton,
-    NgForOf,
-    MatPaginator,
-    MatMenuItem
+    PricePipe,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatPaginatorModule,
+    TranslateModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
   ],
+  providers: [{ provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './view-products.component.html',
-  styleUrl: './view-products.component.scss'
+  styleUrl: './view-products.component.scss',
 })
-export class ViewProductsComponent implements OnInit{
-  products = signal<ProductData[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
-  categories = signal<Map<number, string>>(new Map());
+export class ViewProductsComponent {
+  private readonly adminService = inject(AdminService);
+  private readonly notifications = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  // Pagination properties
-  totalElements = signal(0);
-  pageSize = signal(10);
-  currentPage = signal(0);
-  pageSizeOptions = [5, 10, 20, 50];
-  sortBy = signal('id');
-  sortDir = signal('asc');
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly products = signal<readonly ProductData[]>([]);
+  protected readonly total = signal(0);
 
-  // Make Math available in template
-  Math = Math;
+  /** Paging and sorting live in the URL, so a view can be shared or refreshed. */
+  private readonly params = toSignal(this.route.queryParams, { initialValue: {} as any });
 
-  // Menu management
-  activeMenuId = signal<number | null>(null);
+  protected readonly page = computed(() => Number(this.params()['page'] ?? 0));
+  protected readonly size = computed(() => Number(this.params()['size'] ?? 10));
+  protected readonly sortBy = computed<SortKey>(() => (this.params()['sortBy'] ?? 'id') as SortKey);
+  protected readonly sortDir = computed<'asc' | 'desc'>(() =>
+    this.params()['sortDir'] === 'desc' ? 'desc' : 'asc'
+  );
 
-  constructor(
-    private adminService: AdminService,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog,
-    private router: Router,
-    private translate: TranslateService
-  ) {}
+  /** Client-side filter over the current page, for quick narrowing. */
+  protected readonly search = signal('');
 
-  ngOnInit(){
-    this.loadCategories();
-    this.loadProducts();
+  protected readonly visible = computed(() => {
+    const term = this.search().trim().toLowerCase();
+    if (!term) return this.products();
+
+    return this.products().filter(
+      product =>
+        product.name?.toLowerCase().includes(term) ||
+        product.categoryName?.toLowerCase().includes(term) ||
+        product.material?.toLowerCase().includes(term)
+    );
+  });
+
+  constructor() {
+    // Re-fetch whenever paging or sorting changes in the URL.
+    this.params();
+    this.load();
   }
 
-  loadCategories() {
-    this.adminService.getCategories().subscribe({
-      next: (categories: any[]) => {
-        const categoryMap = new Map<number, string>();
-        categories.forEach(category => {
-          categoryMap.set(category.id, category.name);
-        });
-        this.categories.set(categoryMap);
-        console.log('Categories loaded:', categoryMap);
-      },
-      error: (error) => {
-        console.error('Error loading categories:', error);
-      }
-    });
+  protected load(): void {
+    this.state.set('loading');
+
+    this.adminService
+      .getProductsPaginated(this.page(), this.size(), this.sortBy(), this.sortDir())
+      .subscribe({
+        next: result => {
+          this.products.set(result.content ?? []);
+          this.total.set(result.totalElements ?? 0);
+          this.state.set(result.content?.length ? 'ready' : 'empty');
+        },
+        error: () => this.state.set('error'),
+      });
   }
 
-  loadProducts(){
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.adminService.getProductsPaginated(
-      this.currentPage(),
-      this.pageSize(),
-      this.sortBy(),
-      this.sortDir()
-    ).subscribe({
-      next: (response: ProductPaginatedResponse) => {
-        this.loading.set(false);
-        this.products.set(response.content);
-        this.totalElements.set(response.totalElements);
-        console.log('Products loaded:', this.products());
-        console.log('Pagination info:', {
-          totalElements: response.totalElements,
-          totalPages: response.totalPages,
-          currentPage: response.number,
-          pageSize: response.size
-        });
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.loading.set(false);
-        this.error.set(this.translate.instant('viewProducts.loadError'));
-        this.snackBar.open(this.translate.instant('viewProducts.loadError'), this.translate.instant('viewProducts.close'), {
-          duration: 3000
-        });
-      }
-    });
+  protected sort(key: SortKey): void {
+    const dir = this.sortBy() === key && this.sortDir() === 'asc' ? 'desc' : 'asc';
+    this.navigate({ sortBy: key, sortDir: dir, page: 0 });
   }
 
-  // Pagination methods
-  onPageChange(event: PageEvent) {
-    this.currentPage.set(event.pageIndex);
-    this.pageSize.set(event.pageSize);
-    this.loadProducts();
+  protected onPage(event: PageEvent): void {
+    this.navigate({ page: event.pageIndex, size: event.pageSize });
   }
 
-  onSortChange(sortBy: string) {
-    this.sortBy.set(sortBy);
-    this.currentPage.set(0); // Reset to first page when sorting changes
-    this.loadProducts();
+  protected imageFor(product: ProductData): string {
+    return productImageUrl(product.image);
   }
 
-  onSortDirectionChange() {
-    this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
-    this.currentPage.set(0); // Reset to first page when sort direction changes
-    this.loadProducts();
+  protected goToAdd(): void {
+    this.router.navigateByUrl('/admin/add-product');
   }
 
-  getCategoryName(categoryId: number): string {
-    return this.categories().get(categoryId) || 'No Category';
-  }
-
-  // Menu management methods
-  handleMenuClick(productId: number, event: Event): void {
-    event.stopPropagation();
-    console.log('Button clicked for product:', productId);
-    this.toggleMenu(productId);
-  }
-
-  toggleMenu(productId: number): void {
-    console.log('Toggle menu clicked for product:', productId);
-    console.log('Current activeMenuId:', this.activeMenuId());
-    this.activeMenuId.set(this.activeMenuId() === productId ? null : productId);
-    console.log('New activeMenuId:', this.activeMenuId());
-  }
-
-  closeMenu(): void {
-    this.activeMenuId.set(null);
-  }
-
-  onEditProduct(product: ProductData): void {
-    this.closeMenu();
-    this.router.navigate(['/admin/edit-product'], {
-      queryParams: { productId: product.id }
-    });
-  }
-
-  onDeleteProduct(product: ProductData): void {
-    this.closeMenu();
+  protected confirmDelete(product: ProductData): void {
     const dialogRef = this.dialog.open(ConfirmDeleteComponent, {
-      width: '400px',
-      data: { message: this.translate.instant('viewProducts.confirmDelete') }
+      width: '420px',
+      data: {
+        message: this.translate.instant('viewProducts.confirmDelete'),
+        titleKey: 'viewProducts.deleteProduct',
+        destructive: true,
+      },
     });
-    dialogRef.afterClosed().subscribe( result => {
-      if (result === true){
-        this.loading.set(true);
-        this.adminService.deleteProduct(product.id).subscribe({
-          next: value => {
-            this.loading.set(false);
-            this.snackBar.open(
-              this.translate.instant('viewProducts.productDeletedSuccess'), 
-              this.translate.instant('viewProducts.ok'), 
-              {duration: 3000}
-            );
-            this.loadProducts();
-          },
-          error: err => {
-            this.loading.set(false);
-            this.snackBar.open(
-              this.translate.instant('viewProducts.deleteError'), 
-              this.translate.instant('viewProducts.ok'), 
-              {duration: 3000}
-            );
-          }
-        })
-        console.log('Delete product:', product);
-      }
-    })
 
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed !== true) return;
+
+      this.adminService.deleteProduct(product.id).subscribe({
+        next: () => {
+          this.notifications.success('viewProducts.productDeletedSuccess');
+          this.load();
+        },
+        error: () => this.notifications.error('viewProducts.deleteError'),
+      });
+    });
+  }
+
+  private navigate(queryParams: Record<string, unknown>): void {
+    this.router
+      .navigate([], { relativeTo: this.route, queryParams, queryParamsHandling: 'merge' })
+      .then(() => this.load());
   }
 }

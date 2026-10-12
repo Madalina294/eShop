@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {StorageService} from '../storage/storage.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ProductData} from '../admin/admin.service';
+import { ProductData } from '../../models/admin';
+import { environment } from '../../../environments/environments';
 
 
 @Injectable({
@@ -10,44 +10,32 @@ import {ProductData} from '../admin/admin.service';
 })
 export class UserService {
 
-  private baseUrl = 'http://localhost:8080/api/user'
-  constructor(
-    private http: HttpClient
-  ) { }
+  private readonly baseUrl = `${environment.apiUrl}/user`;
+  private readonly http = inject(HttpClient);
 
   deleteAccount(userId: number) {
-    return this.http.delete(this.baseUrl + `/delete/${userId}`, {headers: this.createAuthorizationHeader()});
+    return this.http.delete(this.baseUrl + `/delete/${userId}`);
   }
 
 
   updateProfileWithFormData(formData: any): Observable<any>{
-    const headers = this.createAuthorizationHeader();
-    return this.http.put(this.baseUrl + `/update-infos`, formData, {headers: headers});
+    return this.http.put(this.baseUrl + `/update-infos`, formData);
   }
 
   updatePreferredTheme(userId: number, theme: string): Observable<any> {
-    const headers = this.createAuthorizationHeader();
-    return this.http.put(this.baseUrl + `/update-theme/${userId}/${theme}`, {}, {
-      headers: headers
-    });
+    return this.http.put(this.baseUrl + `/update-theme/${userId}/${theme}`, {});
   }
 
   updatePreferredLanguage(userId: number, language: string): Observable<any> {
-    const headers = this.createAuthorizationHeader();
-    return this.http.put(this.baseUrl + `/update-language/${userId}/${language}`, {}, {
-      headers: headers
-    });
+    return this.http.put(this.baseUrl + `/update-language/${userId}/${language}`, {});
   }
 
   updatePassword(data: any): Observable<any>{
-    const headers = this.createAuthorizationHeader();
-    return this.http.put(this.baseUrl + `/update-password`, data, {headers: headers});
+    return this.http.put(this.baseUrl + `/update-password`, data);
   }
 
   getAllProducts(): Observable<ProductData[]>{
-    return this.http.get<ProductData[]>(this.baseUrl + `/get-all-products`, {
-      headers: this.createAuthorizationHeader()
-    })
+    return this.http.get<ProductData[]>(this.baseUrl + `/get-all-products`)
   }
 
   getProductsPaginated(page: number = 0, size: number = 12, sortBy: string = 'id', sortDir: string = 'asc', categoryId?: number): Observable<any> {
@@ -62,92 +50,55 @@ export class UserService {
       params.append('categoryId', categoryId.toString());
     }
 
-    return this.http.get<any>(this.baseUrl + `/get-products-paginated?${params}`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<any>(this.baseUrl + `/get-products-paginated?${params}`);
   }
 
   getCategories(): Observable<any[]>{
-    return this.http.get<any[]>(this.baseUrl + `/get-categories`, {
-      headers: this.createAuthorizationHeader()
-    })
+    return this.http.get<any[]>(this.baseUrl + `/get-categories`)
   }
 
   getProduct(id: number): Observable<ProductData>{
-    return this.http.get<ProductData>(this.baseUrl + `/get-product/${id}`, {
-      headers: this.createAuthorizationHeader()
-    })
+    return this.http.get<ProductData>(this.baseUrl + `/get-product/${id}`)
   }
 
   addToWishlist(productId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/wishlist/add/${productId}`, {}, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.post(`${this.baseUrl}/wishlist/add/${productId}`, {});
   }
 
   removeFromWishlist(productId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/wishlist/remove/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.delete(`${this.baseUrl}/wishlist/remove/${productId}`);
   }
 
   getUserWishlist(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/wishlist`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<any[]>(`${this.baseUrl}/wishlist`);
   }
 
   checkIfInWishlist(productId: number): Observable<boolean> {
-    return this.http.get<boolean>(`${this.baseUrl}/wishlist/check/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<boolean>(`${this.baseUrl}/wishlist/check/${productId}`);
   }
 
   // Cart methods
   addToCart(productId: number, quantity: number = 1): Observable<any> {
-    return this.http.post(`${this.baseUrl}/cart/add/${productId}`, { quantity }, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.post(`${this.baseUrl}/cart/add/${productId}`, { quantity });
   }
 
   removeFromCart(productId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/cart/remove/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.delete(`${this.baseUrl}/cart/remove/${productId}`);
   }
 
   getUserCart(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/cart`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<any[]>(`${this.baseUrl}/cart`);
   }
 
   updateCartItemQuantity(productId: number, quantity: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/cart/update/${productId}`, { quantity }, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.put(`${this.baseUrl}/cart/update/${productId}`, { quantity });
   }
 
   clearCart(): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/cart/clear`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.delete(`${this.baseUrl}/cart/clear`);
   }
 
   checkIfInCart(productId: number): Observable<boolean> {
-    return this.http.get<boolean>(`${this.baseUrl}/cart/check/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    });
-  }
-  createAuthorizationHeader(): HttpHeaders{
-    const token = StorageService.getToken();
-    if (!token) {
-      console.error('No token found in storage');
-      return new HttpHeaders();
-    }
-
-    return new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    });
+    return this.http.get<boolean>(`${this.baseUrl}/cart/check/${productId}`);
   }
 }

@@ -1,83 +1,66 @@
-import {Component, signal} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AdminService} from '../../services/admin/admin.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonModule} from '@angular/material/button';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatIconModule} from '@angular/material/icon';
-import {CommonModule} from '@angular/common';
-import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
-import {Router} from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AdminService } from '../../services/admin/admin.service';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
 
 @Component({
   selector: 'app-create-category',
+  standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
+    RouterLink,
     MatButtonModule,
-    MatProgressSpinnerModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
     TranslateModule,
-    BreadcrumbComponent
+    PageHeaderComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './create-category.component.html',
-  styleUrl: './create-category.component.scss'
+  styleUrl: './create-category.component.scss',
 })
 export class CreateCategoryComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly adminService = inject(AdminService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
 
-  isSpinning = signal(false);
-  createCategoryForm!: FormGroup;
+  protected readonly saving = signal(false);
 
-  constructor(private fb: FormBuilder,
-              private adminService: AdminService,
-              private snackBar: MatSnackBar,
-              private translate: TranslateService,
-              private route: Router) {
+  protected readonly form = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    description: ['', Validators.required],
+  });
 
-    this.createCategoryForm = this.fb.group({
-      name: ['', [Validators.required]],
-      description: ['', Validators.required]
-    })
-  }
-
-  onSubmit(){
-    if (!this.createCategoryForm.valid){
+  protected submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    this.isSpinning.set(true);
+    this.saving.set(true);
 
-    const categoryData = {
-      name: this.createCategoryForm.get('name')?.value,
-      description: this.createCategoryForm.get('description')?.value
-    };
-
-    this.adminService.createCategory(categoryData).subscribe({
-      next: (response) => {
-        this.isSpinning.set(false);
-        this.snackBar.open(
-          this.translate.instant('createCategory.successMessage'),
-          this.translate.instant('createCategory.ok'),
-          {duration: 3000}
-        );
-        this.route.navigateByUrl("/admin/view-categories");
+    this.adminService.createCategory(this.form.getRawValue()).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.notifications.success('createCategory.successMessage');
+        this.router.navigateByUrl('/admin/view-categories');
       },
-      error: (error) => {
-        this.isSpinning.set(false);
-        this.snackBar.open(
-          this.translate.instant('createCategory.errorMessage'),
-          this.translate.instant('createCategory.ok'),
-          {duration: 3000}
-        );
-      }
-    })
-
+      error: () => {
+        this.saving.set(false);
+        this.notifications.error('createCategory.errorMessage');
+      },
+    });
   }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { CurrencyPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
@@ -37,7 +37,7 @@ interface Spec {
   standalone: true,
   imports: [
     RouterLink,
-    CurrencyPipe,
+    PricePipe,
     MatButtonModule,
     MatChipsModule,
     MatDividerModule,

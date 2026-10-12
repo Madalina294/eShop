@@ -80,7 +80,7 @@
         } @else {
           <p class="confirm__cancelled-note" role="status">
             <mat-icon aria-hidden="true">cancel</mat-icon>
-            {{ "orderStatus.CANCELLED" | translate }}
+            {{ "orderConfirmation.cancelledMessage" | translate }}
           </p>
         }
 
@@ -120,12 +120,12 @@
                         </a>
                         <span class="order-items__meta">
                           {{ line.quantity }} &times;
-                          {{ line.unitPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                          {{ line.unitPrice | price }}
                         </span>
                       </span>
 
                       <span class="order-items__total">
-                        {{ line.totalPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                        {{ line.totalPrice | price }}
                       </span>
                     </li>
                   }
@@ -201,15 +201,15 @@
               </div>
               <div class="data-rows__row">
                 <dt>{{ "checkout.subtotal" | translate }}</dt>
-                <dd>{{ itemsSubtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+                <dd>{{ itemsSubtotal() | price }}</dd>
               </div>
               <div class="data-rows__row">
                 <dt>{{ "checkout.shipping" | translate }}</dt>
-                <dd>{{ shippingCost() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+                <dd>{{ shippingCost() | price }}</dd>
               </div>
               <div class="data-rows__row">
                 <dt>{{ "checkout.total" | translate }}</dt>
-                <dd>{{ item.totalAmount | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+                <dd>{{ item.totalAmount | price }}</dd>
               </div>
             </dl>
 

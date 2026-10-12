@@ -1,155 +1,107 @@
-import {Component, OnInit, OnDestroy, signal} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
+
 import { UserStateService } from '../../services/user-state/user-state.service';
 import { UserService } from '../../services/user/user.service';
-import { ThemeService, Theme } from '../../services/theme/theme.service';
-import {LanguageService} from '../../services/language/language.service';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import { Theme, ThemeService } from '../../services/theme/theme.service';
+import { LanguageService, } from '../../services/language/language.service';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
 
+type Language = 'en' | 'ro';
+
+/**
+ * Theme and language preferences.
+ *
+ * Both are applied optimistically and then persisted: the services are the
+ * source of truth for what is currently active, so the controls stay correct
+ * even when the theme or language is changed from the header instead.
+ */
 @Component({
   selector: 'app-edit-preferences',
+  standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
+    RouterLink,
     MatButtonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    TranslatePipe
+    MatButtonToggleModule,
+    MatIconModule,
+    TranslateModule,
+    PageHeaderComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './edit-preferences.component.html',
-  styleUrl: './edit-preferences.component.scss'
+  styleUrl: './edit-preferences.component.scss',
 })
-export class EditPreferencesComponent implements OnInit, OnDestroy {
-  selectedTheme = signal("light");
-  selectedLanguage = signal("en")
-  isLoading = signal(false);
-  private themeSubscription?: Subscription;
-  private languageSubscription?: Subscription;
+export class EditPreferencesComponent {
+  private readonly userState = inject(UserStateService);
+  private readonly userService = inject(UserService);
+  private readonly themeService = inject(ThemeService);
+  private readonly languageService = inject(LanguageService);
+  private readonly notifications = inject(NotificationService);
 
-  constructor(
-    private userStateService: UserStateService,
-    private userService: UserService,
-    private themeService: ThemeService,
-    private languageService: LanguageService,
-    private snackBar: MatSnackBar,
-    private router: Router,
-    private translate: TranslateService
-  ) {}
+  protected readonly theme = signal<Theme>(this.themeService.getCurrentTheme());
+  protected readonly language = signal<Language>(this.languageService.current as Language);
+  protected readonly saving = signal(false);
 
-  ngOnInit() {
-    const user = this.userStateService.user();
-    
-    // Încarcă tema preferată din starea utilizatorului
-    if (user?.preferredTheme) {
-      this.selectedTheme.set(user.preferredTheme);
-    }
+  constructor() {
+    // Keep in step with changes made elsewhere (the header has both controls).
+    this.themeService.currentTheme$
+      .pipe(takeUntilDestroyed())
+      .subscribe(theme => this.theme.set(theme));
 
-    // Încarcă limba preferată din starea utilizatorului
-    if (user?.preferredLanguage) {
-      this.selectedLanguage.set(user.preferredLanguage);
-    }
+    this.languageService.currentLanguage$
+      .pipe(takeUntilDestroyed())
+      .subscribe(language => this.language.set(language as Language));
+  }
 
-    // Ascultă schimbările de temă din ThemeService
-    this.themeSubscription = this.themeService.currentTheme$.subscribe(theme => {
-      this.selectedTheme.set(theme);
+  protected onThemeChange(theme: Theme): void {
+    // Apply first: a preference the user cannot see take effect feels broken,
+    // and a failed save only means the server keeps the previous value.
+    this.themeService.setTheme(theme);
+    this.persist('preferredTheme', theme, 'preferences.themeUpdated', 'preferences.themeUpdateError');
+  }
+
+  protected onLanguageChange(language: Language): void {
+    this.languageService.use(language);
+    this.persist(
+      'preferredLanguage',
+      language,
+      'preferences.languageUpdated',
+      'preferences.languageUpdateError'
+    );
+  }
+
+  private persist(
+    field: 'preferredTheme' | 'preferredLanguage',
+    value: string,
+    successKey: string,
+    errorKey: string
+  ): void {
+    const user = this.userState.user();
+    if (!user) return;
+
+    this.saving.set(true);
+
+    const request$ =
+      field === 'preferredTheme'
+        ? this.userService.updatePreferredTheme(user.id, value)
+        : this.userService.updatePreferredLanguage(user.id, value);
+
+    request$.subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.userState.updateUser({ [field]: value });
+        this.notifications.success(successKey);
+      },
+      error: () => {
+        this.saving.set(false);
+        this.notifications.error(errorKey);
+      },
     });
-
-    // Ascultă schimbările de limbă din LanguageService
-    this.languageSubscription = this.languageService.currentLanguage$.subscribe(language => {
-      this.selectedLanguage.set(language);
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
-    }
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-    }
-  }
-
-  onThemeChange(newTheme: string) {
-    this.selectedTheme.set(newTheme);
-    this.isLoading.set(true);
-    const user = this.userStateService.user();
-
-    if (user) {
-      this.userService.updatePreferredTheme(user.id, newTheme).subscribe({
-        next: (response) => {
-          this.isLoading.set(false);
-          // Actualizează starea utilizatorului
-          this.userStateService.updateUser({ preferredTheme: newTheme });
-
-          // Aplică tema imediat
-          this.themeService.setTheme(newTheme as 'light' | 'dark');
-
-          this.snackBar.open(
-            this.translate.instant('preferences.themeUpdated'), 
-            this.translate.instant('common.close') || 'Close', 
-            { duration: 3000 }
-          );
-
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          console.error('Error updating theme:', error);
-          this.snackBar.open(
-            this.translate.instant('preferences.themeUpdateError'), 
-            this.translate.instant('common.close') || 'Close', 
-            { duration: 3000 }
-          );
-        }
-      });
-    }
-  }
-
-  goBack() {
-    this.router.navigate(['/profile']);
-  }
-
-
-  onLanguageChange(preferredLanguage: string) {
-    this.selectedLanguage.set(preferredLanguage);
-    this.isLoading.set(true);
-    const user = this.userStateService.user();
-
-    if (user) {
-      this.userService.updatePreferredLanguage(user.id, preferredLanguage).subscribe({
-        next: (response) => {
-          this.isLoading.set(false);
-          // Actualizează starea utilizatorului
-          this.userStateService.updateUser({ preferredLanguage: preferredLanguage });
-
-          // Aplică limba imediat
-          this.languageService.use(preferredLanguage as 'en' | 'ro');
-
-          this.snackBar.open(
-            this.translate.instant('preferences.languageUpdated'), 
-            this.translate.instant('common.close') || 'Close', 
-            { duration: 3000 }
-          );
-
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          console.error('Error updating language:', error);
-          this.snackBar.open(
-            this.translate.instant('preferences.languageUpdateError'), 
-            this.translate.instant('common.close') || 'Close', 
-            { duration: 3000 }
-          );
-        }
-      });
-    }
   }
 }

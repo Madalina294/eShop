@@ -1,165 +1,121 @@
-<div class="statistics-container">
-  <app-breadcrumb></app-breadcrumb>
-
-  <div class="header-section">
-    <h1>{{ "adminStatistics.title" | translate }}</h1>
-    <button mat-raised-button color="primary" (click)="refreshStatistics()">
+<div class="page">
+  <app-page-header icon="insights" [title]="'adminStatistics.title' | translate">
+    <button mat-stroked-button type="button" (click)="load()">
       <mat-icon>refresh</mat-icon>
-      {{ "adminStatistics.refresh" | translate }}
+      <span>{{ "adminStatistics.refresh" | translate }}</span>
     </button>
-  </div>
+  </app-page-header>
 
-  <!-- Average Cart Statistics Card -->
-  <mat-card class="stat-card">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon>shopping_cart</mat-icon>
-        {{ "adminStatistics.averageCart.title" | translate }}
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loadingAverageCart()" class="loading-spinner">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-      <div *ngIf="!loadingAverageCart() && hasAverageCart()" class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">
-            {{ "adminStatistics.averageCart.averageValue" | translate }}
-          </div>
-          <div class="stat-value">
-            {{ formatCurrency(averageCart()!.averageCartValue) }}
-          </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="table" [count]="6" />
+    }
+
+    @case ("empty") {
+      <app-empty-state icon="insights" [title]="'adminStatistics.noData' | translate" />
+    }
+
+    @case ("error") {
+      <app-error-state
+        [title]="'adminStatistics.noData' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
+
+    @default {
+      @if (averageCart(); as cart) {
+        <div class="stats__cards">
+          <app-stat-card
+            icon="receipt_long"
+            tone="brand"
+            [label]="'adminStatistics.averageCart.totalOrders' | translate"
+            [value]="cart.totalOrders"
+          />
+          <app-stat-card
+            icon="payments"
+            tone="success"
+            [label]="'adminStatistics.averageCart.totalRevenue' | translate"
+            [value]="cart.totalRevenue | price"
+          />
+          <app-stat-card
+            icon="shopping_cart"
+            tone="info"
+            [label]="'adminStatistics.averageCart.averageValue' | translate"
+            [value]="cart.averageCartValue | price"
+          />
         </div>
-        <div class="stat-item">
-          <div class="stat-label">
-            {{ "adminStatistics.averageCart.totalOrders" | translate }}
+      }
+
+      <!-- Top customers -->
+      <section class="stats__section panel">
+        <h2 class="panel__title">{{ "adminStatistics.topCustomers.title" | translate }}</h2>
+
+        @if (topCustomers().length) {
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ "adminStatistics.topCustomers.userName" | translate }}</th>
+                  <th scope="col">{{ "adminStatistics.topCustomers.email" | translate }}</th>
+                  <th scope="col" class="is-numeric">
+                    {{ "adminStatistics.topCustomers.orderCount" | translate }}
+                  </th>
+                  <th scope="col" class="is-numeric">
+                    {{ "adminStatistics.topCustomers.totalSpent" | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of topCustomers(); track row.userId) {
+                  <tr>
+                    <td>{{ row.userName }}</td>
+                    <td class="is-muted">{{ row.userEmail }}</td>
+                    <td class="is-numeric">{{ row.orderCount }}</td>
+                    <td class="is-numeric">
+                      {{ row.totalSpent | price }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
-          <div class="stat-value">{{ averageCart()!.totalOrders }}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">
-            {{ "adminStatistics.averageCart.totalRevenue" | translate }}
+        } @else {
+          <p class="is-muted">{{ "adminStatistics.noData" | translate }}</p>
+        }
+      </section>
+
+      <!-- Orders by user -->
+      <section class="stats__section panel">
+        <h2 class="panel__title">{{ "adminStatistics.ordersByUser.title" | translate }}</h2>
+
+        @if (ordersByUser().length) {
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ "adminStatistics.ordersByUser.userName" | translate }}</th>
+                  <th scope="col">{{ "adminStatistics.ordersByUser.email" | translate }}</th>
+                  <th scope="col" class="is-numeric">
+                    {{ "adminStatistics.ordersByUser.orderCount" | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of ordersByUser(); track row.userId) {
+                  <tr>
+                    <td>{{ row.userName }}</td>
+                    <td class="is-muted">{{ row.userEmail }}</td>
+                    <td class="is-numeric">{{ row.orderCount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
-          <div class="stat-value">
-            {{ formatCurrency(averageCart()!.totalRevenue) }}
-          </div>
-        </div>
-      </div>
-      <div *ngIf="!loadingAverageCart() && !hasAverageCart()" class="no-data">
-        {{ "adminStatistics.noData" | translate }}
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Top Customers Card -->
-  <mat-card class="stat-card">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon>star</mat-icon>
-        {{ "adminStatistics.topCustomers.title" | translate }}
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loadingTopCustomers()" class="loading-spinner">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-      <div *ngIf="!loadingTopCustomers() && hasTopCustomers()">
-        <table mat-table [dataSource]="topCustomers()" class="statistics-table">
-          <ng-container matColumnDef="userName">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.topCustomers.userName" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let customer">{{ customer.userName }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="userEmail">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.topCustomers.email" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let customer">
-              {{ customer.userEmail }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="orderCount">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.topCustomers.orderCount" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let customer">
-              {{ customer.orderCount }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="totalSpent">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.topCustomers.totalSpent" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let customer">
-              {{ formatCurrency(customer.totalSpent) }}
-            </td>
-          </ng-container>
-
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumnsTopCustomers"
-          ></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: displayedColumnsTopCustomers"
-          ></tr>
-        </table>
-      </div>
-      <div *ngIf="!loadingTopCustomers() && !hasTopCustomers()" class="no-data">
-        {{ "adminStatistics.noData" | translate }}
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Orders by User Card -->
-  <mat-card class="stat-card">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon>assignment</mat-icon>
-        {{ "adminStatistics.ordersByUser.title" | translate }}
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loadingOrdersByUser()" class="loading-spinner">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-      <div *ngIf="!loadingOrdersByUser() && hasOrdersByUser()">
-        <table mat-table [dataSource]="ordersByUser()" class="statistics-table">
-          <ng-container matColumnDef="userName">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.ordersByUser.userName" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let user">{{ user.userName }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="userEmail">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.ordersByUser.email" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let user">{{ user.userEmail }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="orderCount">
-            <th mat-header-cell *matHeaderCellDef>
-              {{ "adminStatistics.ordersByUser.orderCount" | translate }}
-            </th>
-            <td mat-cell *matCellDef="let user">{{ user.orderCount }}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumnsOrders"></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: displayedColumnsOrders"
-          ></tr>
-        </table>
-      </div>
-      <div *ngIf="!loadingOrdersByUser() && !hasOrdersByUser()" class="no-data">
-        {{ "adminStatistics.noData" | translate }}
-      </div>
-    </mat-card-content>
-  </mat-card>
+        } @else {
+          <p class="is-muted">{{ "adminStatistics.noData" | translate }}</p>
+        }
+      </section>
+    }
+  }
 </div>

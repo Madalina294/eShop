@@ -1,97 +1,166 @@
-<div class="profile-main-container">
-  <div class="profile-card">
-    <!-- Preview imagine -->
-    <div class="image-section">
-      <img [src]="imageToDisplay()" class="user-profile" alt="profile-img" />
-      <input
-        type="file"
-        #fileInput
-        (change)="onFileSelected($event)"
-        accept="image/*"
-        style="display: none"
-      />
-      <button mat-button (click)="fileInput.click()">
-        {{ "profile.changePicture" | translate }}
-      </button>
-    </div>
+<div class="page page--narrow">
+  <app-page-header icon="account_circle" [title]="'profile.title' | translate" />
 
-    <form [formGroup]="updateForm" (ngSubmit)="updateProfile()">
+  @if (user(); as account) {
+    <!-- Avatar -->
+    <section class="profile__identity surface">
+      <span class="profile__avatar">
+        <img [src]="avatar()" alt="" width="96" height="96" />
+      </span>
+
+      <div class="profile__identity-text">
+        <h2 class="profile__name">{{ account.firstname }} {{ account.lastname }}</h2>
+        <p class="profile__email">{{ account.email }}</p>
+
+        <label class="profile__upload">
+          <input
+            type="file"
+            accept="image/*"
+            class="sr-only"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Styled as a button rather than being one: the real control is the
+               file input the label wraps, so a nested button would swallow the
+               click that opens the picker. -->
+          <span class="profile__upload-button">
+            <mat-icon aria-hidden="true">photo_camera</mat-icon>
+            <span>{{ "profile.changePicture" | translate }}</span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Details -->
+    <form class="profile__form panel" [formGroup]="form" (ngSubmit)="updateProfile()">
+      <div class="profile__row">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "profile.firstName" | translate }}</mat-label>
+          <input matInput formControlName="firstName" autocomplete="given-name" />
+          @if (form.controls.firstName.hasError("required")) {
+            <mat-error>{{ "register.firstNameRequired" | translate }}</mat-error>
+          } @else if (form.controls.firstName.hasError("minlength")) {
+            <mat-error>{{ "register.firstNameMin" | translate }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "profile.lastName" | translate }}</mat-label>
+          <input matInput formControlName="lastName" autocomplete="family-name" />
+          @if (form.controls.lastName.hasError("required")) {
+            <mat-error>{{ "register.lastNameRequired" | translate }}</mat-error>
+          } @else if (form.controls.lastName.hasError("minlength")) {
+            <mat-error>{{ "register.lastNameMin" | translate }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
       <mat-form-field appearance="outline">
-        <mat-label>{{ "profile.firstName" | translate }}</mat-label>
-        <input matInput formControlName="firstName" />
+        <mat-label>{{
+          (isGoogleUser() ? "profile.emailFromGoogle" : "profile.email") | translate
+        }}</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [readonly]="isGoogleUser()"
+        />
+        <mat-icon matSuffix>mail_outline</mat-icon>
+        @if (form.controls.email.hasError("required")) {
+          <mat-error>{{ "common.required" | translate }}</mat-error>
+        } @else if (form.controls.email.hasError("email")) {
+          <mat-error>{{ "profile.emailInvalid" | translate }}</mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>{{ "profile.lastName" | translate }}</mat-label>
-        <input matInput formControlName="lastName" />
-      </mat-form-field>
-
-      <!-- Email field - NU afișa pentru utilizatorii Google (email-ul vine de la Google) -->
-      <mat-form-field appearance="outline" *ngIf="!isGoogleUser()">
-        <mat-label>{{ "profile.email" | translate }}</mat-label>
-        <input matInput formControlName="email" type="email" />
-        <mat-error *ngIf="updateForm.get('email')?.hasError('email')">
-          {{ "profile.emailInvalid" | translate }}
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Pentru utilizatorii Google, afișează email-ul ca read-only -->
-      <mat-form-field appearance="outline" *ngIf="isGoogleUser()">
-        <mat-label>{{ "profile.emailFromGoogle" | translate }}</mat-label>
-        <input matInput [value]="user()?.email || ''" readonly />
-      </mat-form-field>
-
-      <!-- Phone Number field -->
       <mat-form-field appearance="outline">
         <mat-label>{{ "profile.phoneNumber" | translate }}</mat-label>
-        <input matInput formControlName="phoneNumber" type="tel" />
-        <mat-error *ngIf="updateForm.get('phoneNumber')?.hasError('pattern')">
-          {{ "profile.phoneInvalid" | translate }}
-        </mat-error>
+        <input matInput type="tel" formControlName="phoneNumber" autocomplete="tel" />
+        <mat-icon matSuffix>phone</mat-icon>
+        @if (form.controls.phoneNumber.hasError("pattern")) {
+          <mat-error>{{ "profile.phoneInvalid" | translate }}</mat-error>
+        }
       </mat-form-field>
 
-      <!-- 2FA checkbox - NU afișa pentru utilizatorii Google (Google are deja 2FA) -->
-      <mat-checkbox formControlName="mfaEnabled" *ngIf="!isGoogleUser()">
-        {{ "profile.enable2FA" | translate }}
-      </mat-checkbox>
-
-      <!-- Pentru utilizatorii Google, afișează informație despre 2FA Google -->
-      <div *ngIf="isGoogleUser()" class="google-2fa-info">
-        <mat-icon>security</mat-icon>
-        <span>{{ "profile.google2FAManaged" | translate }}</span>
+      <!-- Two-factor -->
+      <div class="profile__mfa">
+        @if (isGoogleUser()) {
+          <p class="profile__mfa-managed">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            {{ "profile.google2FAManaged" | translate }}
+          </p>
+        } @else {
+          <mat-checkbox formControlName="mfaEnabled" color="primary">
+            {{ "profile.enable2FA" | translate }}
+          </mat-checkbox>
+          <p class="profile__mfa-hint">{{ "profile.2FARequireLogin" | translate }}</p>
+        }
       </div>
 
-      <small *ngIf="user() && !user()!.mfaEnabled && !isGoogleUser()">
-        {{ "profile.2FARequireLogin" | translate }}
-      </small>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="profile__submit"
+        [disabled]="saving()"
+      >
+        @if (saving()) {
+          <mat-progress-spinner mode="indeterminate" diameter="18" />
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        <span>{{ "profile.updateProfile" | translate }}</span>
+      </button>
+    </form>
 
-      <div class="button-group">
+    <!-- Shortcuts -->
+    <nav class="profile__links" [attr.aria-label]="'profile.title' | translate">
+      @if (isCustomer()) {
+        <a mat-stroked-button routerLink="/user/orders">
+          <mat-icon>receipt_long</mat-icon>
+          <span>{{ "orders.title" | translate }}</span>
+        </a>
+      }
+
+      @if (isGoogleUser()) {
+        <button mat-stroked-button type="button" (click)="goToGoogleAccount()">
+          <mat-icon>open_in_new</mat-icon>
+          <span>{{ "profile.manageGoogleAccount" | translate }}</span>
+        </button>
+      } @else {
+        <a mat-stroked-button routerLink="/update-password">
+          <mat-icon>lock_reset</mat-icon>
+          <span>{{ "profile.changePassword" | translate }}</span>
+        </a>
+      }
+
+      <a mat-stroked-button routerLink="/edit-preferences">
+        <mat-icon>tune</mat-icon>
+        <span>{{ "profile.editPreferences" | translate }}</span>
+      </a>
+    </nav>
+
+    <!-- Destructive -->
+    <section class="profile__danger panel">
+      <h2 class="panel__title">{{ "profile.deleteAccount" | translate }}</h2>
+      <p class="panel__subtitle">{{ "profile.confirmDelete.message" | translate }}</p>
+
+      <div class="profile__danger-actions">
+        <button mat-button type="button" (click)="signOut()">
+          <mat-icon>logout</mat-icon>
+          <span>{{ "profile.signOut" | translate }}</span>
+        </button>
+
         <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="updateForm.invalid"
+          mat-flat-button
+          type="button"
+          class="profile__delete"
+          (click)="deleteAccount()"
         >
-          {{ "profile.updateProfile" | translate }}
+          <mat-icon>delete_forever</mat-icon>
+          <span>{{ "profile.deleteAccount" | translate }}</span>
         </button>
       </div>
-    </form>
-    <div class="button-group">
-      <button mat-button routerLink="/update-password" *ngIf="!isGoogleUser()">
-        {{ "profile.changePassword" | translate }}
-      </button>
-      <button mat-button routerLink="/edit-preferences">
-        {{ "profile.editPreferences" | translate }}
-      </button>
-      <button mat-button (click)="goToGoogleAccount()" *ngIf="isGoogleUser()">
-        {{ "profile.manageGoogleAccount" | translate }}
-      </button>
-      <button mat-button (click)="logout()">
-        {{ "profile.signOut" | translate }}
-      </button>
-      <button mat-button color="warn" (click)="deleteAccount()">
-        {{ "profile.deleteAccount" | translate }}
-      </button>
-    </div>
-  </div>
+    </section>
+  }
 </div>

@@ -1,123 +1,80 @@
-.admin-dashboard {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+@use "mixins" as m;
 
-.dashboard-header {
-  margin-bottom: 32px;
-  text-align: center;
+.dash {
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
 
-  h1 {
-    color: #1976d2;
-    font-size: 2.5rem;
-    font-weight: 300;
-    margin-bottom: 8px;
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
-  p {
-    color: #666;
-    font-size: 1.1rem;
-  }
-}
+  &__tiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
 
-.dashboard-grid {
-  .dashboard-card {
-    width: 100%;
-    height: 100%;
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__tile {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    padding: var(--space-5);
+    color: inherit;
+    text-decoration: none;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    mat-card-header {
-      padding-bottom: 16px;
-
-      div[mat-card-avatar] {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        
-        mat-icon {
-          font-size: 24px;
-          color: white;
-        }
-      }
-
-      mat-card-title {
-        font-size: 1.3rem;
-        font-weight: 500;
-      }
-    }
-
-    mat-card-content {
-      flex-grow: 1;
-      
-      p {
-        color: #666;
-        line-height: 1.5;
-      }
-    }
-
-    mat-card-actions {
-      padding-top: 16px;
-    }
-
-    &.card-primary {
-      div[mat-card-avatar] {
-        background-color: #1976d2;
-      }
-    }
-
-    &.card-accent {
-      div[mat-card-avatar] {
-        background-color: #ff4081;
-      }
-    }
-
-    &.card-warn {
-      div[mat-card-avatar] {
-        background-color: #f44336;
-      }
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .admin-dashboard {
-    padding: 16px;
-  }
-
-  .dashboard-header {
-    h1 {
-      font-size: 2rem;
+      text-decoration: none;
+      color: inherit;
     }
   }
 
-  ::ng-deep .dashboard-grid mat-grid-list {
-    .mat-grid-tile {
-      .mat-grid-tile-content {
-        padding: 8px !important;
-      }
-    }
+  &__tile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--brand-soft);
+    color: var(--brand);
   }
-}
 
-@media (max-width: 600px) {
-  ::ng-deep .dashboard-grid mat-grid-list {
-    .mat-grid-list-cols-2 {
-      .mat-grid-tile {
-        width: 100% !important;
-      }
+  &__tile-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-lg);
+  }
+
+  &__tile-text {
+    margin: 0 0 var(--space-4);
+    flex: 1 1 auto;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  &__tile-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--brand);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+
+    mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
     }
   }
 }

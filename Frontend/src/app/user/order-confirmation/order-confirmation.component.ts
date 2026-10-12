@@ -7,8 +7,9 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
 import { RouterLink } from '@angular/router';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,7 +43,7 @@ const STATUS_ICONS: Record<OrderStatus, string> = {
   standalone: true,
   imports: [
     RouterLink,
-    CurrencyPipe,
+    PricePipe,
     DatePipe,
     MatButtonModule,
     MatDividerModule,

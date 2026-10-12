@@ -22,7 +22,7 @@
       <p class="price-stack price-stack--end">
         <span class="price-stack__label">{{ "cart.lineTotal" | translate }}</span>
         <span class="price-stack__value">
-          {{ total() | currency: "RON" : "symbol" : "1.2-2" }}
+          {{ total() | price }}
         </span>
       </p>
     }

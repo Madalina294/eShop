@@ -1,0 +1,65 @@
+<div class="admin">
+  <!-- Mobile bar: the sidebar is off-canvas below the lg breakpoint. -->
+  <div class="admin__bar">
+    <button
+      type="button"
+      class="admin__bar-toggle"
+      [attr.aria-label]="(drawerOpen() ? 'common.closeMenu' : 'common.openMenu') | translate"
+      [attr.aria-expanded]="drawerOpen()"
+      aria-controls="admin-sidebar"
+      (click)="toggleDrawer()"
+    >
+      <mat-icon>{{ drawerOpen() ? "close" : "menu" }}</mat-icon>
+    </button>
+    <span class="admin__bar-title">{{ currentLabel() | translate }}</span>
+  </div>
+
+  @if (drawerOpen()) {
+    <div class="admin__backdrop" (click)="closeDrawer()"></div>
+  }
+
+  <aside
+    id="admin-sidebar"
+    class="admin__sidebar"
+    [class.is-open]="drawerOpen()"
+    [attr.aria-label]="'header.adminPanel' | translate"
+  >
+    <div class="admin__brand">
+      <mat-icon class="admin__brand-mark" aria-hidden="true">admin_panel_settings</mat-icon>
+      <span class="admin__brand-name">{{ "header.adminPanel" | translate }}</span>
+    </div>
+
+    <nav class="admin__nav">
+      @for (item of navItems; track item.link) {
+        <a
+          class="admin__link"
+          [routerLink]="item.link"
+          routerLinkActive="is-active"
+          #rla="routerLinkActive"
+          [attr.aria-current]="rla.isActive ? 'page' : null"
+          [matTooltip]="collapsed() ? (item.label | translate) : ''"
+          matTooltipPosition="right"
+          (click)="closeDrawer()"
+        >
+          <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span class="admin__link-label">{{ item.label | translate }}</span>
+        </a>
+      }
+    </nav>
+
+    <button
+      type="button"
+      class="admin__collapse"
+      [attr.aria-label]="'common.openMenu' | translate"
+      [attr.aria-pressed]="collapsed()"
+      (click)="toggleCollapsed()"
+    >
+      <mat-icon>{{ collapsed() ? "chevron_right" : "chevron_left" }}</mat-icon>
+      <span class="admin__link-label">{{ "common.closeMenu" | translate }}</span>
+    </button>
+  </aside>
+
+  <main class="admin__content">
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,132 @@
+<div class="page">
+  <app-page-header
+    icon="receipt_long"
+    [title]="'orders.title' | translate"
+    [subtitle]="'orders.subtitle' | translate"
+  />
+
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="list" [count]="3" [label]="'orders.loading' | translate" />
+    }
+
+    @case ("empty") {
+      <app-empty-state
+        icon="receipt_long"
+        [title]="'orders.empty.title' | translate"
+        [description]="'orders.empty.description' | translate"
+        [actionLabel]="'orders.empty.action' | translate"
+        actionIcon="storefront"
+        (action)="goShopping()"
+      />
+    }
+
+    @case ("error") {
+      <app-error-state
+        [title]="'orders.error.title' | translate"
+        [description]="'orders.error.description' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
+
+    @default {
+      <!-- Quick filters. Counts make an empty filter obviously empty rather
+           than looking like a failed load. -->
+      <div class="orders__filters" role="group" [attr.aria-label]="'orders.filterBy' | translate">
+        @for (filter of filters; track filter) {
+          <button
+            type="button"
+            class="orders__filter"
+            [class.is-active]="activeFilter() === filter"
+            [attr.aria-pressed]="activeFilter() === filter"
+            (click)="setFilter(filter)"
+          >
+            {{ (filter === "all" ? "common.all" : "orderStatus." + filter) | translate }}
+            <span class="orders__filter-count">{{ countFor(filter) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (visibleOrders().length) {
+        <ul class="orders__list">
+          @for (order of visibleOrders(); track order.id) {
+            <li class="orders__card surface">
+              <div class="orders__card-head">
+                <div class="orders__ident">
+                  <h2 class="orders__number">
+                    {{ "orders.number" | translate }}{{ order.id }}
+                  </h2>
+                  <time class="orders__date" [attr.datetime]="order.orderDate">
+                    {{ order.orderDate | date: "d MMMM y, HH:mm" }}
+                  </time>
+                </div>
+
+                <app-status-badge [status]="order.status" />
+              </div>
+
+              <div class="orders__card-body">
+                <div class="orders__thumbs" aria-hidden="true">
+                  @for (thumb of thumbnails(order); track $index) {
+                    <img
+                      class="orders__thumb"
+                      [src]="thumb"
+                      alt=""
+                      width="56"
+                      height="56"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  }
+                  @if (hiddenCount(order); as extra) {
+                    <span class="orders__thumb orders__thumb--more">+{{ extra }}</span>
+                  }
+                </div>
+
+                <dl class="orders__facts">
+                  <div>
+                    <dt>{{ "orders.items" | translate }}</dt>
+                    <dd>{{ itemCount(order) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ "orders.shipping" | translate }}</dt>
+                    <dd>
+                      {{ "checkout.shippingOptions." + order.shippingMethod | translate }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ "orders.total" | translate }}</dt>
+                    <dd class="orders__total">
+                      {{ order.totalAmount | price }}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="orders__card-foot">
+                <a
+                  mat-stroked-button
+                  class="orders__details"
+                  [routerLink]="['/user/order-confirmation', order.id]"
+                >
+                  <mat-icon>visibility</mat-icon>
+                  <span>{{ "orders.viewDetails" | translate }}</span>
+                </a>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <!-- Orders exist, just none in this filter. -->
+        <app-empty-state
+          icon="filter_alt_off"
+          [title]="'orders.noneForFilter.title' | translate"
+          [description]="'orders.noneForFilter.description' | translate"
+          [actionLabel]="'common.clearFilters' | translate"
+          actionIcon="clear"
+          (action)="setFilter('all')"
+        />
+      }
+    }
+  }
+</div>

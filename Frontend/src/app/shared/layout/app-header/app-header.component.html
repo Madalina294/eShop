@@ -173,6 +173,12 @@
             <mat-icon>account_circle</mat-icon>
             <span>{{ "header.myAccount" | translate }}</span>
           </a>
+          @if (isCustomer()) {
+            <a mat-menu-item routerLink="/user/orders">
+              <mat-icon>receipt_long</mat-icon>
+              <span>{{ "orders.title" | translate }}</span>
+            </a>
+          }
           <a mat-menu-item routerLink="/edit-preferences">
             <mat-icon>tune</mat-icon>
             <span>{{ "preferences.title" | translate }}</span>

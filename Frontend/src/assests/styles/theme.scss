@@ -55,60 +55,11 @@ html {
   }
 }
 
-// --- ng-zorro bridge — TEMPORARY --------------------------------------------
-// `auth/register` is the last ng-zorro consumer. DELETE this whole block once
-// it is migrated to Material.
-//
-// These used to be the DARK antd defaults sitting on `:root`, with the light
-// counterparts hidden in `_legacy-overrides.scss`. That was backwards the
-// moment light became the default theme, so the two have been swapped and
-// re-toned onto the warm palette: light on `:root`, dark under `.dark-mode`.
+// `--primary-color` is referenced by the admin product forms but was defined
+// nowhere, so those declarations were silently dead. Aliased to the brand.
+// Everything else here was the ng-zorro bridge, removed with ng-zorro itself.
 :root {
-  --ant-primary-color: #1f5099;
-  --ant-success-color: #1f7d52;
-  --ant-warning-color: #b97d08;
-  --ant-error-color: #c0273c;
-  --ant-info-color: #1d7180;
-  --ant-text-color: rgba(36, 31, 26, 0.88);
-  --ant-text-color-secondary: rgba(36, 31, 26, 0.66);
-  --ant-text-color-inverse: #fffdf8;
-  --ant-background-color: #fffdf8;
-  --ant-background-color-light: #faf6ee;
-  --ant-background-color-base: #f4efe4;
-  --ant-border-color-base: #d6cab8;
-  --ant-border-color-split: #e8e0d4;
-  --ant-border-color-inverse: #fffdf8;
-  --ant-box-shadow-base: 0 3px 6px -4px rgba(61, 48, 34, 0.12), 0 6px 16px 0 rgba(61, 48, 34, 0.08), 0 9px 28px 8px rgba(61, 48, 34, 0.05);
-  --ant-box-shadow-card: 0 1px 2px -2px rgba(61, 48, 34, 0.16), 0 3px 6px 0 rgba(61, 48, 34, 0.12), 0 5px 12px 4px rgba(61, 48, 34, 0.09);
-  --ant-box-shadow-popover: 0 6px 16px -8px rgba(61, 48, 34, 0.08), 0 9px 28px 0 rgba(61, 48, 34, 0.05), 0 12px 48px 16px rgba(61, 48, 34, 0.03);
-  --ant-box-shadow-drawer: 0 16px 24px 2px rgba(61, 48, 34, 0.14), 0 6px 30px 5px rgba(61, 48, 34, 0.12), 0 8px 10px -5px rgba(61, 48, 34, 0.2);
-  --ant-box-shadow-modal: 0 24px 48px -12px rgba(61, 48, 34, 0.18), 0 0 0 1px rgba(61, 48, 34, 0.08);
-
-  // Referenced by admin/add-product and admin/edit-product but defined nowhere
-  // — those four declarations were silently dead. Aliased to the brand.
   --primary-color: var(--brand);
-}
-
-.dark-mode {
-  --ant-primary-color: #88ace0;
-  --ant-success-color: #2f9e6b;
-  --ant-warning-color: #e0a020;
-  --ant-error-color: #e04a58;
-  --ant-info-color: #2a8f9e;
-  --ant-text-color: rgba(245, 239, 228, 0.88);
-  --ant-text-color-secondary: rgba(245, 239, 228, 0.66);
-  --ant-text-color-inverse: #16130f;
-  --ant-background-color: #201c17;
-  --ant-background-color-light: #2b251f;
-  --ant-background-color-base: #16130f;
-  --ant-border-color-base: #3a332b;
-  --ant-border-color-split: #2b251f;
-  --ant-border-color-inverse: #f5efe4;
-  --ant-box-shadow-base: 0 3px 6px -4px rgba(0, 0, 0, 0.32), 0 6px 16px 0 rgba(0, 0, 0, 0.24), 0 9px 28px 8px rgba(0, 0, 0, 0.16);
-  --ant-box-shadow-card: 0 1px 2px -2px rgba(0, 0, 0, 0.36), 0 3px 6px 0 rgba(0, 0, 0, 0.28), 0 5px 12px 4px rgba(0, 0, 0, 0.20);
-  --ant-box-shadow-popover: 0 6px 16px -8px rgba(0, 0, 0, 0.28), 0 9px 28px 0 rgba(0, 0, 0, 0.20), 0 12px 48px 16px rgba(0, 0, 0, 0.14);
-  --ant-box-shadow-drawer: 0 16px 24px 2px rgba(0, 0, 0, 0.40), 0 6px 30px 5px rgba(0, 0, 0, 0.32), 0 8px 10px -5px rgba(0, 0, 0, 0.44);
-  --ant-box-shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(0, 0, 0, 0.32);
 }
 
 // ============================================================================

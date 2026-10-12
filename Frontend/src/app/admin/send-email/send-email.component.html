@@ -1,67 +1,50 @@
-<div class="enter-email-container">
-  <div class="email-container">
-    <nz-spin
-      [nzSpinning]="isSpinning()"
-      [nzSize]="'large'"
-      [nzTip]="'sendEmail.processing' | translate"
-      class="proccesing-spinner"
-    >
-      <div class="card-header">
-        <h1 class="form-title">{{ "sendEmail.title" | translate }}</h1>
-        <p class="form-subtitle">
-          {{ "sendEmail.to" | translate }}: {{ toEmail }}
-        </p>
-      </div>
+<div class="page page--narrow">
+  <app-page-header icon="mail" [title]="'sendEmail.title' | translate" />
 
-      <form
-        nz-form
-        [formGroup]="emailForm"
-        (ngSubmit)="onSubmit()"
-        class="email-form"
-        nzLayout="vertical"
-      >
-        <nz-form-item>
-          <nz-form-label nzRequired>{{
-            "sendEmail.subjectLabel" | translate
-          }}</nz-form-label>
-          <nz-form-control
-            [nzErrorTip]="'sendEmail.subjectRequired' | translate"
-          >
-            <input
-              nz-input
-              formControlName="subject"
-              [placeholder]="'sendEmail.subjectPlaceholder' | translate"
-            />
-          </nz-form-control>
-        </nz-form-item>
+  <form class="form-panel panel" [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "sendEmail.to" | translate }}</mat-label>
+      <input matInput type="email" formControlName="toEmail" autocomplete="off" />
+      <mat-icon matSuffix>person</mat-icon>
+      @if (form.controls.toEmail.hasError("required")) {
+        <mat-error>{{ "common.required" | translate }}</mat-error>
+      } @else if (form.controls.toEmail.hasError("email")) {
+        <mat-error>{{ "login.emailInvalid" | translate }}</mat-error>
+      }
+    </mat-form-field>
 
-        <nz-form-item>
-          <nz-form-label nzRequired>{{
-            "sendEmail.contentLabel" | translate
-          }}</nz-form-label>
-          <nz-form-control
-            [nzErrorTip]="'sendEmail.contentRequired' | translate"
-          >
-            <textarea
-              nz-input
-              formControlName="content"
-              rows="6"
-              style="resize: vertical"
-              [placeholder]="'sendEmail.contentPlaceholder' | translate"
-            ></textarea>
-          </nz-form-control>
-        </nz-form-item>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "sendEmail.subjectLabel" | translate }}</mat-label>
+      <input matInput formControlName="subject" [placeholder]="'sendEmail.subjectPlaceholder' | translate" />
+      @if (form.controls.subject.hasError("required")) {
+        <mat-error>{{ "sendEmail.subjectRequired" | translate }}</mat-error>
+      }
+    </mat-form-field>
 
-        <button
-          nz-button
-          class="submit-button"
-          [nzType]="'primary'"
-          type="submit"
-          [disabled]="emailForm.invalid"
-        >
-          {{ "sendEmail.sendButton" | translate }}
-        </button>
-      </form>
-    </nz-spin>
-  </div>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "sendEmail.contentLabel" | translate }}</mat-label>
+      <textarea
+        matInput
+        rows="8"
+        formControlName="content"
+        [placeholder]="'sendEmail.contentPlaceholder' | translate"
+      ></textarea>
+      @if (form.controls.content.hasError("required")) {
+        <mat-error>{{ "sendEmail.contentRequired" | translate }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-panel__actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="sending()">
+        @if (sending()) {
+          <mat-progress-spinner mode="indeterminate" diameter="18" />
+        } @else {
+          <mat-icon>send</mat-icon>
+        }
+        <span>{{ (sending() ? "sendEmail.processing" : "sendEmail.sendButton") | translate }}</span>
+      </button>
+
+      <a mat-button routerLink="/admin/all-users">{{ "editCategory.cancelButton" | translate }}</a>
+    </div>
+  </form>
 </div>

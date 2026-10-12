@@ -1,58 +1,66 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {AdminService} from '../../services/admin/admin.service';
-import {ActivatedRoute} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {NgIf} from '@angular/common';
-import {MatIcon} from '@angular/material/icon';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
+import { AdminService } from '../../services/admin/admin.service';
+import { UserData } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { avatarUrl } from '../../core/http/image-url';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+
+/** Read-only view of a single user account, opened from the user listing. */
 @Component({
   selector: 'app-view-user-account',
+  standalone: true,
   imports: [
-    NgIf,
-    MatIcon,
-    MatProgressSpinner,
-    TranslateModule
+    RouterLink,
+    MatButtonModule,
+    MatIconModule,
+    TranslateModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './view-user-account.component.html',
-  styleUrl: './view-user-account.component.scss'
+  styleUrl: './view-user-account.component.scss',
 })
-export class ViewUserAccountComponent implements OnInit{
+export class ViewUserAccountComponent {
+  private readonly adminService = inject(AdminService);
+  private readonly route = inject(ActivatedRoute);
 
-  user: any;
-  isSpinning = signal(false);
+  private readonly userId = Number(this.route.snapshot.queryParams['userId']);
 
-  constructor(private adminService: AdminService,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private translate: TranslateService){}
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly user = signal<UserData | null>(null);
 
-  ngOnInit(){
-    this.loadUserData();
+  constructor() {
+    this.load();
   }
 
-  getFullImageUrl(imageUrl: string | null): string {
-    if (!imageUrl) return '';
-    if (imageUrl.startsWith('/uploads/')) {
-      return 'http://localhost:8080' + imageUrl;
+  protected load(): void {
+    if (!this.userId) {
+      this.state.set('error');
+      return;
     }
-    return imageUrl;
-  }
 
-  loadUserData(){
-    this.isSpinning.set(true);
-    this.adminService.getUserById(this.route.snapshot.queryParams['userId']).subscribe({
-      next: (res) =>{
-        this.isSpinning.set(false);
-        console.log(res);
-        this.user = res;
+    this.state.set('loading');
+
+    this.adminService.getUserById(this.userId).subscribe({
+      next: user => {
+        this.user.set(user);
+        this.state.set('ready');
       },
-      error: (res) =>{
-        this.isSpinning.set(false);
-        this.snackBar.open(this.translate.instant('viewUserAccount.errorLoading'), this.translate.instant('viewUserAccount.ok'), {duration: 3000});
-      }
-    })
+      error: () => this.state.set('error'),
+    });
   }
 
+  protected avatarFor(user: UserData): string {
+    // Was hardcoded to `http://localhost:8080` + the raw path.
+    return avatarUrl(user.imageUrl);
+  }
 }

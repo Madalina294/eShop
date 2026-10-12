@@ -56,7 +56,7 @@
     <span class="product-card__name">{{ product().name }}</span>
 
     <span class="product-card__price">
-      {{ product().price | currency: currency() : "symbol" : "1.2-2" }}
+      {{ product().price | price: currency() }}
     </span>
 
     @if (footnote()) {

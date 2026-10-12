@@ -1,20 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RegisterRequest} from '../../models/register-request';
 import {AuthenticationResponse} from '../../models/authentication-response';
 import {Observable} from 'rxjs';
 import {VerificationRequest} from '../../models/verification-request';
 import {AuthenticationRequest} from '../../models/authentication-request';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
-  private baseUrl = 'http://localhost:8080/api/auth'
-  constructor(
-    private http: HttpClient
-  ) { }
+  // Was hardcoded to `http://localhost:8080/api/auth`, which bypassed the
+  // environment and broke every non-local build.
+  private readonly baseUrl = `${environment.apiUrl}/auth`;
+  private readonly http = inject(HttpClient);
 
   register(registerRequest : RegisterRequest): Observable<AuthenticationResponse> {
     return this.http.post<AuthenticationResponse>(`${this.baseUrl}/register`, registerRequest,  { responseType: 'json' });

@@ -1,75 +1,47 @@
-<app-breadcrumb></app-breadcrumb>
-<div class="category-main-container">
-  <mat-card class="category-header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>category</mat-icon>
-      </div>
-      <mat-card-title>{{ "createCategory.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-        "createCategory.subtitle" | translate
-      }}</mat-card-subtitle>
-    </mat-card-header>
-  </mat-card>
+<div class="page page--narrow">
+  <app-page-header
+    icon="category"
+    [title]="'createCategory.title' | translate"
+    [subtitle]="'createCategory.subtitle' | translate"
+  />
 
-  <mat-card class="category-form-card">
-    <!-- Loading Spinner -->
-    <div *ngIf="isSpinning()" class="loading-overlay">
-      <mat-progress-spinner
-        mode="indeterminate"
-        diameter="50"
-        color="primary"
-      ></mat-progress-spinner>
-      <p>{{ "createCategory.creating" | translate }}</p>
-    </div>
+  <form class="form-panel panel" [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "createCategory.nameLabel" | translate }}</mat-label>
+      <input matInput formControlName="name" [placeholder]="'createCategory.namePlaceholder' | translate" />
+      @if (form.controls.name.hasError("required")) {
+        <mat-error>{{ "createCategory.nameRequired" | translate }}</mat-error>
+      }
+    </mat-form-field>
 
-    <form
-      [formGroup]="createCategoryForm"
-      (ngSubmit)="onSubmit()"
-      class="category-form"
-    >
-      <!-- Name Field -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ "createCategory.nameLabel" | translate }}</mat-label>
-        <input
-          matInput
-          formControlName="name"
-          [placeholder]="'createCategory.namePlaceholder' | translate"
-        />
-        <mat-error *ngIf="createCategoryForm.get('name')?.hasError('required')">
-          {{ "createCategory.nameRequired" | translate }}
-        </mat-error>
-      </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ "createCategory.descriptionLabel" | translate }}</mat-label>
+      <textarea
+        matInput
+        rows="4"
+        formControlName="description"
+        [placeholder]="'createCategory.descriptionPlaceholder' | translate"
+      ></textarea>
+      @if (form.controls.description.hasError("required")) {
+        <mat-error>{{ "createCategory.descriptionRequired" | translate }}</mat-error>
+      }
+    </mat-form-field>
 
-      <!-- Description Field -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{
-          "createCategory.descriptionLabel" | translate
-        }}</mat-label>
-        <textarea
-          matInput
-          formControlName="description"
-          rows="4"
-          [placeholder]="'createCategory.descriptionPlaceholder' | translate"
-        ></textarea>
-        <mat-error
-          *ngIf="createCategoryForm.get('description')?.hasError('required')"
-        >
-          {{ "createCategory.descriptionRequired" | translate }}
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Submit Button -->
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="createCategoryForm.invalid || isSpinning()"
-        class="submit-button"
-      >
-        <mat-icon>add</mat-icon>
-        {{ "createCategory.createButton" | translate }}
+    <div class="form-panel__actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+        @if (saving()) {
+          <mat-progress-spinner mode="indeterminate" diameter="18" />
+        } @else {
+          <mat-icon>add</mat-icon>
+        }
+        <span>{{
+          (saving() ? "createCategory.creating" : "createCategory.createButton") | translate
+        }}</span>
       </button>
-    </form>
-  </mat-card>
+
+      <a mat-button routerLink="/admin/view-categories">
+        {{ "editCategory.cancelButton" | translate }}
+      </a>
+    </div>
+  </form>
 </div>

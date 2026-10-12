@@ -29,14 +29,6 @@ const CUSTOMER_NAV: readonly NavItem[] = [
   { label: 'header.about', link: '/about', icon: 'info' },
 ];
 
-const ADMIN_NAV: readonly NavItem[] = [
-  { label: 'header.dashboardAdmin', link: '/admin/dashboard', icon: 'dashboard' },
-  { label: 'viewProducts.title', link: '/admin/view-products', icon: 'inventory_2' },
-  { label: 'viewCategories.title', link: '/admin/view-categories', icon: 'category' },
-  { label: 'header.manageUsers', link: '/admin/all-users', icon: 'supervisor_account' },
-  { label: 'adminStatistics.title', link: '/admin/statistics', icon: 'insights' },
-];
-
 /**
  * The app chrome: brand, primary navigation, catalogue search, cart and
  * wishlist badges, language switch, theme toggle and the account menu.
@@ -117,8 +109,12 @@ export class AppHeaderComponent {
     }
   }
 
+  /**
+   * Customers only. Admin navigation lives in `AdminLayoutComponent`'s sidebar
+   * — listing it here as well put every admin destination on screen twice.
+   */
   protected readonly navItems = computed<readonly NavItem[]>(() =>
-    this.isAdmin() ? ADMIN_NAV : this.isCustomer() ? CUSTOMER_NAV : []
+    this.isCustomer() ? CUSTOMER_NAV : []
   );
 
   /** Home target depends on the role, so the brand link is never a dead end. */

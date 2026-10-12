@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { PricePipe } from '../pipes/price.pipe';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,7 +29,7 @@ export interface QuantityDialogResult {
   selector: 'app-quantity-dialog',
   standalone: true,
   imports: [
-    CurrencyPipe,
+    PricePipe,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,

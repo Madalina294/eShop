@@ -9,9 +9,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -86,7 +86,7 @@ const SHIPPING_OPTIONS: readonly ShippingOption[] = [
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    CurrencyPipe,
+    PricePipe,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,

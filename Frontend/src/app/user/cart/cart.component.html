@@ -95,7 +95,7 @@
 
                 <!-- Unit price -->
                 <div class="cart-row__cell" [attr.data-label]="'cart.unitPrice' | translate">
-                  {{ row.productPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                  {{ row.productPrice | price }}
                 </div>
 
                 <!-- Quantity -->
@@ -116,7 +116,7 @@
                   class="cart-row__cell cart-row__cell--total"
                   [attr.data-label]="'cart.lineTotal' | translate"
                 >
-                  {{ row.lineTotal | currency: "RON" : "symbol" : "1.2-2" }}
+                  {{ row.lineTotal | price }}
                 </div>
 
                 <!-- Remove -->
@@ -155,7 +155,7 @@
             </div>
             <div class="data-rows__row">
               <dt>{{ "cart.subtotal" | translate }}</dt>
-              <dd>{{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+              <dd>{{ subtotal() | price }}</dd>
             </div>
           </dl>
 

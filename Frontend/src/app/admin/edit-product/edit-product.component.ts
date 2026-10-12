@@ -1,253 +1,136 @@
-import {ChangeDetectorRef, Component, computed, OnInit, signal} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AdminService, ProductData} from '../../services/admin/admin.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
-import {MatButton} from '@angular/material/button';
-import {MatCard, MatCardAvatar, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
-import {MatInput, MatLabel} from '@angular/material/input';
-import {NgFor, NgIf} from '@angular/common';
-import {MatError, MatFormField} from '@angular/material/form-field';
-import {MatIcon} from '@angular/material/icon';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatOption, MatSelect} from '@angular/material/select';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AdminService } from '../../services/admin/admin.service';
+import { CategoryData } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { productImageUrl } from '../../core/http/image-url';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+import { buildProductForm, toProductFormData } from '../product-form/product-form';
 
 @Component({
   selector: 'app-edit-product',
+  standalone: true,
   imports: [
-    BreadcrumbComponent,
-    FormsModule,
-    MatButton,
-    MatCard,
-    MatCardAvatar,
-    MatCardHeader,
-    MatCardSubtitle,
-    MatCardTitle,
-    MatError,
-    MatFormField,
-    MatIcon,
-    MatInput,
-    MatLabel,
-    MatProgressSpinner,
-    NgIf,
-    NgFor,
     ReactiveFormsModule,
-    TranslatePipe,
-    MatSelect,
-    MatOption
+    RouterLink,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    TranslateModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './edit-product.component.html',
-  styleUrl: './edit-product.component.scss'
+  styleUrl: './edit-product.component.scss',
 })
-export class EditProductComponent implements OnInit {
-  isLoading = signal(false);
-  updateProductForm!: FormGroup;
-  productId!: number;
-  selectedFile: File | null = null;
-  tempImagePreview = signal<string | null>(null);
-  existingImage = signal<string | null>(null);
-  categories: any[] = [];
+export class EditProductComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly adminService = inject(AdminService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  imageToDisplay = computed(() => {
-    const tempImage = this.tempImagePreview();
-    const existing = this.existingImage();
-    
-    // Dacă există imagine temporară (nou selectată), afișează-o
-    if (tempImage) {
-      return tempImage;
-    }
-    
-    // Dacă există imagine existentă, afișează-o
-    if (existing && existing.startsWith('/uploads/')) {
-      return 'http://localhost:8080' + existing;
-    }
-    
-    return existing || 'assets/default-avatar.png';
-  });
+  private readonly productId = Number(this.route.snapshot.queryParams['productId']);
 
-  constructor(
-    private fb: FormBuilder,
-    private adminService: AdminService,
-    private snackBar: MatSnackBar,
-    private translate: TranslateService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
-  ) {
-    // Inițializează formularul mai întâi (gol)
-    this.updateProductForm = this.fb.group({
-      name: ['', [Validators.required]],
-      price: ['', [Validators.required]],
-      image: [''], // Nu este required pentru update
-      description: ['', Validators.required],
-      categoryId: ['', Validators.required],
-      color: ['', Validators.required],
-      dimensions: ['', Validators.required],
-      material: ['', Validators.required],
-      weight: ['', Validators.required],
-      quantity: ['', Validators.required]
-    });
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly saving = signal(false);
+  protected readonly categories = signal<readonly CategoryData[]>([]);
+  protected readonly selectedFile = signal<File | null>(null);
+  /** Local preview if a new file was picked, otherwise the stored image. */
+  protected readonly preview = signal<string | null>(null);
 
-    // Extrage ID-ul produsului
-    this.productId = this.route.snapshot.queryParams['productId'];
+  protected readonly form = buildProductForm(this.fb);
+
+  constructor() {
+    this.load();
   }
 
-  ngOnInit() {
-    this.loadCategories();
-    this.loadProduct();
-  }
-
-  loadCategories() {
-    this.adminService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-      },
-      error: (err) => {
-        this.snackBar.open(
-          this.translate.instant('editProduct.errorLoadingCategories'),
-          this.translate.instant('editProduct.ok'),
-          {duration: 3000}
-        );
-      }
-    });
-  }
-
-  loadProduct() {
-    this.isLoading.set(true);
-    this.adminService.getProduct(this.productId).subscribe({
-      next: (product: ProductData) => {
-        this.isLoading.set(false);
-        // Populează formularul cu datele primite
-        this.updateProductForm.patchValue({
-          name: product.name,
-          price: product.price,
-          description: product.description,
-          categoryId: product.categoryId,
-          color: product.color,
-          dimensions: product.dimensions,
-          material: product.material,
-          weight: product.weight,
-          quantity: product.quantity
-        });
-        
-        // Salvează URL-ul imaginii existente
-        if (product.image) {
-          this.existingImage.set(product.image);
-          console.log('Loaded product image:', product.image);
-        }
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.snackBar.open(
-          this.translate.instant('editProduct.errorMessage'),
-          this.translate.instant('editProduct.ok'),
-          {duration: 3000}
-        );
-      }
-    });
-  }
-
-  onSubmit() {
-    if (this.updateProductForm.invalid) {
-      this.snackBar.open(
-        this.translate.instant('editProduct.errorMessage'),
-        this.translate.instant('editProduct.ok'),
-        {duration: 3000}
-      );
+  protected load(): void {
+    if (!this.productId) {
+      this.state.set('error');
       return;
     }
 
-    this.isLoading.set(true);
+    this.state.set('loading');
 
-    const formData = new FormData();
-    
-    // IMPORTANT: Trimite ID-ul!
-    formData.append('id', this.productId.toString());
-    formData.append('name', this.updateProductForm.get('name')?.value);
-    formData.append('price', this.updateProductForm.get('price')?.value);
-    formData.append('description', this.updateProductForm.get('description')?.value);
-    formData.append('color', this.updateProductForm.get('color')?.value);
-    formData.append('dimensions', this.updateProductForm.get('dimensions')?.value);
-    formData.append('material', this.updateProductForm.get('material')?.value);
-    formData.append('weight', this.updateProductForm.get('weight')?.value);
-    formData.append('quantity', this.updateProductForm.get('quantity')?.value);
-    formData.append('categoryId', this.updateProductForm.get('categoryId')?.value);
+    forkJoin({
+      product: this.adminService.getProduct(this.productId),
+      categories: this.adminService.getCategories(),
+    }).subscribe({
+      next: ({ product, categories }) => {
+        this.categories.set(categories ?? []);
 
-    // Trimite imaginea doar dacă a fost selectată una nouă
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile, this.selectedFile.name);
-      console.log('Sending new image:', this.selectedFile.name);
-    } else {
-      console.log('No new image selected, keeping existing image:', this.existingImage());
-    }
+        this.form.patchValue({
+          name: product.name ?? '',
+          price: product.price ?? 0,
+          description: product.description ?? '',
+          color: product.color ?? '',
+          dimensions: product.dimensions ?? '',
+          material: product.material ?? '',
+          weight: product.weight ?? '',
+          quantity: product.quantity ?? 0,
+          categoryId: product.categoryId ?? 0,
+        });
 
-    this.adminService.updateProduct(formData).subscribe({
-      next: (response) => {
-        this.isLoading.set(false);
-        console.log('Product updated successfully:', response);
-        console.log('Updated product image:', response.image);
-        this.snackBar.open(
-          this.translate.instant('editProduct.successMessage'),
-          this.translate.instant('editProduct.ok'),
-          {duration: 3000}
-        );
-        // Redirect înapoi la lista de produse după 1 secundă
-        setTimeout(() => {
-          this.router.navigate(['/admin/view-products']);
-        }, 1000);
+        // Was built by hand with a hardcoded `http://localhost:8080` prefix.
+        this.preview.set(product.image ? productImageUrl(product.image) : null);
+        this.state.set('ready');
       },
-      error: (err) => {
-        this.isLoading.set(false);
-        console.error('Error updating product:', err);
-        this.snackBar.open(
-          this.translate.instant('editProduct.errorMessage'),
-          this.translate.instant('editProduct.ok'),
-          {duration: 3000}
-        );
-      }
+      error: () => this.state.set('error'),
     });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+  protected onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
 
-    if (file) {
-      // Validate type
-      if (!file.type.startsWith('image/')) {
-        this.snackBar.open(
-          this.translate.instant('profile.invalidImageType'),
-          this.translate.instant('profile.ok')
-        );
-        return;
-      }
+    this.selectedFile.set(file);
 
-      // Validate size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.snackBar.open(
-          this.translate.instant('profile.imageTooLarge'),
-          this.translate.instant('profile.ok')
-        );
-        return;
-      }
-
-      // Save file for upload (exact ca la user)
-      this.selectedFile = file;
-
-      // Generate preview pentru UI
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.tempImagePreview.set(reader.result as string); // base64 string doar pentru preview
-        this.updateProductForm.patchValue({ image: 'selected' }); // marchează că există imagine
-        this.cdr.markForCheck(); // force UI update (OnPush)
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = () => this.preview.set(reader.result as string);
+    reader.readAsDataURL(file);
   }
 
-  onCancel() {
-    this.router.navigate(['/admin/view-products']);
+  protected submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.saving.set(true);
+
+    this.adminService
+      .updateProduct(
+        toProductFormData(this.form.getRawValue(), this.selectedFile(), this.productId)
+      )
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.notifications.success('editProduct.successMessage');
+          this.router.navigateByUrl('/admin/view-products');
+        },
+        error: () => {
+          this.saving.set(false);
+          this.notifications.error('editProduct.errorMessage');
+        },
+      });
   }
 }

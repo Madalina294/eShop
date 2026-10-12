@@ -881,7 +881,8 @@
     "updatePassword": "Schimbă parola",
     "preferences": "Preferințe",
     "notFound": "Pagina nu a fost găsită",
-    "about": "Despre noi"
+    "about": "Despre noi",
+    "orders": "Comenzile mele"
   },
   "footer": {
     "tagline": "Răsfoiește catalogul, salvează-ți favoritele și finalizează comanda în siguranță.",
@@ -906,7 +907,7 @@
     "CONFIRMED": "Confirmată",
     "SHIPPED": "Expediată",
     "DELIVERED": "Livrată",
-    "CANCELLED": "Această comandă a fost anulată"
+    "CANCELLED": "Anulată"
   },
   "orderConfirmation": {
     "cancelledTitle": "Comandă anulată",
@@ -955,6 +956,30 @@
       "phone": "Telefon",
       "hours": "Program",
       "hoursValue": "Luni – vineri, 9:00 – 18:00"
+    }
+  },
+  "orders": {
+    "title": "Comenzile mele",
+    "subtitle": "Tot ce ai comandat, cele mai noi primele",
+    "loading": "Se încarcă comenzile…",
+    "filterBy": "Filtrează după status",
+    "number": "Comanda #",
+    "items": "Produse",
+    "shipping": "Livrare",
+    "total": "Total",
+    "viewDetails": "Vezi detalii",
+    "empty": {
+      "title": "Nicio comandă încă",
+      "description": "După ce plasezi o comandă, o vei găsi aici, cu status și tot ce ai cumpărat.",
+      "action": "Vezi catalogul"
+    },
+    "noneForFilter": {
+      "title": "Nimic cu acest status",
+      "description": "Ai comenzi, dar niciuna în această stare momentan."
+    },
+    "error": {
+      "title": "Nu am putut încărca comenzile",
+      "description": "Ceva nu a mers pe drum. Încearcă din nou în câteva momente."
     }
   }
 }

@@ -1,74 +1,75 @@
-<app-breadcrumb></app-breadcrumb>
-<div class="categories-container">
-  <mat-card class="categories-header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>category</mat-icon>
-      </div>
-      <mat-card-title>{{ "viewCategories.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-        "viewCategories.subtitle" | translate
-      }}</mat-card-subtitle>
-    </mat-card-header>
-    <button mat-button routerLink="/admin/create-category"
-            style="background-color: #6b46c1; color: white; align-content: flex-end; border-radius: 10px">
+<div class="page">
+  <app-page-header
+    icon="category"
+    [title]="'viewCategories.title' | translate"
+    [subtitle]="'viewCategories.subtitle' | translate"
+  >
+    <a mat-flat-button color="primary" routerLink="/admin/create-category">
       <mat-icon>add</mat-icon>
-      <span>Add Category</span>
-    </button>
-  </mat-card>
+      <span>{{ "createCategory.title" | translate }}</span>
+    </a>
+  </app-page-header>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="isSpinning()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "viewCategories.loadingCategories" | translate }}</p>
-  </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="list" [count]="5" />
+    }
 
-  <!-- Categories List -->
-  <div *ngIf="!isSpinning()" class="categories-list">
-    <div *ngIf="categories().length === 0" class="no-categories">
-      <mat-icon>category</mat-icon>
-      <p>{{ "viewCategories.noCategories" | translate }}</p>
-    </div>
+    @case ("empty") {
+      <app-empty-state
+        icon="category"
+        [title]="'viewCategories.noCategories' | translate"
+        [actionLabel]="'createCategory.title' | translate"
+        actionIcon="add"
+        (action)="goToCreate()"
+      />
+    }
 
-    <div class="categories-grid">
-      <mat-card *ngFor="let category of categories()" class="category-card">
-        <mat-card-content>
-          <div class="category-info">
-            <div class="category-icon">
-              <mat-icon>label</mat-icon>
-            </div>
-            <div class="category-details">
-              <h3>{{ category.name }}</h3>
-              <p class="description">
-                {{
-                  category.description ||
-                    ("viewCategories.noDescription" | translate)
-                }}
+    @case ("error") {
+      <app-error-state
+        [title]="'viewCategories.loadError' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
+
+    @default {
+      <ul class="cats__list">
+        @for (category of categories(); track category.id) {
+          <li class="cats__item surface">
+            <div class="cats__text">
+              <h2 class="cats__name">{{ category.name }}</h2>
+              <p class="cats__description">
+                {{ category.description || ("viewCategories.noDescription" | translate) }}
               </p>
-              <div class="category-meta">
-                <span class="category-id"
-                  >{{ "viewCategories.categoryId" | translate }}:
-                  {{ category.id }}</span
-                >
-              </div>
+              <span class="cats__id">
+                {{ "viewCategories.categoryId" | translate }}: {{ category.id }}
+              </span>
             </div>
-          </div>
-        </mat-card-content>
 
-        <mat-card-actions align="end">
-          <button mat-button color="primary" (click)="editCategory(category.id)">
-            <mat-icon>edit</mat-icon>
-            {{ "viewCategories.editButton" | translate }}
-          </button>
-          <button mat-button color="warn" (click)="deleteCategory(category.id)">
-            <mat-icon>delete</mat-icon>
-            {{ "viewCategories.deleteButton" | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </div>
+            <div class="cats__actions">
+              <button
+                mat-stroked-button
+                type="button"
+                (click)="edit(category)"
+              >
+                <mat-icon>edit</mat-icon>
+                <span>{{ "viewCategories.editButton" | translate }}</span>
+              </button>
+
+              <button
+                mat-button
+                type="button"
+                class="cats__delete"
+                (click)="confirmDelete(category)"
+              >
+                <mat-icon>delete</mat-icon>
+                <span>{{ "viewCategories.deleteButton" | translate }}</span>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
 </div>

@@ -1,0 +1,208 @@
+@use "mixins" as m;
+
+$sidebar-width: 248px;
+$sidebar-collapsed: 72px;
+
+.admin {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: calc(100vh - var(--header-height));
+
+  @include m.respond-to(lg) {
+    grid-template-columns: $sidebar-width 1fr;
+
+    :host(.is-collapsed) & {
+      grid-template-columns: $sidebar-collapsed 1fr;
+    }
+  }
+
+  // --- Mobile bar -----------------------------------------------------------
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-1);
+
+    @include m.respond-to(lg) {
+      display: none;
+    }
+  }
+
+  &__bar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    @include m.focus-ring;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  &__bar-title {
+    font-weight: var(--weight-semibold);
+  }
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: var(--overlay);
+
+    @include m.respond-to(lg) {
+      display: none;
+    }
+  }
+
+  // --- Sidebar --------------------------------------------------------------
+
+  &__sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--z-overlay) + 1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: $sidebar-width;
+    padding: var(--space-4) var(--space-3);
+    background: var(--surface-1);
+    border-right: 1px solid var(--border-subtle);
+    transform: translateX(-100%);
+    transition: transform var(--duration-normal) var(--ease-out);
+
+    &.is-open {
+      transform: none;
+    }
+
+    @include m.respond-to(lg) {
+      position: sticky;
+      top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+      transform: none;
+      width: auto;
+    }
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  &__brand-mark {
+    flex: 0 0 auto;
+    color: var(--brand);
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1 1 auto;
+    overflow-y: auto;
+    @include m.custom-scrollbar;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+    @include m.focus-ring;
+
+    mat-icon {
+      flex: 0 0 auto;
+      color: var(--text-tertiary);
+    }
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    &.is-active {
+      background: var(--brand-soft);
+      color: var(--brand);
+
+      mat-icon {
+        color: var(--brand);
+      }
+    }
+  }
+
+  &__collapse {
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 0;
+    border-top: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-tertiary);
+    font: inherit;
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    @include m.focus-ring;
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-2);
+    }
+
+    // Collapsing is a desktop affordance; on mobile the drawer just closes.
+    @include m.respond-to(lg) {
+      display: flex;
+    }
+  }
+
+  // Collapsed: icons only, labels removed from the accessibility tree too.
+  :host(.is-collapsed) & {
+    &__link-label,
+    &__brand-name {
+      @include m.respond-to(lg) {
+        display: none;
+      }
+    }
+  }
+
+  // --- Content --------------------------------------------------------------
+
+  &__content {
+    min-width: 0;
+    padding: var(--space-5) 0;
+  }
+}

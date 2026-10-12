@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { PricePipe } from '../../shared/pipes/price.pipe';
 import { RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -45,7 +45,7 @@ const FALLBACK_MAX_QUANTITY = 99;
   standalone: true,
   imports: [
     RouterLink,
-    CurrencyPipe,
+    PricePipe,
     MatButtonModule,
     MatDividerModule,
     MatIconModule,

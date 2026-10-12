@@ -1,50 +1,68 @@
-<div class="welcome-container">
-  <div *ngIf="isSpinning()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "viewUserAccount.loadingUserInfo" | translate }}</p>
-  </div>
+<div class="page page--narrow">
+  <app-page-header icon="account_circle" [title]="'allUsers.viewButton' | translate">
+    <a mat-stroked-button routerLink="/admin/all-users">
+      <mat-icon>arrow_back</mat-icon>
+      <span>{{ "allUsers.title" | translate }}</span>
+    </a>
+  </app-page-header>
 
-  <div class="user-profile-section" *ngIf="user">
-    <div class="profile-card">
-      <div class="profile-avatar">
-        <img
-          *ngIf="user.imageUrl"
-          [src]="getFullImageUrl(user.imageUrl)"
-          alt="User Avatar"
-          class="user-image"
-        />
-        <div *ngIf="!user.imageUrl" class="default-avatar">
-          {{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}
-        </div>
-      </div>
-      <div class="profile-info">
-        <h2>{{ user.firstName }} {{ user.lastName }}</h2>
-        <p class="user-id">
-          {{ "viewUserAccount.id" | translate }}: {{ user.userId }}
-        </p>
-        <p class="user-id">
-          <mat-icon>alternate_email</mat-icon
-          ><strong>{{ "viewUserAccount.email" | translate }}:</strong>
-          {{ user.email }}
-        </p>
-        <p class="user-id">
-          <mat-icon>date_range</mat-icon
-          ><strong>{{ "viewUserAccount.createdAt" | translate }}:</strong>
-          {{ user.createdAt }}
-        </p>
-        <p class="user-id">
-          <mat-icon>security</mat-icon
-          ><strong>{{ "viewUserAccount.twoFactorAuth" | translate }}:</strong>
-          {{
-            user.mfaEnabled
-              ? ("viewUserAccount.enabled" | translate)
-              : ("viewUserAccount.notEnabled" | translate)
-          }}
-        </p>
-      </div>
-    </div>
-  </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="spinner" [label]="'viewUserAccount.loadingUserInfo' | translate" />
+    }
+
+    @case ("error") {
+      <app-error-state
+        [title]="'viewUserAccount.errorLoading' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
+
+    @default {
+      @if (user(); as account) {
+        <section class="account__card surface">
+          <span class="account__avatar">
+            <img [src]="avatarFor(account)" alt="" width="88" height="88" />
+          </span>
+
+          <div class="account__text">
+            <h2 class="account__name">{{ account.firstName }} {{ account.lastName }}</h2>
+            <p class="account__email">{{ account.email }}</p>
+          </div>
+        </section>
+
+        <dl class="data-rows panel">
+          <div class="data-rows__row">
+            <dt>{{ "viewUserAccount.id" | translate }}</dt>
+            <dd>{{ account.userId }}</dd>
+          </div>
+          <div class="data-rows__row">
+            <dt>{{ "viewUserAccount.email" | translate }}</dt>
+            <dd>{{ account.email }}</dd>
+          </div>
+          <div class="data-rows__row">
+            <dt>{{ "viewUserAccount.twoFactorAuth" | translate }}</dt>
+            <dd>
+              {{
+                (account.mfaEnabled ? "viewUserAccount.enabled" : "viewUserAccount.notEnabled")
+                  | translate
+              }}
+            </dd>
+          </div>
+        </dl>
+
+        <a
+          mat-flat-button
+          color="primary"
+          routerLink="/admin/send-email"
+          [queryParams]="{ email: account.email }"
+          class="account__cta"
+        >
+          <mat-icon>mail</mat-icon>
+          <span>{{ "allUsers.sendEmailButton" | translate }}</span>
+        </a>
+      }
+    }
+  }
 </div>

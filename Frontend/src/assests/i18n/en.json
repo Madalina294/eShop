@@ -881,7 +881,8 @@
     "updatePassword": "Change password",
     "preferences": "Preferences",
     "notFound": "Page not found",
-    "about": "About us"
+    "about": "About us",
+    "orders": "My orders"
   },
   "footer": {
     "tagline": "Browse the catalogue, save your favourites and check out securely.",
@@ -906,7 +907,7 @@
     "CONFIRMED": "Confirmed",
     "SHIPPED": "Shipped",
     "DELIVERED": "Delivered",
-    "CANCELLED": "This order was cancelled"
+    "CANCELLED": "Cancelled"
   },
   "orderConfirmation": {
     "cancelledTitle": "Order cancelled",
@@ -955,6 +956,30 @@
       "phone": "Phone",
       "hours": "Hours",
       "hoursValue": "Monday to Friday, 9:00 – 18:00"
+    }
+  },
+  "orders": {
+    "title": "My orders",
+    "subtitle": "Everything you have ordered, newest first",
+    "loading": "Loading your orders…",
+    "filterBy": "Filter by status",
+    "number": "Order #",
+    "items": "Items",
+    "shipping": "Delivery",
+    "total": "Total",
+    "viewDetails": "View details",
+    "empty": {
+      "title": "No orders yet",
+      "description": "Once you place an order it will show up here, with its status and everything you bought.",
+      "action": "Browse the catalogue"
+    },
+    "noneForFilter": {
+      "title": "Nothing with this status",
+      "description": "You have orders, but none in this state right now."
+    },
+    "error": {
+      "title": "We could not load your orders",
+      "description": "Something went wrong on the way. Try again in a moment."
     }
   }
 }

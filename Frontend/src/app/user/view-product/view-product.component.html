@@ -69,7 +69,7 @@
             <h1 class="product__title">{{ item.name }}</h1>
 
             <p class="product__price">
-              {{ item.price | currency: "RON" : "symbol" : "1.2-2" }}
+              {{ item.price | price }}
             </p>
 
             <!-- Stock, as a status rather than a raw number buried in a list -->
@@ -108,7 +108,7 @@
                       {{ "viewProduct.subtotal" | translate }}
                     </span>
                     <span class="price-stack__value">
-                      {{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}
+                      {{ subtotal() | price }}
                     </span>
                   </p>
                 </div>
@@ -204,7 +204,7 @@
         <div class="price-stack">
           <span class="price-stack__label">{{ "viewProduct.subtotal" | translate }}</span>
           <span class="price-stack__value">
-            {{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}
+            {{ subtotal() | price }}
           </span>
         </div>
 

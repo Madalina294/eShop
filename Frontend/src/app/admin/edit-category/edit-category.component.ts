@@ -1,130 +1,101 @@
-import {Component, signal} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AdminService} from '../../services/admin/admin.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatFormField, MatLabel, MatError} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
-import {MatButton} from '@angular/material/button';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle} from '@angular/material/card';
-import {MatIcon} from '@angular/material/icon';
-import {CommonModule} from '@angular/common';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
 
+import { AdminService } from '../../services/admin/admin.service';
+import { ViewState } from '../../models/ui-state';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
 
 @Component({
   selector: 'app-edit-category',
+  standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
     TranslateModule,
-    MatFormField,
-    MatInput,
-    MatButton,
-    MatProgressSpinner,
-    MatLabel,
-    MatError,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
-    MatIcon,
-    BreadcrumbComponent
+    PageHeaderComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './edit-category.component.html',
-  styleUrl: './edit-category.component.scss'
+  styleUrl: './edit-category.component.scss',
 })
 export class EditCategoryComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly adminService = inject(AdminService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  isLoading = signal(false);
-  updateForm!: FormGroup;
-  categoryId!: number;
+  private readonly categoryId = Number(this.route.snapshot.queryParams['categoryId']);
 
-  constructor(private fb: FormBuilder,
-              private adminService: AdminService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private translate: TranslateService) {
-    // Inițializează formularul mai întâi (gol)
-    this.updateForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]]
-    });
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly saving = signal(false);
 
-    // Extrage ID-ul categoriei
-    this.categoryId = this.route.snapshot.queryParams["categoryId"];
-    
-    // Încarcă datele categoriei și populează formularul
-    this.loadCategory();
+  protected readonly form = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    description: ['', Validators.required],
+  });
+
+  constructor() {
+    this.load();
   }
 
-  loadCategory() {
-    this.isLoading.set(true);
-    this.adminService.getCategoryById(this.categoryId).subscribe({
-      next: (res) => {
-        this.isLoading.set(false);
-        // Populează formularul cu datele primite
-        this.updateForm.patchValue({
-          name: res.name,
-          description: res.description
-        });
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.snackBar.open(
-          this.translate.instant('editCategory.errorMessage'), 
-          this.translate.instant('editCategory.ok'), 
-          {duration: 3000}
-        );
-      }
-    });
-  }
-
-  onSubmit(){
-    if (this.updateForm.invalid) {
-      this.snackBar.open(
-        this.translate.instant('editCategory.errorMessage'), 
-        this.translate.instant('editCategory.ok'), 
-        {duration: 3000}
-      );
+  protected load(): void {
+    if (!this.categoryId) {
+      this.state.set('error');
       return;
     }
 
-    const data = {
-      id: this.categoryId,  // IMPORTANT: Trimite ID-ul!
-      name: this.updateForm.get('name')?.value,
-      description: this.updateForm.get('description')?.value
-    }
-    
-    this.isLoading.set(true);
-    this.adminService.updateCategory(data).subscribe({
-      next: response => {
-        this.isLoading.set(false);
-        this.snackBar.open(
-          this.translate.instant('editCategory.successMessage'), 
-          this.translate.instant('editCategory.ok'), 
-          {duration: 3000}
-        );
-        // Redirect înapoi la lista de categorii după 1 secundă
-        setTimeout(() => {
-          this.router.navigate(['/admin/view-categories']);
-        }, 1000);
+    this.state.set('loading');
+
+    this.adminService.getCategoryById(this.categoryId).subscribe({
+      next: category => {
+        this.form.patchValue({
+          name: category.name ?? '',
+          description: category.description ?? '',
+        });
+        this.state.set('ready');
       },
-      error: err => {
-        this.isLoading.set(false);
-        this.snackBar.open(
-          this.translate.instant('editCategory.errorMessage'), 
-          this.translate.instant('editCategory.ok'), 
-          {duration: 3000}
-        );
-      }
+      error: () => this.state.set('error'),
     });
   }
 
-  onCancel() {
-    this.router.navigate(['/admin/view-categories']);
+  protected submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.saving.set(true);
+
+    this.adminService
+      .updateCategory({ id: this.categoryId, ...this.form.getRawValue() })
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.notifications.success('editCategory.successMessage');
+          this.router.navigateByUrl('/admin/view-categories');
+        },
+        error: () => {
+          this.saving.set(false);
+          this.notifications.error('editCategory.errorMessage');
+        },
+      });
   }
 }

@@ -1,103 +1,100 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {AdminService} from '../../services/admin/admin.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {CommonModule} from '@angular/common';
-import {MatButton} from '@angular/material/button';
-import {MatCard, MatCardHeader, MatCardTitle, MatCardContent, MatCardActions, MatCardSubtitle} from '@angular/material/card';
-import {MatIcon} from '@angular/material/icon';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {ConfirmDeleteComponent} from '../../shared/confirm-delete/confirm-delete.component';
-import {MatDialog} from '@angular/material/dialog';
-import {Router, RouterLink} from '@angular/router';
-import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-export interface CategoryDto {
-  id: number;
-  name: string;
-  description: string;
-}
+import { AdminService } from '../../services/admin/admin.service';
+import { CategoryData } from '../../models/admin';
+import { ViewState } from '../../models/ui-state';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { ConfirmDeleteComponent } from '../../shared/confirm-delete/confirm-delete.component';
+import { CategoryEditDialogComponent } from '../category-edit-dialog/category-edit-dialog.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
 
+/** Category listing, with rename handled in a dialog rather than a page hop. */
 @Component({
   selector: 'app-view-categories',
+  standalone: true,
   imports: [
-    CommonModule,
-    MatButton,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
-    MatCardContent,
-    MatCardActions,
-    MatIcon,
-    MatProgressSpinner,
-    TranslateModule,
     RouterLink,
-    BreadcrumbComponent
+    MatButtonModule,
+    MatIconModule,
+    TranslateModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './view-categories.component.html',
-  styleUrl: './view-categories.component.scss'
+  styleUrl: './view-categories.component.scss',
 })
-export class ViewCategoriesComponent implements OnInit{
-  isSpinning = signal(false);
-  categories = signal<CategoryDto[]>([]);
-  loading = signal(false);
+export class ViewCategoriesComponent {
+  private readonly adminService = inject(AdminService);
+  private readonly notifications = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
-  constructor(private adminService: AdminService,
-              private snackBar: MatSnackBar,
-              private translate: TranslateService,
-              private dialog: MatDialog,
-              private router: Router) {
-  }
-  ngOnInit(){
-    this.loadCategories();
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly categories = signal<readonly CategoryData[]>([]);
+
+  constructor() {
+    this.load();
   }
 
-  loadCategories(){
-    this.isSpinning.set(true);
+  protected load(): void {
+    this.state.set('loading');
+
     this.adminService.getCategories().subscribe({
-      next: (response) => {
-        this.isSpinning.set(false);
-        this.categories.set(response as CategoryDto[]);
+      next: categories => {
+        this.categories.set(categories ?? []);
+        this.state.set(categories?.length ? 'ready' : 'empty');
       },
-      error: err => {
-        this.isSpinning.set(false);
-        this.snackBar.open(
-          this.translate.instant('viewCategories.loadError'),
-          this.translate.instant('viewCategories.ok'),
-          {duration: 3000}
-        );
-      }
-    })
-  }
-
-  editCategory(id: number){
-    this.router.navigate(["/admin/edit-category"], {
-      queryParams: {categoryId: id}
+      error: () => this.state.set('error'),
     });
   }
 
-  deleteCategory(id: number){
+  protected goToCreate(): void {
+    this.router.navigateByUrl('/admin/create-category');
+  }
+
+  protected edit(category: CategoryData): void {
+    const dialogRef = this.dialog.open(CategoryEditDialogComponent, {
+      width: '480px',
+      data: category,
+    });
+
+    dialogRef.afterClosed().subscribe(saved => {
+      if (saved) this.load();
+    });
+  }
+
+  protected confirmDelete(category: CategoryData): void {
     const dialogRef = this.dialog.open(ConfirmDeleteComponent, {
-      width: '400px',
-      data: { message: this.translate.instant('viewCategories.confirmDelete') }
+      width: '420px',
+      data: {
+        message: this.translate.instant('viewCategories.confirmDelete'),
+        titleKey: 'viewCategories.deleteButton',
+        destructive: true,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if(result === true){
-        this.loading.set(true);
-        this.adminService.deleteCategory(id).subscribe({
-          next: () => {
-            this.loading.set(false);
-            this.snackBar.open(this.translate.instant('viewCategories.categoryDeletedSuccess'), this.translate.instant('allUsers.ok'), {duration: 3000});
-            this.loadCategories();
-          },
-          error: () =>{
-            this.loading.set(false);
-            this.snackBar.open(this.translate.instant('viewCategories.deleteError'), this.translate.instant('allUsers.ok'), {duration: 3000});
-          }
-        })
-      }
-    })
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed !== true) return;
+
+      this.adminService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.notifications.success('viewCategories.categoryDeletedSuccess');
+          this.load();
+        },
+        error: () => this.notifications.error('viewCategories.deleteError'),
+      });
+    });
   }
 }

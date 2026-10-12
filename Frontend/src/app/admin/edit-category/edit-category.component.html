@@ -1,94 +1,58 @@
-<app-breadcrumb></app-breadcrumb>
-<div class="category-main-container">
-  <mat-card class="category-header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>edit</mat-icon>
-      </div>
-      <mat-card-title>{{ "editCategory.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ "editCategory.subtitle" | translate }}</mat-card-subtitle>
-    </mat-card-header>
-  </mat-card>
+<div class="page page--narrow">
+  <app-page-header
+    icon="category"
+    [title]="'editCategory.title' | translate"
+    [subtitle]="'editCategory.subtitle' | translate"
+  />
 
-  <mat-card class="category-form-card">
-    <!-- Loading Spinner -->
-    <div *ngIf="isLoading()" class="loading-overlay">
-      <mat-progress-spinner
-        mode="indeterminate"
-        diameter="50"
-        color="primary"
-      ></mat-progress-spinner>
-      <p>{{ "editCategory.loading" | translate }}</p>
-    </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="spinner" [label]="'editCategory.loading' | translate" />
+    }
 
-    <form
-      [formGroup]="updateForm"
-      (ngSubmit)="onSubmit()"
-      class="category-form"
-    >
-      <!-- Name Field -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ "editCategory.nameLabel" | translate }}</mat-label>
-        <input
-          matInput
-          formControlName="name"
-          [placeholder]="'editCategory.namePlaceholder' | translate"
-          [disabled]="isLoading()"
-        />
-        <mat-error *ngIf="updateForm.get('name')?.hasError('required')">
-          {{ "editCategory.nameRequired" | translate }}
-        </mat-error>
-        <mat-error *ngIf="updateForm.get('name')?.hasError('minlength')">
-          {{ "editCategory.nameMinLength" | translate }}
-        </mat-error>
-      </mat-form-field>
+    @case ("error") {
+      <app-error-state
+        [title]="'editCategory.errorMessage' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
 
-      <!-- Description Field -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ "editCategory.descriptionLabel" | translate }}</mat-label>
-        <textarea
-          matInput
-          formControlName="description"
-          rows="4"
-          [placeholder]="'editCategory.descriptionPlaceholder' | translate"
-          [disabled]="isLoading()"
-        ></textarea>
-        <mat-error
-          *ngIf="updateForm.get('description')?.hasError('required')"
-        >
-          {{ "editCategory.descriptionRequired" | translate }}
-        </mat-error>
-        <mat-error
-          *ngIf="updateForm.get('description')?.hasError('minlength')"
-        >
-          {{ "editCategory.descriptionMinLength" | translate }}
-        </mat-error>
-      </mat-form-field>
+    @default {
+      <form class="form-panel panel" [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "editCategory.nameLabel" | translate }}</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.controls.name.hasError("required")) {
+            <mat-error>{{ "editCategory.nameRequired" | translate }}</mat-error>
+          } @else if (form.controls.name.hasError("minlength")) {
+            <mat-error>{{ "editCategory.nameMinLength" | translate }}</mat-error>
+          }
+        </mat-form-field>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="updateForm.invalid || isLoading()"
-          class="submit-button"
-        >
-          <mat-icon>save</mat-icon>
-          {{ "editCategory.saveButton" | translate }}
-        </button>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "editCategory.descriptionLabel" | translate }}</mat-label>
+          <textarea matInput rows="4" formControlName="description"></textarea>
+          @if (form.controls.description.hasError("required")) {
+            <mat-error>{{ "editCategory.descriptionRequired" | translate }}</mat-error>
+          }
+        </mat-form-field>
 
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="onCancel()"
-          [disabled]="isLoading()"
-          class="cancel-button"
-        >
-          <mat-icon>cancel</mat-icon>
-          {{ "editCategory.cancelButton" | translate }}
-        </button>
-      </div>
-    </form>
-  </mat-card>
+        <div class="form-panel__actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+            @if (saving()) {
+              <mat-progress-spinner mode="indeterminate" diameter="18" />
+            } @else {
+              <mat-icon>save</mat-icon>
+            }
+            <span>{{ "editCategory.saveButton" | translate }}</span>
+          </button>
+
+          <a mat-button routerLink="/admin/view-categories">
+            {{ "editCategory.cancelButton" | translate }}
+          </a>
+        </div>
+      </form>
+    }
+  }
 </div>

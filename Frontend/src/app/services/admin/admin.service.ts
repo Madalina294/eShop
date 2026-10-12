@@ -1,228 +1,151 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { StorageService } from '../storage/storage.service';
 
-export interface UserData {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  imageUrl?: string;
-  mfaEnabled: boolean;
-}
+import { environment } from '../../../environments/environments';
+import { Page } from '../../models/product';
+import {
+  ActivityLog,
+  ActivityLogFilters,
+  AverageCart,
+  CategoryData,
+  ProductData,
+  TopCustomer,
+  UserData,
+  UserOrderCount,
+} from '../../models/admin';
 
-export interface ProductData {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  categoryId: number;
-  image?: string;
-  color: string;
-  dimensions: string;
-  material: string;
-  weight: string;
-  quantity: number;
-
-}
-
-export interface PaginatedResponse {
-  content: UserData[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-  numberOfElements: number;
-}
-
-export interface ProductPaginatedResponse {
-  content: ProductData[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-  numberOfElements: number;
-}
-
-export interface UserOrderCount {
-  userId: number;
-  userName: string;
-  userEmail: string;
-  orderCount: number;
-}
-
-export interface TopCustomer {
-  userId: number;
-  userName: string;
-  userEmail: string;
-  totalSpent: number;
-  orderCount: number;
-}
-
-export interface AverageCart {
-  averageCartValue: number;
-  totalOrders: number;
-  totalRevenue: number;
-}
-
-
-@Injectable({
-  providedIn: 'root'
-})
+/**
+ * Everything under `/api/admin`.
+ *
+ * Reworked off three long-standing problems: the base URL was hardcoded to
+ * `http://localhost:8080`, every call built its own `Authorization` header even
+ * though `authInterceptor` already adds one, and the DTOs were declared in this
+ * file instead of `models/`.
+ */
+@Injectable({ providedIn: 'root' })
 export class AdminService {
+  private readonly baseUrl = `${environment.apiUrl}/admin`;
+  private readonly http = inject(HttpClient);
 
-  private baseUrl = 'http://localhost:8080/api/admin';
-
-  constructor(private http: HttpClient) { }
+  // --- Users ----------------------------------------------------------------
 
   getAllUsers(): Observable<UserData[]> {
-    return this.http.get<UserData[]>(`${this.baseUrl}/users`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<UserData[]>(`${this.baseUrl}/users`);
   }
 
-  getUsersPaginated(page: number = 0, size: number = 10, sortBy: string = 'id', sortDir: string = 'asc'): Observable<PaginatedResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      size: size.toString(),
-      sortBy: sortBy,
-      sortDir: sortDir
-    });
-
-    return this.http.get<PaginatedResponse>(`${this.baseUrl}/users/paginated?${params}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  getUsersPaginated(
+    page = 0,
+    size = 10,
+    sortBy = 'id',
+    sortDir: 'asc' | 'desc' = 'asc'
+  ): Observable<Page<UserData>> {
+    const params = new HttpParams({ fromObject: { page, size, sortBy, sortDir } });
+    return this.http.get<Page<UserData>>(`${this.baseUrl}/users/paginated`, { params });
   }
 
-  getProductsPaginated(page: number = 0, size: number = 10, sortBy: string = 'id', sortDir: string = 'asc'): Observable<ProductPaginatedResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      size: size.toString(),
-      sortBy: sortBy,
-      sortDir: sortDir
-    });
-
-    return this.http.get<ProductPaginatedResponse>(`${this.baseUrl}/products/paginated?${params}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  getUserById(userId: number): Observable<UserData> {
+    return this.http.get<UserData>(`${this.baseUrl}/get-user/${userId}`);
   }
 
-  deleteUser(userId: number) {
-    return this.http.delete(`${this.baseUrl}/delete-user/${userId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  deleteUser(userId: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/delete-user/${userId}`);
   }
 
-  deleteProduct(productId: number) {
-    return this.http.delete(`${this.baseUrl}/product/delete-product/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  /**
+   * The endpoint reads `subject`, `content` and `toEmail` as QUERY PARAMETERS,
+   * not a JSON body — the previous implementation posted a body, so nothing
+   * ever arrived and the mail was silently never sent.
+   */
+  sendEmail(request: { subject: string; content: string; toEmail: string }): Observable<unknown> {
+    const params = new HttpParams({ fromObject: { ...request } });
+    return this.http.post(`${this.baseUrl}/send-email`, null, { params });
   }
 
-  sendEmail(requestData: any){
-    return this.http.post(`${this.baseUrl}/send-email`, requestData, {
-      headers: this.createAuthorizationHeader()
-    });
+  // --- Products -------------------------------------------------------------
+
+  getProductsPaginated(
+    page = 0,
+    size = 10,
+    sortBy = 'id',
+    sortDir: 'asc' | 'desc' = 'asc'
+  ): Observable<Page<ProductData>> {
+    const params = new HttpParams({ fromObject: { page, size, sortBy, sortDir } });
+    return this.http.get<Page<ProductData>>(`${this.baseUrl}/products/paginated`, { params });
   }
 
-  getUserById(userId: number){
-    return this.http.get(`${this.baseUrl}/get-user/${userId}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  getProduct(productId: number): Observable<ProductData> {
+    return this.http.get<ProductData>(`${this.baseUrl}/product/get-product/${productId}`);
   }
 
-  createCategory(categoryData: any){
-    const headers = this.createAuthorizationHeader().set('Content-Type', 'application/json');
-    return this.http.post(`${this.baseUrl}/category/create-category`, categoryData, {
-      headers: headers
-    });
+  addProduct(data: FormData): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/product/add-product`, data);
   }
 
-  deleteCategory(id:number){
-    return this.http.delete(`${this.baseUrl}/category/delete-category/${id}`, {
-      headers: this.createAuthorizationHeader()
-    })
+  updateProduct(data: FormData): Observable<ProductData> {
+    return this.http.put<ProductData>(`${this.baseUrl}/product/edit-product`, data);
   }
 
-  getCategories(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.baseUrl}/category/get-categories`, {
-      headers: this.createAuthorizationHeader()
-    })
+  deleteProduct(productId: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/product/delete-product/${productId}`);
   }
 
-  getCategoryById(id: number): Observable<any>{
-    return this.http.get(`${this.baseUrl}/category/get-category/${id}`,
-      {
-        headers: this.createAuthorizationHeader()
-      });
+  // --- Categories -----------------------------------------------------------
+
+  getCategories(): Observable<CategoryData[]> {
+    return this.http.get<CategoryData[]>(`${this.baseUrl}/category/get-categories`);
   }
 
-  updateCategory(data: any):Observable<any>{
-    return this.http.put<Observable<any>>(`${this.baseUrl}/category/edit-category`, data,  {
-      headers: this.createAuthorizationHeader()
-    })
+  getCategoryById(id: number): Observable<CategoryData> {
+    return this.http.get<CategoryData>(`${this.baseUrl}/category/get-category/${id}`);
   }
 
-  updateProduct(data: any):Observable<ProductData>{
-    return this.http.put<ProductData>(`${this.baseUrl}/product/edit-product`, data,  {
-      headers: this.createAuthorizationHeader()
-    })
+  createCategory(data: Partial<CategoryData>): Observable<CategoryData> {
+    return this.http.post<CategoryData>(`${this.baseUrl}/category/create-category`, data);
   }
 
-  getProduct(productId: number): Observable<ProductData>{
-    return this.http.get<ProductData>(`${this.baseUrl}/product/get-product/${productId}`, {
-      headers: this.createAuthorizationHeader()
-    })
+  updateCategory(data: Partial<CategoryData>): Observable<CategoryData> {
+    return this.http.put<CategoryData>(`${this.baseUrl}/category/edit-category`, data);
   }
 
-  addProduct(data: any){
-    return this.http.post(`${this.baseUrl}/product/add-product`, data,  {
-      headers: this.createAuthorizationHeader()
-    })
+  deleteCategory(id: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/category/delete-category/${id}`);
   }
 
-  // Statistici
+  // --- Statistics -----------------------------------------------------------
+
   getOrdersCountByUser(): Observable<UserOrderCount[]> {
-    return this.http.get<UserOrderCount[]>(`${this.baseUrl}/statistics/orders-by-user`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<UserOrderCount[]>(`${this.baseUrl}/statistics/orders-by-user`);
   }
 
-  getTopCustomers(limit: number = 10): Observable<TopCustomer[]> {
-    const params = new URLSearchParams({
-      limit: limit.toString()
-    });
-    return this.http.get<TopCustomer[]>(`${this.baseUrl}/statistics/top-customers?${params}`, {
-      headers: this.createAuthorizationHeader()
-    });
+  getTopCustomers(limit = 10): Observable<TopCustomer[]> {
+    const params = new HttpParams({ fromObject: { limit } });
+    return this.http.get<TopCustomer[]>(`${this.baseUrl}/statistics/top-customers`, { params });
   }
 
   getAverageCartValue(): Observable<AverageCart> {
-    return this.http.get<AverageCart>(`${this.baseUrl}/statistics/average-cart`, {
-      headers: this.createAuthorizationHeader()
-    });
+    return this.http.get<AverageCart>(`${this.baseUrl}/statistics/average-cart`);
   }
 
-  getActivityLogs(queryParams: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/activity-logs?${queryParams}`, {
-      headers: this.createAuthorizationHeader()
-    });
-  }
+  // --- Activity log ---------------------------------------------------------
 
-  private createAuthorizationHeader(): HttpHeaders {
-    const token = StorageService.getToken();
-    if (!token) {
-      console.error('No token found in storage');
-      return new HttpHeaders();
+  /** Takes a typed filter object instead of a pre-built query string. */
+  getActivityLogs(filters: ActivityLogFilters = {}): Observable<Page<ActivityLog>> {
+    let params = new HttpParams()
+      .set('page', filters.page ?? 0)
+      .set('size', filters.size ?? 10)
+      .set('sortBy', filters.sortBy ?? 'createdAt')
+      .set('sortDir', filters.sortDir ?? 'desc');
+
+    // Only send the optional filters that are actually set: a blank one would
+    // be matched literally by the backend.
+    for (const key of ['userId', 'actionType', 'status', 'startDate', 'endDate'] as const) {
+      const value = filters[key];
+      if (value !== null && value !== undefined && value !== '') {
+        params = params.set(key, value as string | number);
+      }
     }
 
-    return new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    });
+    return this.http.get<Page<ActivityLog>>(`${this.baseUrl}/activity-logs`, { params });
   }
 }

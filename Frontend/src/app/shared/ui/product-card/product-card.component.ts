@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
+import { PricePipe } from '../../pipes/price.pipe';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -19,7 +20,7 @@ import { productImageUrl } from '../../../core/http/image-url';
   selector: 'app-product-card',
   standalone: true,
   imports: [
-    CurrencyPipe,
+    PricePipe,
     NgTemplateOutlet,
     RouterLink,
     MatButtonModule,
