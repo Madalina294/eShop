@@ -349,23 +349,6 @@
     color: rgba(255, 255, 255, 0.6) !important;
   }
 
-  .mat-mdc-menu-panel custom-menu mat-menu-after mat-menu-below {
-    background-color: #1f1f1f;
-  }
-
-  .custom-menu {
-    background: #1f1f1f !important;
-
-    .menu-item {
-      background: #303030;
-    }
-
-    .menu-header {
-      background: #1f1f1f;
-      color: #cccccc;
-    }
-  }
-
   //update-password component
 
   .update-password-container{
@@ -521,15 +504,6 @@
     border-left: 4px solid #ffc107 !important;
   }
 
-  .menu-button{
-    background: none !important;
-    color: white;
-
-    mat-icon{
-      color: white;
-    }
-  }
-
   button[color="warn"] {
     background: linear-gradient(45deg, #ff6b6b, #ee5a24) !important;
     color: white !important;
@@ -564,43 +538,5 @@
     color: #ffffff !important;
   }
 
-
-  .app-brand {
-    color: white !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-  }
-
-  .app-title {
-    color: white !important;
-  }
-
-  // Light mode styles pentru header
-  .custom-toolbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  }
-
-  .menu-button {
-    color: rgba(255, 255, 255, 0.9) !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.2) !important;
-      color: white !important;
-    }
-  }
-
-  .app-brand {
-    color: white !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-  }
-
-  .app-title {
-    color: white !important;
-  }
 }
 

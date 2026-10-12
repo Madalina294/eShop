@@ -14,7 +14,8 @@
     "homePage": "Pagina Principală",
     "myDashboard": "Panoul Meu",
     "myAccount": "Contul Meu",
-    "welcome": "Bun venit"
+    "welcome": "Bun venit",
+    "mainNav": "Navigare principală"
   },
   "auth": {
     "login": "Autentificare",
@@ -84,7 +85,9 @@
     "themeUpdated": "Preferința de temă a fost actualizată cu succes!",
     "themeUpdateError": "Eroare la actualizarea preferinței de temă",
     "languageUpdated": "Preferința de limbă a fost actualizată cu succes!",
-    "languageUpdateError": "Eroare la actualizarea preferinței de limbă"
+    "languageUpdateError": "Eroare la actualizarea preferinței de limbă",
+    "lightMode": "Comută pe tema deschisă",
+    "darkMode": "Comută pe tema întunecată"
   },
   "common": {
     "search": "Caută",
@@ -785,5 +788,12 @@
     "updatePassword": "Schimbă parola",
     "preferences": "Preferințe",
     "notFound": "Pagina nu a fost găsită"
+  },
+  "footer": {
+    "tagline": "Răsfoiește catalogul, salvează-ți favoritele și finalizează comanda în siguranță.",
+    "shop": "Magazin",
+    "account": "Cont",
+    "contact": "Contact",
+    "hours": "Luni–Vineri, 9:00–18:00"
   }
 }

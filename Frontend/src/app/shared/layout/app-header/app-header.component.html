@@ -1,0 +1,223 @@
+<mat-toolbar class="header">
+  <div class="header__inner">
+    <!-- Mobile nav trigger: only rendered when there is somewhere to go. -->
+    @if (navItems().length) {
+      <button
+        mat-icon-button
+        class="header__burger"
+        type="button"
+        [attr.aria-label]="'common.openMenu' | translate"
+        [attr.aria-expanded]="mobileNavOpen()"
+        aria-controls="mobile-nav"
+        (click)="toggleMobileNav()"
+      >
+        <mat-icon>{{ mobileNavOpen() ? "close" : "menu" }}</mat-icon>
+      </button>
+    }
+
+    <a class="header__brand" [routerLink]="homeLink()">
+      <mat-icon class="header__brand-mark" aria-hidden="true">shopping_bag</mat-icon>
+      <span class="header__brand-name">{{ "app.name" | translate }}</span>
+    </a>
+
+    <!-- Desktop navigation. The old header had styles for this but no markup. -->
+    @if (navItems().length) {
+      <nav class="header__nav" [attr.aria-label]="'header.mainNav' | translate">
+        @for (item of navItems(); track item.link) {
+          <a
+            class="header__nav-link"
+            [routerLink]="item.link"
+            routerLinkActive="is-active"
+            #rla="routerLinkActive"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
+          >
+            {{ item.label | translate }}
+          </a>
+        }
+      </nav>
+    }
+
+    <span class="header__spacer"></span>
+
+    <!-- Catalogue search, shoppers only -->
+    @if (isCustomer()) {
+      <form
+        class="header__search"
+        [class.is-open]="searchOpen()"
+        role="search"
+        (submit)="onSearchSubmit($event, searchInput.value)"
+      >
+        <label class="sr-only" for="header-search">{{ "common.search" | translate }}</label>
+        <mat-icon class="header__search-icon" aria-hidden="true">search</mat-icon>
+        <input
+          #searchInput
+          id="header-search"
+          class="header__search-input"
+          type="search"
+          autocomplete="off"
+          [value]="searchTerm()"
+          [placeholder]="'common.search' | translate"
+        />
+        @if (searchTerm()) {
+          <button
+            mat-icon-button
+            type="button"
+            class="header__search-clear"
+            [attr.aria-label]="'common.clear' | translate"
+            (click)="clearSearch(searchInput)"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </form>
+
+      <!-- Collapsed search affordance on narrow screens -->
+      <button
+        mat-icon-button
+        type="button"
+        class="header__search-toggle"
+        [attr.aria-label]="'common.search' | translate"
+        [attr.aria-expanded]="searchOpen()"
+        (click)="toggleSearch()"
+      >
+        <mat-icon>search</mat-icon>
+      </button>
+    }
+
+    <div class="header__actions">
+      @if (isCustomer()) {
+        <a
+          mat-icon-button
+          routerLink="/user/wishlist"
+          class="header__action"
+          [matBadge]="cartState.wishlistBadge()"
+          matBadgeColor="warn"
+          matBadgeSize="small"
+          [matTooltip]="'wishlist.title' | translate"
+          [attr.aria-label]="
+            ('wishlist.title' | translate) + ' (' + cartState.wishlistCount() + ')'
+          "
+        >
+          <mat-icon>favorite_border</mat-icon>
+        </a>
+
+        <a
+          mat-icon-button
+          routerLink="/user/cart"
+          class="header__action"
+          [matBadge]="cartState.cartBadge()"
+          matBadgeColor="accent"
+          matBadgeSize="small"
+          [matTooltip]="'cart.title' | translate"
+          [attr.aria-label]="('cart.title' | translate) + ' (' + cartState.cartCount() + ')'"
+        >
+          <mat-icon>shopping_cart</mat-icon>
+        </a>
+      }
+
+      <!-- Language: a real toggle group, so the active language is announced. -->
+      <mat-button-toggle-group
+        class="header__lang"
+        [value]="currentLang()"
+        [hideSingleSelectionIndicator]="true"
+        [attr.aria-label]="'header.language' | translate"
+        (change)="changeLanguage($any($event.value))"
+      >
+        <mat-button-toggle value="ro">RO</mat-button-toggle>
+        <mat-button-toggle value="en">EN</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="header__action"
+        [matTooltip]="(isDarkMode() ? 'preferences.lightMode' : 'preferences.darkMode') | translate"
+        [attr.aria-label]="
+          (isDarkMode() ? 'preferences.lightMode' : 'preferences.darkMode') | translate
+        "
+        [attr.aria-pressed]="isDarkMode()"
+        (click)="toggleTheme()"
+      >
+        <mat-icon>{{ isDarkMode() ? "light_mode" : "dark_mode" }}</mat-icon>
+      </button>
+
+      @if (isSignedIn()) {
+        <button
+          mat-button
+          type="button"
+          class="header__account"
+          [matMenuTriggerFor]="accountMenu"
+          [attr.aria-label]="'header.myAccount' | translate"
+        >
+          <span class="header__avatar">
+            @if (avatar()) {
+              <img [src]="avatar()!" alt="" width="32" height="32" />
+            } @else {
+              <span aria-hidden="true">{{ initial() || "?" }}</span>
+            }
+          </span>
+          <span class="header__account-name">{{ userName() }}</span>
+          <mat-icon class="header__account-caret">expand_more</mat-icon>
+        </button>
+
+        <mat-menu #accountMenu="matMenu" xPosition="before">
+          <a mat-menu-item routerLink="/profile">
+            <mat-icon>account_circle</mat-icon>
+            <span>{{ "header.myAccount" | translate }}</span>
+          </a>
+          <a mat-menu-item routerLink="/edit-preferences">
+            <mat-icon>tune</mat-icon>
+            <span>{{ "preferences.title" | translate }}</span>
+          </a>
+          <a mat-menu-item routerLink="/update-password">
+            <mat-icon>lock_reset</mat-icon>
+            <span>{{ "titles.updatePassword" | translate }}</span>
+          </a>
+          <mat-divider />
+          <button mat-menu-item type="button" class="header__logout" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>{{ "header.logout" | translate }}</span>
+          </button>
+        </mat-menu>
+      } @else {
+        <a mat-flat-button color="primary" routerLink="/login" class="header__login">
+          <mat-icon>login</mat-icon>
+          <span class="header__login-label">{{ "auth.login" | translate }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</mat-toolbar>
+
+<!-- Mobile navigation drawer -->
+@if (navItems().length && mobileNavOpen()) {
+  <div class="mobile-nav-backdrop" (click)="closeMobileNav()"></div>
+
+  <nav id="mobile-nav" class="mobile-nav" [attr.aria-label]="'header.mainNav' | translate">
+    @for (item of navItems(); track item.link) {
+      <a
+        class="mobile-nav__link"
+        [routerLink]="item.link"
+        routerLinkActive="is-active"
+        #mrla="routerLinkActive"
+        [attr.aria-current]="mrla.isActive ? 'page' : null"
+        (click)="closeMobileNav()"
+      >
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <span>{{ item.label | translate }}</span>
+      </a>
+    }
+
+    <mat-divider />
+
+    <a class="mobile-nav__link" routerLink="/profile" (click)="closeMobileNav()">
+      <mat-icon aria-hidden="true">account_circle</mat-icon>
+      <span>{{ "header.myAccount" | translate }}</span>
+    </a>
+
+    <button class="mobile-nav__link mobile-nav__link--danger" type="button" (click)="logout()">
+      <mat-icon aria-hidden="true">logout</mat-icon>
+      <span>{{ "header.logout" | translate }}</span>
+    </button>
+  </nav>
+}

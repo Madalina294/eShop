@@ -14,7 +14,8 @@
     "homePage": "Home Page",
     "myDashboard": "My Dashboard",
     "myAccount": "My Account",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "mainNav": "Main navigation"
   },
   "auth": {
     "login": "Log in",
@@ -84,7 +85,9 @@
     "themeUpdated": "Theme preference updated successfully!",
     "themeUpdateError": "Error updating theme preference",
     "languageUpdated": "Language preference updated successfully!",
-    "languageUpdateError": "Error updating language preference"
+    "languageUpdateError": "Error updating language preference",
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode"
   },
   "common": {
     "search": "Search",
@@ -785,5 +788,12 @@
     "updatePassword": "Change password",
     "preferences": "Preferences",
     "notFound": "Page not found"
+  },
+  "footer": {
+    "tagline": "Browse the catalogue, save your favourites and check out securely.",
+    "shop": "Shop",
+    "account": "Account",
+    "contact": "Contact",
+    "hours": "Mon–Fri, 9:00–18:00"
   }
 }

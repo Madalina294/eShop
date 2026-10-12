@@ -1,0 +1,55 @@
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand-col">
+      <span class="footer__brand">
+        <mat-icon class="footer__brand-mark" aria-hidden="true">shopping_bag</mat-icon>
+        <span class="footer__brand-name">{{ "app.name" | translate }}</span>
+      </span>
+      <p class="footer__tagline">{{ "footer.tagline" | translate }}</p>
+    </div>
+
+    @if (isCustomer()) {
+      <nav class="footer__col" [attr.aria-label]="'footer.shop' | translate">
+        <h2 class="footer__heading">{{ "footer.shop" | translate }}</h2>
+        <a class="footer__link" routerLink="/user/all-products">
+          {{ "allProducts.title" | translate }}
+        </a>
+        <a class="footer__link" routerLink="/user/cart">{{ "cart.title" | translate }}</a>
+        <a class="footer__link" routerLink="/user/wishlist">{{ "wishlist.title" | translate }}</a>
+      </nav>
+    }
+
+    @if (isSignedIn()) {
+      <nav class="footer__col" [attr.aria-label]="'footer.account' | translate">
+        <h2 class="footer__heading">{{ "footer.account" | translate }}</h2>
+        <a class="footer__link" routerLink="/profile">{{ "header.myAccount" | translate }}</a>
+        <a class="footer__link" routerLink="/edit-preferences">
+          {{ "preferences.title" | translate }}
+        </a>
+        <a class="footer__link" routerLink="/update-password">
+          {{ "titles.updatePassword" | translate }}
+        </a>
+      </nav>
+    }
+
+    <div class="footer__col">
+      <h2 class="footer__heading">{{ "footer.contact" | translate }}</h2>
+      <a class="footer__link footer__link--icon" href="mailto:support@eshop.ro">
+        <mat-icon aria-hidden="true">mail</mat-icon>
+        support&#64;eshop.ro
+      </a>
+      <a class="footer__link footer__link--icon" href="tel:+40721000000">
+        <mat-icon aria-hidden="true">call</mat-icon>
+        +40 721 000 000
+      </a>
+      <span class="footer__link footer__link--icon footer__link--static">
+        <mat-icon aria-hidden="true">schedule</mat-icon>
+        {{ "footer.hours" | translate }}
+      </span>
+    </div>
+  </div>
+
+  <div class="footer__bar">
+    <p class="footer__copy">&copy; {{ year }} {{ "app.name" | translate }}</p>
+  </div>
+</footer>
