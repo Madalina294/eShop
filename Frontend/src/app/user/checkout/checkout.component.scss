@@ -1,173 +1,242 @@
-.checkout-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
+@use "mixins" as m;
 
-.checkout-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 30px;
+.checkout {
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    align-items: start;
 
-  .back-button {
-    margin-right: 15px;
-  }
-
-  h1 {
-    margin: 0;
-    color: #1976d2;
-  }
-}
-
-.checkout-section {
-  margin-bottom: 20px;
-
-  mat-card-header {
-    mat-card-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #1976d2;
-      margin-bottom: 10px;
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: var(--space-6);
     }
   }
-}
 
-.form-row {
-  display: flex;
-  gap: 15px;
+  &__steps {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
 
-  mat-form-field {
-    flex: 1;
+  &__step-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  // --- Summary --------------------------------------------------------------
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+
+    @include m.respond-to(lg) {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-4));
+    }
+  }
+
+  &__summary-title {
+    margin: 0;
+    font-size: var(--text-lg);
   }
 }
 
-.full-width {
-  width: 100%;
+// --- Forms ------------------------------------------------------------------
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2) var(--space-4);
+
+  @include m.respond-to(sm) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &__full {
+    grid-column: 1 / -1;
+  }
 }
 
-.shipping-option, .payment-option {
-  margin-bottom: 15px;
-  padding: 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+// --- Radio option cards -----------------------------------------------------
 
-  .option-content {
+.option-set {
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &__legend {
+    padding: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+.option {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+  }
+
+  // Material marks the selected radio button with this class.
+  &.mat-mdc-radio-checked {
+    border-color: var(--border-brand);
+    background: var(--brand-soft);
+  }
+
+  &__body {
     display: flex;
     align-items: center;
-    gap: 10px;
-
-    .price {
-      margin-left: auto;
-      font-weight: bold;
-      color: #1976d2;
-    }
-
-    small {
-      display: block;
-      color: #666;
-      margin-top: 5px;
-    }
+    gap: var(--space-3);
+    width: 100%;
+    padding-block: var(--space-1);
   }
-}
 
-.stripe-payment {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #f9f9f9;
-}
+  &__icon {
+    flex: 0 0 auto;
+    color: var(--text-tertiary);
+  }
 
-.order-items {
-  .order-item {
+  &__text {
     display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    flex-direction: column;
+    min-width: 0;
+    line-height: var(--leading-tight);
+  }
 
-    img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
+  &__label {
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+  }
 
-    .item-details {
-      flex: 1;
+  &__hint {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
 
-      h4 {
-        margin: 0 0 5px 0;
-      }
-
-      p {
-        margin: 0;
-        color: #666;
-      }
-
-      .price {
-        font-weight: bold;
-        color: #1976d2;
-      }
-    }
+  &__price {
+    margin-left: auto;
+    padding-left: var(--space-3);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 }
 
-.order-totals {
-  border-top: 2px solid #e0e0e0;
-  padding-top: 15px;
+// --- Stripe card field ------------------------------------------------------
 
-  .total-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-
-    &.total {
-      font-weight: bold;
-      font-size: 1.2em;
-      border-top: 1px solid #e0e0e0;
-      padding-top: 10px;
-    }
-  }
-}
-
-.checkout-actions {
+.card-field {
   display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
 
-  button[type="submit"] {
-    min-width: 200px;
+  &__label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+  }
+
+  // Stripe renders an iframe inside; we only own the frame around it.
+  &__host {
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-fast) var(--ease-out);
+
+    &.is-invalid {
+      border-color: var(--error);
+    }
+  }
+
+  &__hint,
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--text-xs);
+  }
+
+  &__hint {
+    color: var(--text-tertiary);
+
+    mat-icon {
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+    }
+  }
+
+  &__error {
+    color: var(--error);
   }
 }
 
-.loading-container {
-  text-align: center;
-  padding: 50px;
-}
+// --- Summary lines ----------------------------------------------------------
 
-// Stripe Elements styling
-.stripe-payment {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #fafafa;
+.summary-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  list-style: none;
+  border-bottom: 1px solid var(--border-subtle);
 
-  #card-element {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    margin-bottom: 10px;
+  &__item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
   }
 
-  #card-errors {
-    color: #e74c3c;
-    font-size: 14px;
-    margin-top: 5px;
-    min-height: 20px;
+  &__qty {
+    flex: 0 0 auto;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--text-secondary);
+    @include m.truncate;
+  }
+
+  &__price {
+    flex: 0 0 auto;
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: tabular-nums;
   }
 }

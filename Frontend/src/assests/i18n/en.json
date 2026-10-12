@@ -787,6 +787,27 @@
       "FAN_COURIER": "Delivery in 2-3 business days",
       "SAME_DAY": "Same day delivery",
       "URGENT": "Delivery in 2-4 hours"
+    },
+    "emptyCartMessage": "There is nothing to check out. Add a few products first.",
+    "addressHint": "Street, number, city, county and postcode",
+    "billingHint": "Leave empty to use the shipping address",
+    "cashHint": "Pay the courier when your order arrives",
+    "cardHint": "Pay now by card, securely through Stripe",
+    "cardDetails": "Card details",
+    "securePayment": "Your card details go straight to Stripe and never reach our servers.",
+    "shippingOptions": {
+      "FAN_COURIER": "Fan Courier",
+      "SAME_DAY": "Same-day delivery",
+      "URGENT": "Urgent delivery"
+    },
+    "errors": {
+      "formInvalid": "Please check the highlighted fields before placing your order.",
+      "nameTooShort": "Enter your full name.",
+      "phoneInvalid": "Enter a valid phone number.",
+      "emailInvalid": "Enter a valid email address.",
+      "addressTooShort": "Enter the full address, including the city.",
+      "stripeUnavailable": "Card payment is unavailable right now. Please choose cash on delivery.",
+      "orderFailed": "We could not place your order. No payment was taken — please try again."
     }
   },
   "errors": {

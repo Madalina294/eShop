@@ -1,255 +1,283 @@
-<div class="checkout-container">
-  <div class="checkout-header">
-    <button mat-button (click)="goBack()" class="back-button">
+<div class="page checkout">
+  <app-page-header icon="lock" [title]="'checkout.title' | translate">
+    <a mat-button routerLink="/user/cart">
       <mat-icon>arrow_back</mat-icon>
-      {{ "checkout.back" | translate }}
-    </button>
-    <h1>{{ "checkout.title" | translate }}</h1>
-  </div>
+      {{ "cart.title" | translate }}
+    </a>
+  </app-page-header>
 
-  <div class="checkout-content" *ngIf="!loading()">
-    <!-- Formularul de checkout -->
-    <form [formGroup]="checkoutForm" (ngSubmit)="processOrder()">
-      <!-- Informații de contact -->
-      <mat-card class="checkout-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>person</mat-icon>
-            {{ "checkout.contactInfo" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>{{ "checkout.fullName" | translate }}</mat-label>
-              <input matInput formControlName="customerName" required />
-            </mat-form-field>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state [label]="'checkout.loading' | translate" />
+    }
 
-            <mat-form-field appearance="outline">
-              <mat-label>{{ "checkout.phone" | translate }}</mat-label>
-              <input
-                matInput
-                formControlName="customerPhone"
-                type="tel"
-                required
-              />
-            </mat-form-field>
-          </div>
+    @case ("error") {
+      <app-error-state
+        [title]="'errors.loadFailedTitle' | translate"
+        [description]="'errors.loadFailedDescription' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="loadCart()"
+      />
+    }
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ "checkout.email" | translate }}</mat-label>
-            <input
-              matInput
-              formControlName="customerEmail"
-              type="email"
-              required
-            />
-          </mat-form-field>
-        </mat-card-content>
-      </mat-card>
+    @case ("empty") {
+      <app-empty-state
+        icon="shopping_cart"
+        [title]="'cart.empty.title' | translate"
+        [description]="'checkout.emptyCartMessage' | translate"
+      >
+        <a mat-flat-button color="primary" routerLink="/user/all-products">
+          <mat-icon>storefront</mat-icon>
+          {{ "cart.empty.browseProducts" | translate }}
+        </a>
+      </app-empty-state>
+    }
 
-      <!-- Adresă de livrare -->
-      <mat-card class="checkout-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>local_shipping</mat-icon>
-            {{ "checkout.shippingAddress" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ "checkout.address" | translate }}</mat-label>
-            <textarea
-              matInput
-              formControlName="shippingAddress"
-              rows="3"
-              required
-            ></textarea>
-          </mat-form-field>
+    @default {
+      <div class="checkout__layout">
+        <!-- ------------------------------------------------------------ -->
+        <!--  Steps                                                        -->
+        <!-- ------------------------------------------------------------ -->
+        <mat-stepper class="checkout__steps" orientation="vertical" linear>
+          <!-- 1. Contact -->
+          <mat-step [stepControl]="contactForm" [label]="'checkout.contactInfo' | translate">
+            <form [formGroup]="contactForm" class="form-grid">
+              <mat-form-field appearance="outline" class="form-grid__full">
+                <mat-label>{{ "checkout.fullName" | translate }}</mat-label>
+                <input matInput formControlName="customerName" autocomplete="name" />
+                @if (contactForm.controls.customerName.hasError("required")) {
+                  <mat-error>{{ "common.required" | translate }}</mat-error>
+                } @else if (contactForm.controls.customerName.hasError("minlength")) {
+                  <mat-error>{{ "checkout.errors.nameTooShort" | translate }}</mat-error>
+                }
+              </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ "checkout.billingAddress" | translate }}</mat-label>
-            <textarea
-              matInput
-              formControlName="billingAddress"
-              rows="3"
-            ></textarea>
-          </mat-form-field>
-        </mat-card-content>
-      </mat-card>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ "checkout.phone" | translate }}</mat-label>
+                <input matInput formControlName="customerPhone" type="tel" autocomplete="tel" />
+                @if (contactForm.controls.customerPhone.hasError("required")) {
+                  <mat-error>{{ "common.required" | translate }}</mat-error>
+                } @else if (contactForm.controls.customerPhone.hasError("pattern")) {
+                  <mat-error>{{ "checkout.errors.phoneInvalid" | translate }}</mat-error>
+                }
+              </mat-form-field>
 
-      <!-- Metoda de livrare -->
-      <mat-card class="checkout-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>delivery_dining</mat-icon>
-            {{ "checkout.shippingMethod" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-radio-group formControlName="shippingMethod">
-            <div class="shipping-option">
-              <mat-radio-button value="FAN_COURIER">
-                <div class="option-content">
-                  <strong>Fan Courier</strong>
-                  <span class="price">{{
-                    shippingMethods.get("FAN_COURIER") | currency : "RON"
-                  }}</span>
-                  <small>{{
-                    "checkout.shippingDescriptions.FAN_COURIER" | translate
-                  }}</small>
-                </div>
-              </mat-radio-button>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ "checkout.email" | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="customerEmail"
+                  type="email"
+                  autocomplete="email"
+                />
+                @if (contactForm.controls.customerEmail.hasError("required")) {
+                  <mat-error>{{ "common.required" | translate }}</mat-error>
+                } @else if (contactForm.controls.customerEmail.hasError("email")) {
+                  <mat-error>{{ "checkout.errors.emailInvalid" | translate }}</mat-error>
+                }
+              </mat-form-field>
+            </form>
+
+            <div class="checkout__step-actions">
+              <button mat-flat-button color="primary" type="button" matStepperNext
+                      (click)="markStepTouched('contact')">
+                {{ "common.next" | translate }}
+              </button>
             </div>
+          </mat-step>
 
-            <div class="shipping-option">
-              <mat-radio-button value="SAME_DAY">
-                <div class="option-content">
-                  <strong>Same Day Delivery</strong>
-                  <span class="price">{{
-                    shippingMethods.get("SAME_DAY") | currency : "RON"
-                  }}</span>
-                  <small>{{
-                    "checkout.shippingDescriptions.SAME_DAY" | translate
-                  }}</small>
-                </div>
-              </mat-radio-button>
+          <!-- 2. Delivery -->
+          <mat-step [stepControl]="addressForm" [label]="'checkout.shippingAddress' | translate">
+            <form [formGroup]="addressForm" class="form-grid">
+              <mat-form-field appearance="outline" class="form-grid__full">
+                <mat-label>{{ "checkout.address" | translate }}</mat-label>
+                <textarea
+                  matInput
+                  formControlName="shippingAddress"
+                  rows="3"
+                  autocomplete="shipping street-address"
+                ></textarea>
+                <mat-hint>{{ "checkout.addressHint" | translate }}</mat-hint>
+                @if (addressForm.controls.shippingAddress.hasError("required")) {
+                  <mat-error>{{ "common.required" | translate }}</mat-error>
+                } @else if (addressForm.controls.shippingAddress.hasError("minlength")) {
+                  <mat-error>{{ "checkout.errors.addressTooShort" | translate }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-grid__full">
+                <mat-label>{{ "checkout.billingAddress" | translate }}</mat-label>
+                <textarea
+                  matInput
+                  formControlName="billingAddress"
+                  rows="2"
+                  autocomplete="billing street-address"
+                ></textarea>
+                <mat-hint>{{ "checkout.billingHint" | translate }}</mat-hint>
+              </mat-form-field>
+
+              <fieldset class="option-set form-grid__full">
+                <legend class="option-set__legend">
+                  {{ "checkout.shippingMethod" | translate }}
+                </legend>
+
+                <mat-radio-group formControlName="shippingMethod" class="option-set__list">
+                  @for (option of shippingOptions; track option.value) {
+                    <mat-radio-button class="option" [value]="option.value">
+                      <span class="option__body">
+                        <mat-icon class="option__icon" aria-hidden="true">{{ option.icon }}</mat-icon>
+                        <span class="option__text">
+                          <span class="option__label">{{ option.labelKey | translate }}</span>
+                          <span class="option__hint">{{ option.descriptionKey | translate }}</span>
+                        </span>
+                        <span class="option__price">
+                          {{ option.cost | currency: "RON" : "symbol" : "1.2-2" }}
+                        </span>
+                      </span>
+                    </mat-radio-button>
+                  }
+                </mat-radio-group>
+              </fieldset>
+            </form>
+
+            <div class="checkout__step-actions">
+              <button mat-button type="button" matStepperPrevious>
+                {{ "common.back" | translate }}
+              </button>
+              <button mat-flat-button color="primary" type="button" matStepperNext
+                      (click)="markStepTouched('address')">
+                {{ "common.next" | translate }}
+              </button>
             </div>
+          </mat-step>
 
-            <div class="shipping-option">
-              <mat-radio-button value="URGENT">
-                <div class="option-content">
-                  <strong>Urgent Delivery</strong>
-                  <span class="price">{{
-                    shippingMethods.get("URGENT") | currency : "RON"
-                  }}</span>
-                  <small>{{
-                    "checkout.shippingDescriptions.URGENT" | translate
-                  }}</small>
-                </div>
-              </mat-radio-button>
-            </div>
-          </mat-radio-group>
-        </mat-card-content>
-      </mat-card>
+          <!-- 3. Payment -->
+          <mat-step [label]="'checkout.paymentMethod' | translate">
+            <form [formGroup]="paymentForm">
+              <fieldset class="option-set">
+                <legend class="sr-only">{{ "checkout.paymentMethod" | translate }}</legend>
 
-      <!-- Metoda de plată -->
-      <mat-card class="checkout-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>payment</mat-icon>
-            {{ "checkout.paymentMethod" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-radio-group formControlName="paymentMethod">
-            <div class="payment-option">
-              <mat-radio-button value="CASH_ON_DELIVERY">
-                <div class="option-content">
-                  <mat-icon>money</mat-icon>
-                  <span>{{ "checkout.cashOnDelivery" | translate }}</span>
-                </div>
-              </mat-radio-button>
-            </div>
+                <mat-radio-group formControlName="paymentMethod" class="option-set__list">
+                  <mat-radio-button class="option" value="CASH_ON_DELIVERY">
+                    <span class="option__body">
+                      <mat-icon class="option__icon" aria-hidden="true">payments</mat-icon>
+                      <span class="option__text">
+                        <span class="option__label">{{ "checkout.cashOnDelivery" | translate }}</span>
+                        <span class="option__hint">{{ "checkout.cashHint" | translate }}</span>
+                      </span>
+                    </span>
+                  </mat-radio-button>
 
-            <div class="payment-option">
-              <mat-radio-button value="CARD_ONLINE">
-                <div class="option-content">
-                  <mat-icon>credit_card</mat-icon>
-                  <span>{{ "checkout.cardPayment" | translate }}</span>
-                </div>
-              </mat-radio-button>
-            </div>
-          </mat-radio-group>
+                  <mat-radio-button class="option" value="CARD_ONLINE">
+                    <span class="option__body">
+                      <mat-icon class="option__icon" aria-hidden="true">credit_card</mat-icon>
+                      <span class="option__text">
+                        <span class="option__label">{{ "checkout.cardPayment" | translate }}</span>
+                        <span class="option__hint">{{ "checkout.cardHint" | translate }}</span>
+                      </span>
+                    </span>
+                  </mat-radio-button>
+                </mat-radio-group>
+              </fieldset>
+            </form>
 
-          <!-- Stripe Elements pentru plată cu cardul -->
-          <div
-            class="stripe-payment"
-            [style.display]="
-              checkoutForm.get('paymentMethod')?.value === 'CARD_ONLINE' &&
-              stripeInitialized()
-                ? 'block'
-                : 'none'
-            "
-          >
-            <div #cardElement id="card-element">
-              <!-- Stripe Elements va fi injectat aici -->
-            </div>
-            <div id="card-errors" role="alert"></div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+            @if (payingByCard()) {
+              <div class="card-field">
+                <label class="card-field__label" for="card-host">
+                  {{ "checkout.cardDetails" | translate }}
+                </label>
 
-      <!-- Rezumat comandă -->
-      <mat-card class="checkout-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>receipt</mat-icon>
-            {{ "checkout.orderSummary" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="order-items">
-            <div *ngFor="let item of cartItems()" class="order-item">
-              <img
-                [src]="'http://localhost:8080' + item.productImage"
-                [alt]="item.productName"
-              />
-              <div class="item-details">
-                <h4>{{ item.productName }}</h4>
-                <p>
-                  {{ "checkout.quantity" | translate }}: {{ item.quantity }}
-                </p>
-                <p class="price">
-                  {{ item.productPrice * item.quantity | currency : "RON" }}
-                </p>
+                <!-- Stripe mounts its iframe here. -->
+                <div
+                  #cardHost
+                  id="card-host"
+                  class="card-field__host"
+                  [class.is-invalid]="!!cardError()"
+                ></div>
+
+                @if (cardError()) {
+                  <p class="card-field__error" role="alert">{{ cardError() }}</p>
+                } @else {
+                  <p class="card-field__hint">
+                    <mat-icon aria-hidden="true">lock</mat-icon>
+                    {{ "checkout.securePayment" | translate }}
+                  </p>
+                }
+
+                @if (!stripeReady()) {
+                  <p class="card-field__error" role="alert">
+                    {{ "checkout.errors.stripeUnavailable" | translate }}
+                  </p>
+                }
               </div>
-            </div>
-          </div>
+            }
 
-          <div class="order-totals">
-            <div class="total-line">
-              <span>{{ "checkout.subtotal" | translate }}</span>
-              <span>{{ subtotal() | currency : "RON" }}</span>
-            </div>
-            <div class="total-line">
-              <span>{{ "checkout.shipping" | translate }}</span>
-              <span>{{ shippingCost() | currency : "RON" }}</span>
-            </div>
-            <div class="total-line total">
-              <span>{{ "checkout.total" | translate }}</span>
-              <span>{{ totalAmount() | currency : "RON" }}</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+            <div class="checkout__step-actions">
+              <button mat-button type="button" matStepperPrevious [disabled]="processing()">
+                {{ "common.back" | translate }}
+              </button>
 
-      <!-- Butoane de acțiune -->
-      <div class="checkout-actions">
-        <button mat-button type="button" (click)="goBack()">
-          {{ "checkout.cancel" | translate }}
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="!checkoutForm.valid || processing()"
-        >
-          <mat-spinner *ngIf="processing()" diameter="20"></mat-spinner>
-          <mat-icon *ngIf="!processing()">shopping_cart</mat-icon>
-          {{
-            processing()
-              ? ("checkout.processing" | translate)
-              : ("checkout.placeOrder" | translate)
-          }}
-        </button>
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                class="checkout__submit"
+                [disabled]="processing() || (payingByCard() && !stripeReady())"
+                (click)="placeOrder()"
+              >
+                <!-- Each branch holds a single projectable node, so Material can
+                     place it in the button's icon slot. -->
+                @if (processing()) {
+                  <mat-progress-spinner mode="indeterminate" diameter="18" />
+                } @else {
+                  <mat-icon>check_circle</mat-icon>
+                }
+                <span>
+                  {{ (processing() ? "checkout.processing" : "checkout.placeOrder") | translate }}
+                </span>
+              </button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+
+        <!-- ------------------------------------------------------------ -->
+        <!--  Order summary                                                -->
+        <!-- ------------------------------------------------------------ -->
+        <aside class="checkout__summary" [attr.aria-label]="'checkout.orderSummary' | translate">
+          <h2 class="checkout__summary-title">{{ "checkout.orderSummary" | translate }}</h2>
+
+          <ul class="summary-lines">
+            @for (item of items(); track item.productId) {
+              <li class="summary-lines__item">
+                <span class="summary-lines__qty" aria-hidden="true">{{ item.quantity }}&times;</span>
+                <span class="summary-lines__name">{{ item.productName }}</span>
+                <span class="summary-lines__price">
+                  {{ item.productPrice * item.quantity | currency: "RON" : "symbol" : "1.2-2" }}
+                </span>
+              </li>
+            }
+          </ul>
+
+          <dl class="data-rows data-rows--total">
+            <div class="data-rows__row">
+              <dt>{{ "cart.totalItems" | translate }}</dt>
+              <dd>{{ totalUnits() }}</dd>
+            </div>
+            <div class="data-rows__row">
+              <dt>{{ "checkout.subtotal" | translate }}</dt>
+              <dd>{{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+            </div>
+            <div class="data-rows__row">
+              <dt>{{ "checkout.shipping" | translate }}</dt>
+              <dd>{{ shippingCost() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+            </div>
+            <div class="data-rows__row">
+              <dt>{{ "checkout.total" | translate }}</dt>
+              <dd>{{ totalAmount() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+            </div>
+          </dl>
+        </aside>
       </div>
-    </form>
-  </div>
-
-  <!-- Loading spinner -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-spinner></mat-spinner>
-    <p>{{ "checkout.loading" | translate }}</p>
-  </div>
+    }
+  }
 </div>

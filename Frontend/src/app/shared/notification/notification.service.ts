@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -21,7 +21,17 @@ const DURATIONS: Record<Variant, number> = {
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly snackBar = inject(MatSnackBar);
-  private readonly translate = inject(TranslateService);
+  private readonly injector = inject(Injector);
+
+  /**
+   * Resolved on first use, never in a field initialiser.
+   *
+   * `TranslateService` loads its bundle over HttpClient, which runs the error
+   * interceptor, which reaches this service. Resolving it eagerly closed that
+   * loop and Angular reported a circular dependency, leaving the whole app
+   * showing raw translation keys.
+   */
+  private translateService?: TranslateService;
 
   /**
    * @param key       Translation key, or literal text if no key matches.
@@ -61,7 +71,8 @@ export class NotificationService {
 
   /** `instant()` echoes the key back when it is missing — treat that as literal text. */
   private translateOrLiteral(key: string): string {
-    const translated = this.translate.instant(key);
+    this.translateService ??= this.injector.get(TranslateService);
+    const translated = this.translateService.instant(key);
     return typeof translated === 'string' ? translated : key;
   }
 }

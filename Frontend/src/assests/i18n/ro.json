@@ -787,6 +787,27 @@
       "FAN_COURIER": "Livrare în 2-3 zile lucrătoare",
       "SAME_DAY": "Livrare în aceeași zi",
       "URGENT": "Livrare în 2-4 ore"
+    },
+    "emptyCartMessage": "Nu ai ce să comanzi. Adaugă mai întâi câteva produse.",
+    "addressHint": "Stradă, număr, oraș, județ și cod poștal",
+    "billingHint": "Lasă gol pentru a folosi adresa de livrare",
+    "cashHint": "Plătești curierului la primirea comenzii",
+    "cardHint": "Plătești acum cu cardul, securizat prin Stripe",
+    "cardDetails": "Datele cardului",
+    "securePayment": "Datele cardului merg direct la Stripe și nu ajung niciodată pe serverele noastre.",
+    "shippingOptions": {
+      "FAN_COURIER": "Fan Courier",
+      "SAME_DAY": "Livrare în aceeași zi",
+      "URGENT": "Livrare urgentă"
+    },
+    "errors": {
+      "formInvalid": "Verifică câmpurile marcate înainte de a plasa comanda.",
+      "nameTooShort": "Introdu numele complet.",
+      "phoneInvalid": "Introdu un număr de telefon valid.",
+      "emailInvalid": "Introdu o adresă de email validă.",
+      "addressTooShort": "Introdu adresa completă, inclusiv orașul.",
+      "stripeUnavailable": "Plata cu cardul nu este disponibilă momentan. Alege plata la livrare.",
+      "orderFailed": "Nu am putut plasa comanda. Nu ți s-a reținut nicio sumă — te rugăm să încerci din nou."
     }
   },
   "errors": {
