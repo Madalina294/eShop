@@ -1,370 +1,229 @@
-// Product View Component Styles
-// Modern, responsive design with Material Design principles
+@use "mixins" as m;
 
-// Loading State
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  flex-direction: column;
-}
+.product {
+  // Room for the sticky buy bar on phones.
+  padding-bottom: calc(var(--space-8) + 72px);
 
-.loading-spinner {
-  text-align: center;
-
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
+  @include m.respond-to(md) {
+    padding-bottom: var(--space-8);
   }
 
-  p {
-    color: #666;
-    font-size: 16px;
-    margin: 0;
+  &__crumbs {
+    margin-bottom: var(--space-5);
   }
-}
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+  // --- Layout ---------------------------------------------------------------
 
-// Main Product Container
-.product-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 60vh;
-
-  @media (max-width: 768px) {
+  &__layout {
+    display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 1rem;
-  }
-}
+    gap: var(--space-5);
 
-// Image Card
-.image-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.product-image-card {
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: inherit;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f9fa;
-}
-
-.product-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-}
-
-// Details Card
-.details-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.product-details-card {
-  height: fit-content;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: inherit;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-}
-
-// Card Header
-.product-title {
-  font-size: 2rem !important;
-  font-weight: 700 !important;
-  color: inherit;
-  margin-bottom: 0.5rem !important;
-  line-height: 1.2;
-}
-
-.product-price {
-  font-size: 1.5rem !important;
-  font-weight: 600 !important;
-  color: #e74c3c !important;
-  margin-bottom: 0 !important;
-}
-
-// Product Details
-.product-details {
-  padding: 1rem 0;
-}
-
-.detail-section {
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.detail-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: inherit;
-  margin: 0 0 0.25rem 0;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.detail-value {
-  font-size: 0.85rem;
-  color: inherit;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.4;
-
-  &.description {
-    font-style: italic;
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    border-left: none;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-  }
-}
-
-// Action Buttons
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem 1rem 1rem 1rem;
-  align-items: center;
-  justify-content: flex-start;
-  border-top: 1px solid #eee;
-  flex-wrap: wrap;
-}
-
-// Quantity Section
-.quantity-section {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  margin-top: 2rem;
-
-  .quantity-field {
-    width: 120px;
-
-    .quantity-input {
-      text-align: center;
-      font-weight: 600;
-    }
-  }
-}
-
-.add-to-cart-btn {
-  flex: 1;
-  max-width: 200px;
-  height: 48px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  mat-icon {
-    font-size: 20px;
-  }
-}
-
-.wishlist-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  border: 2px solid #e74c3c;
-  background: white;
-
-  &:hover {
-    background: #e74c3c;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-
-    .heart-icon {
-      color: white !important;
-
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-7);
+      align-items: start;
     }
   }
 
-  .heart-icon {
-    color: #e74c3c;
-    font-size: 24px;
-    transition: color 0.3s ease;
-    padding-top: 3.5px;
-  }
-}
+  &__media {
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
 
-// Responsive Design
-@media (max-width: 768px) {
-  .product-container {
-    grid-template-columns: 1fr;
-    padding: 1rem;
+    @include m.respond-to(lg) {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-4));
+    }
   }
 
-  .product-title {
-    font-size: 1.5rem !important;
+  &__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
 
-  .product-price {
-    font-size: 1.25rem !important;
-  }
+  // --- Summary --------------------------------------------------------------
 
-  .action-buttons {
+  &__summary {
+    display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-3);
+    min-width: 0;
   }
 
-  .quantity-section {
-    width: 100%;
-    justify-content: center;
+  &__category {
+    width: fit-content;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--brand);
+    border-radius: var(--radius-xs);
+    @include m.focus-ring;
   }
 
-  .add-to-cart-btn {
-    max-width: 100%;
-    width: 100%;
+  &__title {
+    margin: 0;
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+
+    @include m.respond-to(md) {
+      font-size: var(--text-3xl);
+    }
   }
 
-  .image-container {
-    height: 300px;
+  &__price {
+    margin: 0;
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__stock {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--success);
+
+    mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+
+    &.is-low {
+      color: var(--warning);
+    }
+
+    &.is-out {
+      color: var(--error);
+    }
+  }
+
+  // --- Buy box --------------------------------------------------------------
+
+  &__buy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  &__buy-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    @include m.respond-to(sm) {
+      flex-direction: row;
+    }
+  }
+
+  &__cart-btn {
+    flex: 1 1 auto;
+    // The sticky bar carries the CTA on phones.
+    display: none;
+
+    @include m.respond-to(md) {
+      display: inline-flex;
+    }
+  }
+
+  &__wishlist-btn {
+    flex: 0 0 auto;
+
+    &.is-active {
+      color: var(--error);
+      border-color: var(--error);
+    }
+  }
+
+  &__wishlist-label {
+    display: none;
+
+    @include m.respond-to(sm) { display: inline; }
+  }
+
+  // --- Tabs -----------------------------------------------------------------
+
+  &__tabs {
+    margin-top: var(--space-2);
+  }
+
+  &__description {
+    margin: 0;
+    padding-top: var(--space-4);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    white-space: pre-line;
+  }
+
+  // --- Related --------------------------------------------------------------
+
+  &__related {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  &__related-title {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-xl);
+  }
+
+  &__related-grid {
+    @include m.auto-grid(220px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > li {
+      display: block;
+      min-width: 0;
+    }
   }
 }
 
-@media (max-width: 480px) {
-  .product-container {
-    padding: 0.5rem;
+// --- Sticky buy bar (phones only) -------------------------------------------
+
+.buy-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: var(--surface-1);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-3);
+
+  @include m.respond-to(md) {
+    display: none;
   }
 
-  .product-title {
-    font-size: 1.25rem !important;
-  }
-
-  .detail-label {
-    font-size: 0.9rem;
-  }
-
-  .detail-value {
-    font-size: 0.9rem;
-  }
-}
-
-// Dark Mode Support
-::ng-deep .dark-mode {
-
-  .product-details-card {
-    background: #1f1f1f;
-  }
-  .product-image-card {
-    background: #1f1f1f;
-  }
-  .product-title{
-    color: white;
-  }
-}
-
-// Animation for smooth loading
-.product-container {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Accessibility improvements
-@media (prefers-reduced-motion: reduce) {
-  .product-image-card,
-  .product-details-card,
-  .add-to-cart-btn,
-  .wishlist-btn,
-  .product-image {
-    transition: none;
-  }
-
-  .product-container {
-    animation: none;
-  }
-}
-
-// High contrast mode
-@media (prefers-contrast: more) {
-  .product-image-card,
-  .product-details-card {
-    border: 2px solid #000;
-  }
-
-  .add-to-cart-btn {
-    border: 2px solid #000;
-  }
-
-  .wishlist-btn {
-    border-width: 3px;
+  &__btn {
+    flex: 1 1 auto;
   }
 }

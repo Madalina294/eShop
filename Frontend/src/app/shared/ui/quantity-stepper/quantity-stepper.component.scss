@@ -1,0 +1,58 @@
+@use "mixins" as m;
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+
+  &__btn {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+
+    &:not(:disabled):hover {
+      color: var(--brand);
+    }
+  }
+
+  &__field {
+    width: 3.5ch;
+    border: 0;
+    background: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    @include m.focus-ring;
+
+    // The custom buttons replace the native spinners.
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+
+    &:disabled {
+      color: var(--text-disabled);
+    }
+  }
+
+  &--sm {
+    padding: 0;
+
+    .stepper__btn {
+      transform: scale(0.85);
+    }
+
+    .stepper__field {
+      font-size: var(--text-sm);
+    }
+  }
+}

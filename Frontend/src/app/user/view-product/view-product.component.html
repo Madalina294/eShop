@@ -1,146 +1,225 @@
-<!-- Loading State -->
-<div class="loading-container" *ngIf="loading()">
-  <div class="loading-spinner">
-    <div class="spinner"></div>
-    <p>{{ "viewProduct.loading" | translate }}</p>
-  </div>
-</div>
+@switch (state()) {
+  @case ("loading") {
+    <div class="page">
+      <app-loading-state [label]="'viewProduct.loading' | translate" />
+    </div>
+  }
 
-<!-- Product Details Container -->
-<div class="product-container" *ngIf="!loading()">
-  <!-- Product Image Card -->
-  <div class="image-card">
-    <mat-card class="product-image-card">
-      <mat-card-content>
-        <div class="image-container">
-          <img
-            [src]="getProductImage(product())"
-            [alt]="product().name"
-            class="product-image"
-            onerror="this.src='user.png'"
-          />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  @case ("error") {
+    <div class="page">
+      <app-error-state
+        [title]="'errors.loadFailedTitle' | translate"
+        [description]="'errors.loadFailedDescription' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="reload()"
+      />
+    </div>
+  }
 
-  <!-- Product Details Card -->
-  <div class="details-card">
-    <mat-card class="product-details-card">
-      <mat-card-header>
-        <mat-card-title class="product-title">{{
-          product().name
-        }}</mat-card-title>
-        <mat-card-subtitle class="product-price">{{
-          product().price | currency : "RON" : "symbol" : "1.2-2"
-        }}</mat-card-subtitle>
-      </mat-card-header>
+  @case ("empty") {
+    <div class="page">
+      <app-empty-state
+        icon="search_off"
+        [title]="'viewProduct.notFoundTitle' | translate"
+        [description]="'viewProduct.notFoundDescription' | translate"
+      >
+        <a mat-flat-button color="primary" routerLink="/user/all-products">
+          <mat-icon>storefront</mat-icon>
+          {{ "viewProduct.backToCatalogue" | translate }}
+        </a>
+      </app-empty-state>
+    </div>
+  }
 
-      <mat-card-content>
-        <div class="product-details">
-          <!-- Description -->
-          <div class="detail-section" *ngIf="product().description">
-            <p class="detail-value description">{{ product().description }}</p>
-          </div>
+  @default {
+    @if (product(); as item) {
+      <div class="page product">
+        <app-breadcrumbs class="product__crumbs" [items]="crumbs()" />
 
-          <!-- Color -->
-          <div class="detail-section" *ngIf="product().color">
-            <p class="detail-value">
-              <span class="detail-label">{{
-                "viewProduct.details.color" | translate
-              }}</span>
-              {{ product().color }}
-            </p>
-          </div>
-
-          <!-- Dimensions -->
-          <div class="detail-section" *ngIf="product().dimensions">
-            <p class="detail-value">
-              <span class="detail-label">{{
-                "viewProduct.details.dimensions" | translate
-              }}</span>
-              {{ product().dimensions }}
-            </p>
-          </div>
-
-          <!-- Material -->
-          <div class="detail-section" *ngIf="product().material">
-            <p class="detail-value">
-              <span class="detail-label">{{
-                "viewProduct.details.material" | translate
-              }}</span>
-              {{ product().material }}
-            </p>
-          </div>
-
-          <!-- Weight -->
-          <div class="detail-section" *ngIf="product().weight">
-            <p class="detail-value">
-              <span class="detail-label">{{
-                "viewProduct.details.weight" | translate
-              }}</span>
-              {{ product().weight }}
-            </p>
-          </div>
-
-          <!-- Quantity -->
-          <div class="detail-section" *ngIf="product().quantity !== undefined">
-            <p class="detail-value">
-              <span class="detail-label">{{
-                "viewProduct.details.quantityAvailable" | translate
-              }}</span>
-              {{ product().quantity }}
-              {{ "viewProduct.details.pieces" | translate }}
-            </p>
-          </div>
-        </div>
-      </mat-card-content>
-
-      <mat-card-actions class="action-buttons">
-        <!-- Quantity Selection -->
-        <div class="quantity-section" *ngIf="product().quantity > 0">
-          <mat-form-field class="quantity-field">
-            <mat-label>{{ "viewProduct.quantity" | translate }}</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="selectedQuantity"
-              (ngModelChange)="updateQuantity($event)"
-              min="1"
-              [max]="product().quantity"
-              class="quantity-input"
+        <div class="product__layout">
+          <!-- ---------------------------------------------------------- -->
+          <!--  Media                                                      -->
+          <!-- ---------------------------------------------------------- -->
+          <div class="product__media">
+            <img
+              class="product__image"
+              [src]="imageUrl()"
+              [alt]="item.name"
+              width="800"
+              height="600"
+              fetchpriority="high"
+              decoding="async"
             />
-          </mat-form-field>
+          </div>
+
+          <!-- ---------------------------------------------------------- -->
+          <!--  Summary                                                    -->
+          <!-- ---------------------------------------------------------- -->
+          <div class="product__summary">
+            @if (categoryName()) {
+              <a
+                class="product__category"
+                routerLink="/user/all-products"
+                [queryParams]="{ category: item.categoryId }"
+              >
+                {{ categoryName() }}
+              </a>
+            }
+
+            <h1 class="product__title">{{ item.name }}</h1>
+
+            <p class="product__price">
+              {{ item.price | currency: "RON" : "symbol" : "1.2-2" }}
+            </p>
+
+            <!-- Stock, as a status rather than a raw number buried in a list -->
+            <p
+              class="product__stock"
+              [class.is-low]="lowStock()"
+              [class.is-out]="outOfStock()"
+            >
+              <mat-icon aria-hidden="true">
+                {{ outOfStock() ? "remove_shopping_cart" : lowStock() ? "warning" : "check_circle" }}
+              </mat-icon>
+              @if (outOfStock()) {
+                {{ "viewProduct.outOfStock" | translate }}
+              } @else if (lowStock()) {
+                {{ "viewProduct.lowStock" | translate: { count: stock() } }}
+              } @else {
+                {{ "viewProduct.inStock" | translate: { count: stock() } }}
+              }
+            </p>
+
+            <mat-divider />
+
+            <!-- Buy box -->
+            <div class="product__buy">
+              @if (!outOfStock()) {
+                <div class="product__buy-row">
+                  <app-quantity-stepper
+                    [(value)]="quantity"
+                    [min]="1"
+                    [max]="stock()"
+                    [label]="item.name"
+                  />
+
+                  <p class="price-stack price-stack--end">
+                    <span class="price-stack__label">
+                      {{ "viewProduct.subtotal" | translate }}
+                    </span>
+                    <span class="price-stack__value">
+                      {{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}
+                    </span>
+                  </p>
+                </div>
+              }
+
+              <div class="product__actions">
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  class="product__cart-btn"
+                  [disabled]="outOfStock()"
+                  (click)="addToCart()"
+                >
+                  <mat-icon>add_shopping_cart</mat-icon>
+                  {{
+                    (outOfStock() ? "viewProduct.outOfStock" : "product.addToCart") | translate
+                  }}
+                </button>
+
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="product__wishlist-btn"
+                  [class.is-active]="isInWishlist()"
+                  [attr.aria-pressed]="isInWishlist()"
+                  [matTooltip]="
+                    (isInWishlist() ? 'product.removeFromWishlist' : 'product.addToWishlist')
+                      | translate
+                  "
+                  (click)="toggleWishlist()"
+                >
+                  <mat-icon>{{ isInWishlist() ? "favorite" : "favorite_border" }}</mat-icon>
+                  <span class="product__wishlist-label">
+                    {{
+                      (isInWishlist() ? "product.removeFromWishlist" : "product.addToWishlist")
+                        | translate
+                    }}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <mat-tab-group class="product__tabs" mat-stretch-tabs="false" animationDuration="0ms">
+              <mat-tab [label]="'viewProduct.tabDescription' | translate">
+                <p class="product__description">
+                  {{ item.description || ("viewProduct.noDescription" | translate) }}
+                </p>
+              </mat-tab>
+
+              @if (specs().length) {
+                <mat-tab [label]="'viewProduct.tabSpecs' | translate">
+                  <dl class="data-rows">
+                    @for (spec of specs(); track spec.label) {
+                      <div class="data-rows__row">
+                        <dt>{{ spec.label | translate }}</dt>
+                        <dd>{{ spec.value }}</dd>
+                      </div>
+                    }
+                  </dl>
+                </mat-tab>
+              }
+            </mat-tab-group>
+          </div>
         </div>
 
-        <!-- Add to Cart Button -->
-        <button
-          mat-raised-button
-          color="primary"
-          class="add-to-cart-btn"
-          (click)="addToCart(product().id)"
-          [disabled]="product().quantity === 0"
-        >
-          <mat-icon>shopping_cart</mat-icon>
-          {{
-            product().quantity === 0
-              ? ("viewProduct.actions.outOfStock" | translate)
-              : ("viewProduct.actions.addToCart" | translate)
-          }}
-          <span *ngIf="product().quantity > 0">({{ selectedQuantity }})</span>
-        </button>
+        <!-- ------------------------------------------------------------ -->
+        <!--  Related                                                      -->
+        <!-- ------------------------------------------------------------ -->
+        @if (related().length) {
+          <section class="product__related">
+            <h2 class="product__related-title">{{ "viewProduct.related" | translate }}</h2>
 
-        <!-- Add to Wishlist Button -->
+            <ul class="product__related-grid">
+              @for (suggestion of related(); track suggestion.id) {
+                <li>
+                  <app-product-card
+                    [product]="suggestion"
+                    [categoryName]="categoryName()"
+                    [link]="['/user/view-product']"
+                    [linkQueryParams]="{ id: suggestion.id }"
+                  />
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+
+      <!-- Sticky buy bar on phones, so the CTA is always reachable -->
+      <div class="buy-bar">
+        <div class="price-stack">
+          <span class="price-stack__label">{{ "viewProduct.subtotal" | translate }}</span>
+          <span class="price-stack__value">
+            {{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}
+          </span>
+        </div>
+
         <button
-          mat-icon-button
-          color="accent"
-          class="wishlist-btn"
-          (click)="addToWishList(product().id)"
-          [matTooltip]="'viewProduct.actions.addToWishlist' | translate"
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="buy-bar__btn"
+          [disabled]="outOfStock()"
+          (click)="addToCart()"
         >
-          <mat-icon class="heart-icon">favorite_border</mat-icon>
+          <mat-icon>add_shopping_cart</mat-icon>
+          {{ (outOfStock() ? "viewProduct.outOfStock" : "product.addToCart") | translate }}
         </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
-</div>
+      </div>
+    }
+  }
+}

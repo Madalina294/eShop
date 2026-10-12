@@ -1,0 +1,42 @@
+<div
+  class="stepper"
+  [class.stepper--sm]="size() === 'sm'"
+  role="group"
+  [attr.aria-label]="label() || null"
+>
+  <button
+    mat-icon-button
+    type="button"
+    class="stepper__btn"
+    [disabled]="!canDecrease()"
+    [attr.aria-label]="'common.decrease' | translate"
+    (click)="step(-1)"
+  >
+    <mat-icon>remove</mat-icon>
+  </button>
+
+  <input
+    #field
+    class="stepper__field"
+    type="number"
+    inputmode="numeric"
+    [value]="value()"
+    [min]="min()"
+    [max]="max()"
+    [disabled]="disabled()"
+    [attr.aria-label]="'cart.quantity' | translate"
+    (change)="onInput(field.value)"
+    (blur)="field.value = value().toString()"
+  />
+
+  <button
+    mat-icon-button
+    type="button"
+    class="stepper__btn"
+    [disabled]="!canIncrease()"
+    [attr.aria-label]="'common.increase' | translate"
+    (click)="step(1)"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

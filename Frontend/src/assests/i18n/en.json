@@ -110,7 +110,9 @@
     "skipToContent": "Skip to main content",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "required": "This field is required"
+    "required": "This field is required",
+    "decrease": "Decrease",
+    "increase": "Increase"
   },
   "login": {
     "title": "Welcome Back",
@@ -210,7 +212,19 @@
       "productIdNotFound": "Product ID not found!",
       "loadingFailed": "Something went wrong while loading the product!",
       "ok": "Ok"
-    }
+    },
+    "tabDescription": "Description",
+    "tabSpecs": "Specifications",
+    "noDescription": "No description available for this product.",
+    "related": "You might also like",
+    "relatedEmpty": "No related products yet.",
+    "inStock": "{{count}} in stock",
+    "lowStock": "Only {{count}} left",
+    "outOfStock": "Out of stock",
+    "notFoundTitle": "Product not found",
+    "notFoundDescription": "This product may have been removed, or the link is incorrect.",
+    "backToCatalogue": "Back to products",
+    "subtotal": "Subtotal"
   },
   "welcome": {
     "title": "Welcome, {{firstName}} {{lastName}}!",
@@ -424,7 +438,8 @@
     "createProduct": "Create Product",
     "editProduct": "Edit Product",
     "sendEmail": "Send Email",
-    "viewUserAccount": "View User Account"
+    "viewUserAccount": "View User Account",
+    "title": "Breadcrumb"
   },
   "editCategory": {
     "title": "Edit Category",

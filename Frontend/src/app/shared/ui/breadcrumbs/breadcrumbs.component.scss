@@ -1,0 +1,45 @@
+@use "mixins" as m;
+
+:host { display: block; }
+
+.crumbs {
+  &__list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  &__link {
+    color: var(--text-secondary);
+    border-radius: var(--radius-xs);
+    @include m.focus-ring;
+
+    &:hover { color: var(--brand); }
+  }
+
+  &__current {
+    max-width: 24ch;
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    @include m.truncate;
+  }
+
+  &__sep {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    color: var(--text-disabled);
+  }
+}

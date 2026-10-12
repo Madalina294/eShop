@@ -1,193 +1,237 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {ProductData} from '../../services/admin/admin.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute, Router} from '@angular/router';
-import {UserService} from '../../services/user/user.service';
-import {MatCardModule} from '@angular/material/card';
-import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule} from '@angular/material/icon';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {CommonModule} from '@angular/common';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {FormsModule} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { CurrencyPipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+import { UserService } from '../../services/user/user.service';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { CartStateService } from '../../shared/state/cart-state.service';
+import { QuantityStepperComponent } from '../../shared/ui/quantity-stepper/quantity-stepper.component';
+import { ProductCardComponent } from '../../shared/ui/product-card/product-card.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+import { BreadcrumbsComponent, Crumb } from '../../shared/ui/breadcrumbs/breadcrumbs.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { Category, Page, Product } from '../../models/product';
+import { ViewState } from '../../models/ui-state';
+import { productImageUrl } from '../../core/http/image-url';
+
+/** Below this many units left, the stock line turns into a nudge. */
+const LOW_STOCK_THRESHOLD = 5;
+const RELATED_COUNT = 4;
+
+interface Spec {
+  readonly label: string;
+  readonly value: string;
+}
 
 @Component({
   selector: 'app-view-product',
+  standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
+    RouterLink,
+    CurrencyPipe,
     MatButtonModule,
+    MatChipsModule,
+    MatDividerModule,
     MatIconModule,
+    MatTabsModule,
     MatTooltipModule,
-    MatFormFieldModule,
-    MatInputModule,
     TranslateModule,
-    FormsModule
+    QuantityStepperComponent,
+    ProductCardComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
+    EmptyStateComponent,
+    BreadcrumbsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './view-product.component.html',
-  styleUrl: './view-product.component.scss'
+  styleUrl: './view-product.component.scss',
 })
-export class ViewProductComponent implements OnInit{
-  loading = signal(false);
-  isInWishlist = signal(false);
-  selectedQuantity = 1;
-  product = signal<ProductData> ({
-    id: 0,
-    name: '',
-    price: 0,
-    description: '',
-    categoryId: 0,
-    color: '',
-    dimensions: '',
-    material: '',
-    weight: '',
-    quantity: 0
+export class ViewProductComponent {
+  private readonly userService = inject(UserService);
+  private readonly notifications = inject(NotificationService);
+  private readonly cartState = inject(CartStateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly translate = inject(TranslateService);
+
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly product = signal<Product | null>(null);
+  protected readonly related = signal<Product[]>([]);
+  protected readonly categories = signal<Category[]>([]);
+  protected readonly isInWishlist = signal(false);
+  protected readonly quantity = signal(1);
+
+  /** Read from the URL so the browser's back/forward buttons reload correctly. */
+  private readonly params = toSignal(this.route.queryParams, {
+    initialValue: this.route.snapshot.queryParams,
   });
 
-  constructor(private snackBar: MatSnackBar,
-               private router: Router,
-               private userService: UserService,
-              private route: ActivatedRoute,
-              private translate: TranslateService) {
-  }
+  protected readonly imageUrl = computed(() => productImageUrl(this.product()?.image));
 
-  ngOnInit(){
-    this.loadProductData();
-  }
+  protected readonly categoryName = computed(() => {
+    const product = this.product();
+    if (!product) return '';
+    return this.categories().find(c => c.id === product.categoryId)?.name ?? '';
+  });
 
-  loadProductData(){
-    this.loading.set(true);
-    const productId = this.route.snapshot.queryParams['id'];
+  protected readonly stock = computed(() => this.product()?.quantity ?? 0);
+  protected readonly outOfStock = computed(() => this.stock() <= 0);
+  protected readonly lowStock = computed(() => this.stock() > 0 && this.stock() <= LOW_STOCK_THRESHOLD);
 
-    console.log('=== DEBUG: ViewProductComponent ===');
-    console.log('Query params:', this.route.snapshot.queryParams);
-    console.log('Product ID:', productId);
-    console.log('=== END DEBUG ===');
+  /** Live total for the chosen quantity, so the price is never a surprise. */
+  protected readonly subtotal = computed(() => (this.product()?.price ?? 0) * this.quantity());
 
-    if (!productId) {
-      this.loading.set(false);
-      const message = this.translate.instant('viewProduct.errors.productIdNotFound');
-      const action = this.translate.instant('viewProduct.errors.ok');
-      this.snackBar.open(message, action, {duration: 3000});
-      this.router.navigate(['/user/all-products']);
-      return;
+  /** Only the specs the product actually has — no empty rows. */
+  protected readonly specs = computed<Spec[]>(() => {
+    const product = this.product();
+    if (!product) return [];
+
+    const candidates: ReadonlyArray<[string, string | undefined]> = [
+      ['viewProduct.details.color', product.color],
+      ['viewProduct.details.dimensions', product.dimensions],
+      ['viewProduct.details.material', product.material],
+      ['viewProduct.details.weight', product.weight],
+    ];
+
+    return candidates.flatMap(([label, value]) =>
+      value ? [{ label, value }] : []
+    );
+  });
+
+  /** Catalogue › category › product. */
+  protected readonly crumbs = computed<Crumb[]>(() => {
+    const product = this.product();
+    if (!product) return [];
+
+    const trail: Crumb[] = [
+      { label: this.translate.instant('allProducts.title'), link: '/user/all-products' },
+    ];
+
+    const category = this.categoryName();
+    if (category) {
+      trail.push({
+        label: category,
+        link: '/user/all-products',
+        queryParams: { category: product.categoryId },
+      });
     }
 
-    this.userService.getProduct(productId).subscribe({
-      next: value => {
-        this.loading.set(false);
-        this.product.set(value);
+    trail.push({ label: product.name });
+    return trail;
+  });
 
-        this.checkWishlistStatus(productId);
-      },
-      error: err => {
-        this.loading.set(false);
-        console.error('Error loading product:', err);
-        const message = this.translate.instant('viewProduct.errors.loadingFailed');
-        const action = this.translate.instant('viewProduct.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
-      }
-    })
+  constructor() {
+    this.loadCategories();
+
+    // Re-fetch whenever the `?id=` changes, including via related products.
+    this.route.queryParams
+      .pipe(takeUntilDestroyed())
+      .subscribe(params => this.load(Number(params['id'])));
   }
 
-  checkWishlistStatus(productId: number) {
-    this.userService.checkIfInWishlist(productId).subscribe({
-      next: (isInWishlist: boolean) => {
-        this.isInWishlist.set(isInWishlist);
-      },
-      error: (err) => {
-        console.error('Error checking wishlist status:', err);
-        this.isInWishlist.set(false);
-      }
-    });
+  protected reload(): void {
+    this.load(Number(this.params()['id']));
   }
 
-  getProductImage(product: ProductData): string {
-    if (product.image) {
-      // Verifică dacă path-ul începe deja cu /
-      if (product.image.startsWith('/')) {
-        return `http://localhost:8080${product.image}`;
-      }
-      return `http://localhost:8080/${product.image}`;
-    }
-    return 'user.png';
-  }
+  protected addToCart(): void {
+    const product = this.product();
+    if (!product || this.outOfStock()) return;
 
-  addToCart(productId: number, quantity: number = this.selectedQuantity) {
-    if (quantity <= 0) {
-      const message = this.translate.instant('cart.invalidQuantity');
-      const action = this.translate.instant('cart.errors.ok');
-      this.snackBar.open(message, action, {duration: 3000});
-      return;
-    }
+    const quantity = this.quantity();
 
-    if (quantity > this.product().quantity) {
-      const message = this.translate.instant('cart.quantityExceedsStock');
-      const action = this.translate.instant('cart.errors.ok');
-      this.snackBar.open(message, action, {duration: 3000});
-      return;
-    }
-
-    this.userService.addToCart(productId, quantity).subscribe({
+    this.userService.addToCart(product.id, quantity).subscribe({
       next: () => {
-        const message = this.translate.instant('cart.addedToCart');
-        const action = this.translate.instant('cart.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
+        this.cartState.optimisticCartAdd(quantity);
+        this.notifications.success('product.addedToCart');
       },
-      error: (err) => {
-        console.error('Error adding to cart:', err);
-        const message = this.translate.instant('cart.addError');
-        const action = this.translate.instant('cart.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
-      }
+      // The error interceptor already surfaces the failure.
+      error: () => undefined,
     });
   }
 
-  updateQuantity(quantity: number) {
-    if (quantity < 1) {
-      this.selectedQuantity = 1;
-    } else if (quantity > this.product().quantity) {
-      this.selectedQuantity = this.product().quantity;
-    } else {
-      this.selectedQuantity = quantity;
-    }
+  protected toggleWishlist(): void {
+    const product = this.product();
+    if (!product) return;
+
+    const wasIn = this.isInWishlist();
+    const request = wasIn
+      ? this.userService.removeFromWishlist(product.id)
+      : this.userService.addToWishlist(product.id);
+
+    request.subscribe({
+      next: () => {
+        this.isInWishlist.set(!wasIn);
+
+        if (wasIn) {
+          this.cartState.optimisticWishlistRemove();
+          this.notifications.success('product.removedFromWishlist');
+        } else {
+          this.cartState.optimisticWishlistAdd();
+          this.notifications.success('product.addedToWishlist');
+        }
+      },
+      error: () => undefined,
+    });
   }
 
-  addToWishList(productId: number){
-    if (this.isInWishlist()) {
-      // Produsul este deja în wishlist, îl eliminăm
-      this.userService.removeFromWishlist(productId).subscribe({
-        next: () => {
-          this.isInWishlist.set(false);
-          const message = this.translate.instant('viewProduct.wishlist.removed');
-          const action = this.translate.instant('viewProduct.errors.ok');
-          this.snackBar.open(message, action, {duration: 3000});
-        },
-        error: (err) => {
-          console.error('Error removing from wishlist:', err);
-          const message = this.translate.instant('viewProduct.wishlist.removeError');
-          const action = this.translate.instant('viewProduct.errors.ok');
-          this.snackBar.open(message, action, {duration: 3000});
-        }
-      });
-    } else {
-      // Produsul nu este în wishlist, îl adăugăm
-      this.userService.addToWishlist(productId).subscribe({
-        next: () => {
-          this.isInWishlist.set(true);
-          const message = this.translate.instant('viewProduct.wishlist.added');
-          const action = this.translate.instant('viewProduct.errors.ok');
-          this.snackBar.open(message, action, {duration: 3000});
-        },
-        error: (err) => {
-          console.error('Error adding to wishlist:', err);
-          const message = this.translate.instant('viewProduct.wishlist.addError');
-          const action = this.translate.instant('viewProduct.errors.ok');
-          this.snackBar.open(message, action, {duration: 3000});
-        }
-      });
+  // --- Data ------------------------------------------------------------------
+
+  private load(id: number): void {
+    if (!Number.isFinite(id) || id <= 0) {
+      // A missing or malformed id is a dead link, not a server error. The old
+      // version flashed a toast and silently bounced to the catalogue.
+      this.state.set('empty');
+      return;
     }
+
+    this.state.set('loading');
+    this.quantity.set(1);
+    this.related.set([]);
+
+    this.userService.getProduct(id).subscribe({
+      next: product => {
+        this.product.set(product);
+        this.state.set('ready');
+        this.checkWishlist(id);
+        this.loadRelated(product);
+      },
+      error: () => this.state.set('error'),
+    });
+  }
+
+  private checkWishlist(productId: number): void {
+    this.userService.checkIfInWishlist(productId).subscribe({
+      next: isIn => this.isInWishlist.set(isIn),
+      error: () => this.isInWishlist.set(false),
+    });
+  }
+
+  /** Same category, current product excluded. */
+  private loadRelated(product: Product): void {
+    this.userService
+      .getProductsPaginated(0, RELATED_COUNT + 1, 'id', 'desc', product.categoryId)
+      .subscribe({
+        next: (response: Page<Product>) =>
+          this.related.set(
+            (response.content ?? []).filter(p => p.id !== product.id).slice(0, RELATED_COUNT)
+          ),
+        error: () => this.related.set([]),
+      });
+  }
+
+  private loadCategories(): void {
+    this.userService.getCategories().subscribe({
+      next: categories => this.categories.set(categories ?? []),
+      error: () => this.categories.set([]),
+    });
   }
 }

@@ -110,7 +110,9 @@
     "skipToContent": "Sari la conținutul principal",
     "openMenu": "Deschide meniul",
     "closeMenu": "Închide meniul",
-    "required": "Acest câmp este obligatoriu"
+    "required": "Acest câmp este obligatoriu",
+    "decrease": "Scade",
+    "increase": "Crește"
   },
   "login": {
     "title": "Bine ai revenit",
@@ -210,7 +212,19 @@
       "productIdNotFound": "ID-ul produsului nu a fost găsit!",
       "loadingFailed": "Ceva nu a mers bine la încărcarea produsului!",
       "ok": "Ok"
-    }
+    },
+    "tabDescription": "Descriere",
+    "tabSpecs": "Specificații",
+    "noDescription": "Nu există descriere pentru acest produs.",
+    "related": "Ți-ar putea plăcea și",
+    "relatedEmpty": "Încă nu există produse similare.",
+    "inStock": "{{count}} în stoc",
+    "lowStock": "Au mai rămas doar {{count}}",
+    "outOfStock": "Stoc epuizat",
+    "notFoundTitle": "Produsul nu a fost găsit",
+    "notFoundDescription": "Produsul poate să fi fost șters sau linkul este greșit.",
+    "backToCatalogue": "Înapoi la produse",
+    "subtotal": "Subtotal"
   },
   "welcome": {
     "title": "Bine ai venit, {{firstName}} {{lastName}}!",
@@ -424,7 +438,8 @@
     "createProduct": "Creează Produs",
     "editProduct": "Editează Produs",
     "sendEmail": "Trimite Email",
-    "viewUserAccount": "Vezi Cont Utilizator"
+    "viewUserAccount": "Vezi Cont Utilizator",
+    "title": "Firimituri de navigare"
   },
   "editCategory": {
     "title": "Editează Categoria",
