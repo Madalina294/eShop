@@ -142,11 +142,13 @@
       </button>
 
       @if (isSignedIn()) {
+        <!-- Avatar only. The name used to sit next to it and pushed the whole
+             action row around as it changed length; it now heads the menu. -->
         <button
-          mat-button
           type="button"
           class="header__account"
           [matMenuTriggerFor]="accountMenu"
+          [matTooltip]="userName()"
           [attr.aria-label]="'header.myAccount' | translate"
         >
           <span class="header__avatar">
@@ -156,11 +158,17 @@
               <span aria-hidden="true">{{ initial() || "?" }}</span>
             }
           </span>
-          <span class="header__account-name">{{ userName() }}</span>
-          <mat-icon class="header__account-caret">expand_more</mat-icon>
         </button>
 
         <mat-menu #accountMenu="matMenu" xPosition="before">
+          <div class="header__menu-head">
+            <span class="header__menu-name">{{ userName() }}</span>
+            @if (userState.user()?.email; as email) {
+              <span class="header__menu-email">{{ email }}</span>
+            }
+          </div>
+          <mat-divider />
+
           <a mat-menu-item routerLink="/profile">
             <mat-icon>account_circle</mat-icon>
             <span>{{ "header.myAccount" | translate }}</span>
@@ -191,33 +199,9 @@
 
 <!-- Mobile navigation drawer -->
 @if (navItems().length && mobileNavOpen()) {
-  <div class="mobile-nav-backdrop" (click)="closeMobileNav()"></div>
-
-  <nav id="mobile-nav" class="mobile-nav" [attr.aria-label]="'header.mainNav' | translate">
-    @for (item of navItems(); track item.link) {
-      <a
-        class="mobile-nav__link"
-        [routerLink]="item.link"
-        routerLinkActive="is-active"
-        #mrla="routerLinkActive"
-        [attr.aria-current]="mrla.isActive ? 'page' : null"
-        (click)="closeMobileNav()"
-      >
-        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-        <span>{{ item.label | translate }}</span>
-      </a>
-    }
-
-    <mat-divider />
-
-    <a class="mobile-nav__link" routerLink="/profile" (click)="closeMobileNav()">
-      <mat-icon aria-hidden="true">account_circle</mat-icon>
-      <span>{{ "header.myAccount" | translate }}</span>
-    </a>
-
-    <button class="mobile-nav__link mobile-nav__link--danger" type="button" (click)="logout()">
-      <mat-icon aria-hidden="true">logout</mat-icon>
-      <span>{{ "header.logout" | translate }}</span>
-    </button>
-  </nav>
+  <app-mobile-nav
+    [items]="navItems()"
+    (dismiss)="closeMobileNav()"
+    (signOut)="logout()"
+  />
 }

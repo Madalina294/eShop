@@ -12,6 +12,7 @@
     "manageUsers": "Gestionează Utilizatori",
     "adminProfile": "Profil Admin",
     "homePage": "Pagina Principală",
+    "about": "Despre noi",
     "myDashboard": "Panoul Meu",
     "myAccount": "Contul Meu",
     "welcome": "Bun venit",
@@ -176,7 +177,22 @@
     "mfaSubtitle": "Asigură-ți contul cu 2FA",
     "complete": "Finalizează înregistrarea",
     "helpTitle": "Ai nevoie de ajutor?",
-    "helpText": "Asigură-te că ora dispozitivului este sincronizată și că ai introdus corect codul."
+    "helpText": "Asigură-te că ora dispozitivului este sincronizată și că ai introdus corect codul.",
+    "brandTitle": "Creează-ți contul în mai puțin de un minut.",
+    "brandText": "Un singur cont pentru coș, favorite și toate comenzile tale.",
+    "showPassword": "Arată parola",
+    "hidePassword": "Ascunde parola",
+    "errors": {
+      "emailExists": "Există deja un cont cu acest email.",
+      "generic": "Nu am putut crea contul. Te rugăm încearcă din nou.",
+      "invalidCode": "Codul nu este valid. Verifică aplicația de autentificare și încearcă din nou.",
+      "incompleteData": "Contul a fost creat, dar nu te-am putut autentica. Te rugăm conectează-te."
+    },
+    "success": {
+      "created": "Bine ai venit! Contul tău este gata.",
+      "mfaReady": "Cont creat. Acum configurează autentificarea în doi pași.",
+      "verified": "Autentificarea în doi pași este activă. Bine ai venit!"
+    }
   },
   "oauth": {
     "processing": {
@@ -864,7 +880,8 @@
     "profile": "Profilul meu",
     "updatePassword": "Schimbă parola",
     "preferences": "Preferințe",
-    "notFound": "Pagina nu a fost găsită"
+    "notFound": "Pagina nu a fost găsită",
+    "about": "Despre noi"
   },
   "footer": {
     "tagline": "Răsfoiește catalogul, salvează-ți favoritele și finalizează comanda în siguranță.",
@@ -894,5 +911,50 @@
   "orderConfirmation": {
     "cancelledTitle": "Comandă anulată",
     "cancelledMessage": "Această comandă nu mai este procesată. Orice sumă reținută va fi returnată."
+  },
+  "about": {
+    "title": "Despre noi",
+    "subtitle": "Cine suntem și cum lucrăm",
+    "since": "Magazin independent din 2017",
+    "cta": "Vezi catalogul",
+    "story": {
+      "title": "Un magazin construit pe o listă scurtă",
+      "text": "eShop a început într-un birou cu două camere în Cluj-Napoca, cu o regulă pe care o ținem și azi: punem un produs pe site doar după ce cineva din echipă l-a folosit efectiv. Asta ne face catalogul mai mic decât ar putea fi și înseamnă că putem răspunde la orice întrebare despre un produs fără să citim de pe fișa tehnică. Astăzi suntem douăzeci și șase de oameni, între depozitul din Florești și biroul de suport, iar regula a rămas aceeași."
+    },
+    "stats": {
+      "title": "În cifre",
+      "products": "Produse în catalog",
+      "customers": "Clienți serviți",
+      "delivery": "Zile lucrătoare până la livrare",
+      "rating": "Scor mediu al recenziilor"
+    },
+    "values": {
+      "title": "Ce respectăm",
+      "curated": {
+        "title": "Alese, nu adunate",
+        "text": "Fiecare produs este testat de echipă înainte să ajungă pe site. Dacă nu își merită locul, nu îl listăm — oricât de bine s-ar vinde."
+      },
+      "fair": {
+        "title": "Un singur preț corect",
+        "text": "Prețul pe care îl vezi este prețul pe care îl plătești. Fără reduceri inventate, fără cronometre, fără taxe care apar la ultimul pas din checkout."
+      },
+      "delivery": {
+        "title": "Livrăm când spunem",
+        "text": "Comenzile plasate până la ora 14:00 pleacă din depozit în aceeași zi. Dacă ceva întârzie, afli de la noi primul, nu de la curier."
+      },
+      "support": {
+        "title": "Oameni, nu scripturi",
+        "text": "Suportul este făcut intern, de aceeași echipă care alege produsele. Treizeci de zile pentru retur, fără să fie nevoie de un motiv."
+      }
+    },
+    "contact": {
+      "title": "Ia legătura cu noi",
+      "address": "Adresă",
+      "addressValue": "Str. Memorandumului 28, Cluj-Napoca, România",
+      "email": "Email",
+      "phone": "Telefon",
+      "hours": "Program",
+      "hoursValue": "Luni – vineri, 9:00 – 18:00"
+    }
   }
 }

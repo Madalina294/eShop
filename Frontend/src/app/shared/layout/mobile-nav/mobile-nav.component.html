@@ -1,0 +1,29 @@
+<div class="mobile-nav-backdrop" (click)="dismiss.emit()"></div>
+
+<nav id="mobile-nav" class="mobile-nav" [attr.aria-label]="'header.mainNav' | translate">
+  @for (item of items(); track item.link) {
+    <a
+      class="mobile-nav__link"
+      [routerLink]="item.link"
+      routerLinkActive="is-active"
+      #mrla="routerLinkActive"
+      [attr.aria-current]="mrla.isActive ? 'page' : null"
+      (click)="dismiss.emit()"
+    >
+      <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+      <span>{{ item.label | translate }}</span>
+    </a>
+  }
+
+  <mat-divider />
+
+  <a class="mobile-nav__link" routerLink="/profile" (click)="dismiss.emit()">
+    <mat-icon aria-hidden="true">account_circle</mat-icon>
+    <span>{{ "header.myAccount" | translate }}</span>
+  </a>
+
+  <button class="mobile-nav__link mobile-nav__link--danger" type="button" (click)="signOut.emit()">
+    <mat-icon aria-hidden="true">logout</mat-icon>
+    <span>{{ "header.logout" | translate }}</span>
+  </button>
+</nav>

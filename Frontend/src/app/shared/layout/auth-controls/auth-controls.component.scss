@@ -1,3 +1,5 @@
+@use "mixins" as m;
+
 // The host element must be taken out of flow: this component sits inside the
 // auth page's grid, and in normal flow it would claim the first grid cell and
 // push the showcase and the form into the wrong tracks.
@@ -14,40 +16,30 @@
 .auth-controls {
   display: contents;
 
+  // Geometry from the shared mixins, so these stay in step with the header's
+  // pair instead of drifting apart. Only the colours differ: these float over
+  // the page rather than sitting on the toolbar.
   &__lang {
-    height: 30px;
-    border: 0;
-    border-radius: var(--radius-full);
-    overflow: hidden;
+    @include m.segmented-pill;
+
     background: var(--auth-control-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
-    --mat-standard-button-toggle-divider-color: transparent;
-    --mat-standard-button-toggle-background-color: transparent;
     --mat-standard-button-toggle-text-color: var(--auth-control-fg);
     --mat-standard-button-toggle-selected-state-background-color: var(--auth-control-active);
     --mat-standard-button-toggle-selected-state-text-color: var(--auth-control-active-fg);
-    --mat-standard-button-toggle-hover-state-layer-opacity: 0;
-
-    .mat-button-toggle {
-      border: 0;
-    }
-
-    .mat-button-toggle-label-content {
-      line-height: 28px;
-      padding-inline: var(--space-3);
-      font-size: var(--text-xs);
-      font-weight: var(--weight-semibold);
-      letter-spacing: 0.02em;
-    }
   }
 
   &__theme {
+    @include m.icon-control;
+
     color: var(--auth-control-fg);
     background: var(--auth-control-bg);
+    border-radius: var(--radius-full);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    transition: color var(--duration-fast) var(--ease-out);
 
     &:hover {
       color: var(--auth-control-active-fg);

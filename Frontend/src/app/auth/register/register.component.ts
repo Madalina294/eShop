@@ -1,236 +1,202 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, signal} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
-import {RegisterRequest} from '../../models/register-request';
-import {AuthenticationResponse} from '../../models/authentication-response';
-import {RouterLink, Router} from '@angular/router';
-import {AuthenticationService} from '../../services/auth/authentication.service';
-import {VerificationRequest} from '../../models/verification-request';
-import {NgIf} from '@angular/common';
-import {NzSpinComponent} from 'ng-zorro-antd/spin';
-import {NzButtonComponent} from 'ng-zorro-antd/button';
-import {NzInputDirective} from 'ng-zorro-antd/input';
-import {NzFormControlComponent, NzFormDirective, NzFormItemComponent} from 'ng-zorro-antd/form';
-import {NzMessageService} from 'ng-zorro-antd/message';
-import {StorageService} from '../../services/storage/storage.service';
-import { UserStateService } from '../../services/user-state/user-state.service';
-import {TranslatePipe} from '@ngx-translate/core';
-import {NzIconDirective} from 'ng-zorro-antd/icon';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
+import { AuthenticationService } from '../../services/auth/authentication.service';
+import { StorageService } from '../../services/storage/storage.service';
+import { UserStateService } from '../../services/user-state/user-state.service';
+import { UserService } from '../../services/user/user.service';
+import { ThemeService } from '../../services/theme/theme.service';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { AuthenticationResponse } from '../../models/authentication-response';
+
+/** At least 8 chars, one lower, one upper, one digit, one symbol. */
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+const PHONE_PATTERN = /^[0-9+\-\s()]+$/;
+
+/**
+ * Account creation, with an optional two-factor setup step.
+ *
+ * Rewritten off ng-zorro onto the same Material + typed-forms structure as
+ * `LoginComponent`. The old version used an untyped `FormGroup`, drove the OTP
+ * field with `[(ngModel)]`, showed hardcoded English strings through
+ * `NzMessageService`, had no OnPush, and silently dropped `phoneNumber` from
+ * the payload it sent even though the form required it.
+ */
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [
-    FormsModule,
     ReactiveFormsModule,
     RouterLink,
-    NgIf,
-    NzSpinComponent,
-    NzButtonComponent,
-    NzInputDirective,
-    NzIconDirective,
-    NzFormControlComponent,
-    NzFormDirective,
-    NzFormItemComponent,
-    TranslatePipe
-  ,
-    AuthControlsComponent
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    AuthControlsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
-  registerForm!: FormGroup;
-  registerRequest: RegisterRequest = {};
-  authResponse: AuthenticationResponse | null = null;
-  otpCode = '';
-  isSpinning = signal(false);
-  isVerifying = signal(false);
-  qrCodeUri: string = '';
-  private message: NzMessageService;
-  showMfaEnabled: boolean = false;
-  passwordVisible = signal(false); // Pentru show/hide password
-  confirmPasswordVisible = signal(false); // Pentru show/hide confirm password
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthenticationService);
+  private readonly userService = inject(UserService);
+  private readonly userState = inject(UserStateService);
+  private readonly themeService = inject(ThemeService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthenticationService,
-    private router: Router,
-    private fb: FormBuilder,
-    message: NzMessageService,
-    private userStateService: UserStateService
-  ) {
-    this.message = message;
-    this.initializeForm();
-  }
+  protected readonly year = new Date().getFullYear();
+  protected readonly submitting = signal(false);
+  protected readonly passwordVisible = signal(false);
+  protected readonly confirmPasswordVisible = signal(false);
 
-  private initializeForm() {
-    this.registerForm = this.fb.group({
+  /** Set once the account exists and the backend returned a 2FA secret. */
+  protected readonly mfaResponse = signal<AuthenticationResponse | null>(null);
+  protected readonly inMfaStep = computed(() => this.mfaResponse() !== null);
+  protected readonly qrCodeUrl = computed(() => this.mfaResponse()?.qrCodeUrl ?? '');
+
+  protected readonly registerForm = this.fb.nonNullable.group(
+    {
       firstname: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]+$/)]],
-      password: ['', [
-        Validators.required,
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
-      ]],
-      confirmPassword: ['', [Validators.required]],
-      mfaEnabled: [false]
-    }, { validators: this.passwordsMatchValidator });
-  }
+      phoneNumber: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
+      password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
+      confirmPassword: ['', Validators.required],
+      mfaEnabled: [false],
+    },
+    { validators: passwordsMatchValidator }
+  );
 
-  private passwordsMatchValidator = (group: AbstractControl): ValidationErrors | null => {
-    const password = group.get('password')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordsMismatch: true };
-  }
+  protected readonly otpForm = this.fb.nonNullable.group({
+    code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+  });
 
-  async registerUser() {
+  protected register(): void {
     if (this.registerForm.invalid) {
-      Object.values(this.registerForm.controls).forEach(control => control.markAsDirty());
-      this.registerForm.updateValueAndValidity();
+      this.registerForm.markAllAsTouched();
       return;
     }
 
-    this.isSpinning.set(true);
+    this.submitting.set(true);
+    const form = this.registerForm.getRawValue();
 
-    // Populez registerRequest din form
-    this.registerRequest = {
-      firstname: this.registerForm.get('firstname')?.value,
-      lastname: this.registerForm.get('lastname')?.value,
-      email: this.registerForm.get('email')?.value,
-      password: this.registerForm.get('password')?.value,
-      role: 'USER',
-      mfaEnabled: this.registerForm.get('mfaEnabled')?.value
-    };
-
-    this.authService.register(this.registerRequest)
+    this.authService
+      .register({
+        firstname: form.firstname,
+        lastname: form.lastname,
+        email: form.email,
+        // The old code built this payload without `phoneNumber`, so the number
+        // the form insisted on was never actually saved.
+        phoneNumber: form.phoneNumber,
+        password: form.password,
+        role: 'USER',
+        mfaEnabled: form.mfaEnabled,
+      })
       .subscribe({
-        next: (response) => {
-          console.log('Register response:', response); // Debug log
+        next: response => {
+          this.submitting.set(false);
 
-          if (response && response.mfaEnabled) {
-            // Utilizatorul are 2FA activat - afișează QR code pentru setup
-            this.authResponse = response;
-            this.isSpinning.set(false);
-            this.showMfaEnabled = true;
-
-            // Folosește QR code-ul din răspunsul inițial - MULT MAI RAPID!
-            this.qrCodeUri = response.qrCodeUrl || '';
-            this.message.success('Account created! Please set up 2FA.', { nzDuration: 3000 });
+          if (!response?.userId) {
+            // Account created but the response is unusable — send them to login
+            // rather than leaving them half signed in.
+            this.notifications.error('register.errors.incompleteData');
+            this.router.navigateByUrl('/login');
             return;
-          } else if (response) {
-            // Utilizatorul nu are 2FA activat - loghează automat și redirectează
-            this.isSpinning.set(false);
-
-            // Verificăm că toate câmpurile necesare sunt prezente
-            if (response.userId && response.userRole && response.userFirstName && response.userLastName) {
-              const user = {
-                id: response.userId,
-                role: response.userRole,
-                firstname: response.userFirstName,
-                lastname: response.userLastName,
-                email: this.registerRequest.email || '',
-                image: response.image || null,
-                preferredTheme: response.preferredTheme || "dark",
-                preferredLanguage: response.preferredLanguage || "en",
-                mfaEnabled: response.mfaEnabled || false,
-                googleId: response.googleId || null
-              };
-
-              this.userStateService.setUser(user);
-              StorageService.saveToken(response.accessToken as string);
-
-              this.message.success('Account created successfully! Welcome!', { nzDuration: 2000 });
-              setTimeout(() => {
-                this.router.navigate(['/user/all-products']);
-              }, 1000);
-            } else {
-              this.isSpinning.set(false);
-              this.message.error('Registration completed but user data is incomplete. Please try logging in.', { nzDuration: 5000 });
-              setTimeout(() => {
-                this.router.navigate(['/login']);
-              }, 2000);
-            }
-          } else {
-            // Response este null sau undefined
-            this.isSpinning.set(false);
-            this.message.success('Account created successfully! Please log in.', { nzDuration: 3000 });
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
           }
+
+          if (response.mfaEnabled) {
+            this.mfaResponse.set(response);
+            this.notifications.success('register.success.mfaReady');
+            return;
+          }
+
+          this.completeSignUp(response, 'register.success.created');
         },
-        error: (err) => {
-          this.isSpinning.set(false);
-          if (err.status === 400) {
-            this.message.error('Email already exists or invalid data', { nzDuration: 5000 });
-          } else {
-            this.message.error('Registration failed. Please try again.', { nzDuration: 5000 });
-          }
-        }
+        error: error => {
+          this.submitting.set(false);
+          this.notifications.error(
+            error?.status === 400 ? 'register.errors.emailExists' : 'register.errors.generic'
+          );
+        },
       });
   }
 
-  verifyTfa() {
-    if (this.otpCode.length !== 6) {
-      this.message.error('Code must be 6 digits', { nzDuration: 3000 });
+  protected verifyCode(): void {
+    if (this.otpForm.invalid) {
+      this.otpForm.markAllAsTouched();
       return;
     }
 
-    this.isVerifying.set(true);
+    this.submitting.set(true);
+    const email = this.registerForm.getRawValue().email;
 
-    const verifyRequest: VerificationRequest = {
-      email: this.registerRequest.email,
-      code: this.otpCode
+    this.authService.verifyCode({ email, code: this.otpForm.getRawValue().code }).subscribe({
+      next: response => {
+        this.submitting.set(false);
+        this.completeSignUp({ ...response, mfaEnabled: true }, 'register.success.verified');
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.otpForm.reset();
+        this.notifications.error('register.errors.invalidCode');
+      },
+    });
+  }
+
+  /** Stores the session for the freshly created account and lands on the shop. */
+  private completeSignUp(response: AuthenticationResponse, successKey: string): void {
+    const form = this.registerForm.getRawValue();
+
+    const user = {
+      id: response.userId,
+      role: response.userRole,
+      firstname: response.userFirstName,
+      lastname: response.userLastName,
+      email: form.email,
+      phoneNumber: response.phoneNumber ?? form.phoneNumber,
+      image: response.image ?? null,
+      // The frozen backend hardcodes `preferredTheme = "dark"` for every new
+      // account, so a brand-new user would always land in dark mode even though
+      // nobody chose it. Override here and persist the override through the
+      // existing endpoint. Accounts that genuinely hold 'dark' are untouched —
+      // this path only ever runs for an account created seconds ago.
+      preferredTheme: 'light',
+      preferredLanguage: response.preferredLanguage ?? 'en',
+      mfaEnabled: response.mfaEnabled ?? false,
+      googleId: response.googleId ?? null,
     };
 
-    this.authService.verifyCode(verifyRequest)
-      .subscribe({
-        next: (response) => {
-          // Salvez datele utilizatorului din response (care conține toate datele după verificare)
-          let userImage;
+    StorageService.saveToken(response.accessToken as string);
+    StorageService.saveUser(user);
+    this.userState.setUser(user);
+    this.themeService.setTheme('light');
 
-          const user = {
-            id: response.userId,
-            role: response.userRole,
-            firstname: response.userFirstName,
-            lastname: response.userLastName,
-            email: this.registerRequest.email || '',
-            image: response.image || null, // Backend-ul returnează acum image,
-            preferredTheme: response.preferredTheme || "dark",
-            preferredLanguage: response.preferredLanguage || "en",
-            mfaEnabled: true,
-            googleId: response.googleId || null
-          };
+    // Best-effort: a failure here only means the server keeps its own default,
+    // so it must not block the user from reaching the shop.
+    this.userService.updatePreferredTheme(user.id, 'light').subscribe({ error: () => {} });
 
-          this.userStateService.setUser(user);
-          StorageService.saveToken(response.accessToken as string);
-
-          this.message.success('2FA verified successfully! Welcome!', { nzDuration: 2000 });
-
-          setTimeout(() => {
-            this.isVerifying.set(false);
-            this.router.navigate(['/user/all-products']);
-          }, 1000);
-        },
-        error: (err) => {
-          this.isVerifying.set(false);
-          if (err.status === 400 || err.status === 401) {
-            this.message.error('Verification code is incorrect', { nzDuration: 5000 });
-          } else {
-            this.message.error('Verification failed. Please try again.', { nzDuration: 5000 });
-          }
-          this.otpCode = '';
-        }
-      });
+    this.notifications.success(successKey);
+    this.router.navigateByUrl('/user/all-products');
   }
+}
 
-  onQrCodeLoaded() {
-    console.log('QR Code loaded successfully!');
-  }
-
-  onQrCodeError(event: any) {
-    console.error('QR Code failed to load:', event);
-    console.error('QR Code URL was:', this.qrCodeUri);
-  }
-
+/** Cross-field check: `confirmPassword` must match `password`. */
+function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value;
+  const confirmPassword = group.get('confirmPassword')?.value;
+  return password === confirmPassword ? null : { passwordsMismatch: true };
 }

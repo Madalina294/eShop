@@ -36,7 +36,6 @@ import { API_ORIGIN } from '../../core/http/image-url';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
@@ -148,7 +147,7 @@ export class LoginComponent {
       email,
       phoneNumber: response.phoneNumber ?? '',
       image: response.image ?? null,
-      preferredTheme: response.preferredTheme ?? 'dark',
+      preferredTheme: response.preferredTheme ?? 'light',
       preferredLanguage: response.preferredLanguage ?? 'en',
       mfaEnabled: response.mfaEnabled ?? false,
       googleId: response.googleId ?? null,

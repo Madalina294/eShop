@@ -1,52 +1,77 @@
-<!-- The auth screens render without the app header, so language and
-     theme controls live on the page itself. -->
-<app-auth-controls />
+<div class="auth">
+  <app-auth-controls />
 
-<div class="enter-email-container">
-  <div class="email-container">
-    <nz-spin
-      [nzSpinning]="isSpinning()"
-      [nzSize]="'large'"
-      [nzTip]="'enterEmail.redirecting' | translate"
-      class="proccesing-spinner"
-    >
-      <div class="card-header">
-        <h1 class="form-title">{{ "enterEmail.title" | translate }}</h1>
-        <p class="form-subtitle">{{ "enterEmail.subtitle" | translate }}</p>
+  <aside class="auth__showcase">
+    <span class="auth__glow auth__glow--one" aria-hidden="true"></span>
+    <span class="auth__glow auth__glow--two" aria-hidden="true"></span>
+
+    <div class="auth__showcase-inner">
+      <a class="brand" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
+
+      <div class="auth__pitch">
+        <h2 class="auth__pitch-title">{{ "login.brandTitle" | translate }}</h2>
+        <p class="auth__pitch-text">{{ "login.brandText" | translate }}</p>
       </div>
 
-      <form
-        nz-form
-        [formGroup]="emailForm"
-        (ngSubmit)="onSubmit()"
-        class="email-form"
-      >
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="'enterEmail.emailInvalid' | translate"
-            [nzValidateStatus]="emailForm.controls['email']"
-          >
-            <input
-              nz-input
-              [placeholder]="'enterEmail.emailPlaceholder' | translate"
-              id="email"
-              formControlName="email"
-              class="form-input"
-            />
-          </nz-form-control>
-        </nz-form-item>
+      <p class="auth__legal">&copy; {{ year }} {{ "app.name" | translate }}</p>
+    </div>
+  </aside>
+
+  <main class="auth__panel">
+    <div class="auth-card">
+      <a class="brand brand--compact" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
+
+      <header class="auth-card__header">
+        <h1 class="auth-card__title">{{ "enterEmail.title" | translate }}</h1>
+        <p class="auth-card__subtitle">{{ "enterEmail.subtitle" | translate }}</p>
+      </header>
+
+      <form class="auth-card__form" [formGroup]="emailForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ "enterEmail.emailPlaceholder" | translate }}</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          <mat-icon matSuffix>mail_outline</mat-icon>
+          @if (emailForm.controls.email.hasError("required")) {
+            <mat-error>{{ "common.required" | translate }}</mat-error>
+          } @else if (emailForm.controls.email.hasError("email")) {
+            <mat-error>{{ "enterEmail.emailInvalid" | translate }}</mat-error>
+          }
+        </mat-form-field>
 
         <button
-          nz-button
-          class="submit-button"
-          [nzType]="'primary'"
+          mat-flat-button
+          color="primary"
           type="submit"
-          [disabled]="emailForm.invalid"
+          class="auth-card__submit"
+          [disabled]="submitting()"
         >
-          {{ "enterEmail.sendEmail" | translate }}
+          @if (submitting()) {
+            <mat-progress-spinner mode="indeterminate" diameter="18" />
+          } @else {
+            <mat-icon>send</mat-icon>
+          }
+          <span>{{
+            (submitting() ? "enterEmail.redirecting" : "enterEmail.sendEmail") | translate
+          }}</span>
         </button>
       </form>
-    </nz-spin>
-  </div>
+
+      <p class="auth-card__footer">
+        <a routerLink="/login">{{ "resetPassword.backToSignIn" | translate }}</a>
+      </p>
+    </div>
+  </main>
 </div>

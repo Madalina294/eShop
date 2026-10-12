@@ -12,6 +12,7 @@
     "manageUsers": "Manage Users",
     "adminProfile": "Admin Profile",
     "homePage": "Home Page",
+    "about": "About us",
     "myDashboard": "My Dashboard",
     "myAccount": "My Account",
     "welcome": "Welcome",
@@ -176,7 +177,22 @@
     "mfaSubtitle": "Secure your account with 2FA",
     "complete": "Complete Registration",
     "helpTitle": "Need help?",
-    "helpText": "Make sure your device's time is synchronized and that you've entered the code correctly."
+    "helpText": "Make sure your device's time is synchronized and that you've entered the code correctly.",
+    "brandTitle": "Create your account in under a minute.",
+    "brandText": "One account for your cart, your wishlist and every order you place.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "errors": {
+      "emailExists": "An account with that email already exists.",
+      "generic": "We could not create your account. Please try again.",
+      "invalidCode": "That code is not valid. Check your authenticator app and try again.",
+      "incompleteData": "Your account was created, but we could not sign you in. Please log in."
+    },
+    "success": {
+      "created": "Welcome! Your account is ready.",
+      "mfaReady": "Account created. Now set up two-factor authentication.",
+      "verified": "Two-factor authentication is on. Welcome!"
+    }
   },
   "oauth": {
     "processing": {
@@ -864,7 +880,8 @@
     "profile": "My profile",
     "updatePassword": "Change password",
     "preferences": "Preferences",
-    "notFound": "Page not found"
+    "notFound": "Page not found",
+    "about": "About us"
   },
   "footer": {
     "tagline": "Browse the catalogue, save your favourites and check out securely.",
@@ -894,5 +911,50 @@
   "orderConfirmation": {
     "cancelledTitle": "Order cancelled",
     "cancelledMessage": "This order is no longer being processed. Any payment taken will be refunded."
+  },
+  "about": {
+    "title": "About us",
+    "subtitle": "Who we are and how we work",
+    "since": "Independent shop since 2017",
+    "cta": "Browse the catalogue",
+    "story": {
+      "title": "A shop built around a short list",
+      "text": "eShop started in a two-room office in Cluj-Napoca, with one rule we still keep: we only list a product once someone on the team has actually used it. That makes our catalogue smaller than it could be, and it means we can answer a question about any item on the site without reading from a datasheet. Today we are twenty-six people between the warehouse in Florești and the support desk, and the rule has not changed."
+    },
+    "stats": {
+      "title": "In numbers",
+      "products": "Products in the catalogue",
+      "customers": "Customers served",
+      "delivery": "Working days to delivery",
+      "rating": "Average review score"
+    },
+    "values": {
+      "title": "What we hold to",
+      "curated": {
+        "title": "Chosen, not collected",
+        "text": "Every product is tested by the team before it goes live. If it does not earn its place, it does not get listed — however well it would sell."
+      },
+      "fair": {
+        "title": "One honest price",
+        "text": "The price you see is the price you pay. No invented discounts, no countdown timers, no fees that appear at the last step of checkout."
+      },
+      "delivery": {
+        "title": "Delivered when we say",
+        "text": "Orders placed before 2pm leave the warehouse the same day. If something is going to be late, you hear it from us first, not from the courier."
+      },
+      "support": {
+        "title": "People, not scripts",
+        "text": "Support is handled in-house by the same team that picks the products. Thirty days to return anything, no reason required."
+      }
+    },
+    "contact": {
+      "title": "Get in touch",
+      "address": "Address",
+      "addressValue": "Str. Memorandumului 28, Cluj-Napoca, Romania",
+      "email": "Email",
+      "phone": "Phone",
+      "hours": "Hours",
+      "hoursValue": "Monday to Friday, 9:00 – 18:00"
+    }
   }
 }

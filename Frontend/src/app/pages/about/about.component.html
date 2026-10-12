@@ -1,0 +1,75 @@
+<div class="page">
+  <app-page-header
+    icon="storefront"
+    [title]="'about.title' | translate"
+    [subtitle]="'about.subtitle' | translate"
+  />
+
+  <!-- Story -->
+  <section class="about__hero hero-gradient">
+    <div class="about__hero-inner">
+      <p class="about__eyebrow">{{ "about.since" | translate }}</p>
+      <h2 class="about__hero-title">{{ "about.story.title" | translate }}</h2>
+      <p class="about__hero-text">{{ "about.story.text" | translate }}</p>
+    </div>
+  </section>
+
+  <!-- Numbers -->
+  <section class="about__stats" [attr.aria-label]="'about.stats.title' | translate">
+    @for (stat of stats; track stat.label) {
+      <div class="about__stat surface">
+        <mat-icon class="about__stat-icon" aria-hidden="true">{{ stat.icon }}</mat-icon>
+        <span class="about__stat-value">{{ stat.value }}</span>
+        <span class="about__stat-label">{{ stat.label | translate }}</span>
+      </div>
+    }
+  </section>
+
+  <!-- Values -->
+  <section class="about__section">
+    <h2 class="about__section-title">{{ "about.values.title" | translate }}</h2>
+
+    <div class="about__values">
+      @for (value of values; track value.title) {
+        <article class="about__value surface">
+          <span class="about__value-icon">
+            <mat-icon aria-hidden="true">{{ value.icon }}</mat-icon>
+          </span>
+          <h3 class="about__value-title">{{ value.title | translate }}</h3>
+          <p class="about__value-text">{{ value.text | translate }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="about__section">
+    <h2 class="about__section-title">{{ "about.contact.title" | translate }}</h2>
+
+    <div class="about__contact panel">
+      <dl class="data-rows">
+        <div class="data-rows__row">
+          <dt>{{ "about.contact.address" | translate }}</dt>
+          <dd>{{ "about.contact.addressValue" | translate }}</dd>
+        </div>
+        <div class="data-rows__row">
+          <dt>{{ "about.contact.email" | translate }}</dt>
+          <dd><a href="mailto:contact@eshop.ro">contact&#64;eshop.ro</a></dd>
+        </div>
+        <div class="data-rows__row">
+          <dt>{{ "about.contact.phone" | translate }}</dt>
+          <dd><a href="tel:+40721000000">+40 721 000 000</a></dd>
+        </div>
+        <div class="data-rows__row">
+          <dt>{{ "about.contact.hours" | translate }}</dt>
+          <dd>{{ "about.contact.hoursValue" | translate }}</dd>
+        </div>
+      </dl>
+
+      <a mat-flat-button color="primary" routerLink="/user/all-products" class="about__cta">
+        <mat-icon>storefront</mat-icon>
+        <span>{{ "about.cta" | translate }}</span>
+      </a>
+    </div>
+  </section>
+</div>

@@ -18,10 +18,18 @@
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid var(--header-border);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
 
   // Without blur support the bar must be near-opaque to stay readable.
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     background: var(--header-bg-solid);
+  }
+
+  // At the top of the page a hard rule is enough. Once content slides beneath
+  // the bar, trade the rule for a soft shadow so the bar reads as lifted.
+  :host(.is-scrolled) & {
+    border-bottom-color: transparent;
+    box-shadow: var(--shadow-2);
   }
 
   &__inner {
@@ -100,7 +108,7 @@
   &__nav-link {
     position: relative;
     padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-full);
     color: var(--text-secondary);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
@@ -117,9 +125,24 @@
       text-decoration: none;
     }
 
+    // A filled pill plus a short underline: colour alone is a weak cue for the
+    // current page, and the underline survives a colour-blind read.
     &.is-active {
       color: var(--brand);
       background: var(--header-active);
+      font-weight: var(--weight-semibold);
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: calc(var(--space-1) * -1);
+        width: 18px;
+        height: 2px;
+        border-radius: var(--radius-full);
+        background: var(--brand);
+        transform: translateX(-50%);
+      }
     }
   }
 
@@ -223,6 +246,8 @@
   }
 
   &__action {
+    @include m.icon-control;
+
     color: var(--text-secondary);
     transition: color var(--duration-fast) var(--ease-out);
 
@@ -235,55 +260,44 @@
   // Always visible: a signed-out visitor on a phone has no other way to
   // switch language, since the drawer only exists once signed in.
   &__lang {
-    display: inline-flex;
-    flex: 0 0 auto;
-    height: 30px;
-    border-radius: var(--radius-full);
-    overflow: hidden;
+    @include m.segmented-pill;
 
-    // Strip Material's chrome: the group reads as one quiet pill.
-    --mat-standard-button-toggle-divider-color: transparent;
-    --mat-standard-button-toggle-background-color: transparent;
+    background: var(--header-hover);
+
     --mat-standard-button-toggle-text-color: var(--text-tertiary);
     --mat-standard-button-toggle-selected-state-background-color: var(--header-active);
     --mat-standard-button-toggle-selected-state-text-color: var(--brand);
-    --mat-standard-button-toggle-hover-state-layer-opacity: 0;
 
-    background: var(--header-hover);
-    border: 0;
-
-    .mat-button-toggle {
-      border: 0;
-    }
-
-    .mat-button-toggle-label-content {
-      line-height: 28px;
-      padding-inline: var(--space-2);
-      font-size: var(--text-xs);
-      font-weight: var(--weight-semibold);
-      letter-spacing: 0.02em;
-    }
-
-    @include m.respond-to(md) {
+    // Tighter than the shared default: the toolbar is crowded on small screens.
+    @include m.respond-below(md) {
       .mat-button-toggle-label-content {
-        padding-inline: var(--space-3);
+        padding-inline: var(--space-2);
       }
     }
   }
 
   // --- Account --------------------------------------------------------------
 
+  // A bare button so the avatar is the whole target — no Material padding, no
+  // label box to keep in sync with the name length.
   &__account {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    min-width: 0;
-    padding-inline: var(--space-2);
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    margin-inline-start: var(--space-1);
+    padding: 0;
+    border: 0;
     border-radius: var(--radius-full);
+    background: transparent;
     color: var(--text-secondary);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+    @include m.focus-ring;
 
     &:hover {
-      color: var(--text-primary);
       background: var(--header-hover);
     }
   }
@@ -308,28 +322,26 @@
     }
   }
 
-  &__account-name {
-    display: none;
-    max-width: 14ch;
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
-    @include m.truncate;
-
-    @include m.respond-to(lg) {
-      display: inline;
-    }
+  // Identity moved off the toolbar and into the menu it opens.
+  &__menu-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-3) var(--space-4) var(--space-2);
+    max-width: 260px;
   }
 
-  &__account-caret {
-    display: none;
-    width: 18px;
-    height: 18px;
-    font-size: 18px;
-    color: var(--text-tertiary);
+  &__menu-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+    @include m.truncate;
+  }
 
-    @include m.respond-to(lg) {
-      display: inline-block;
-    }
+  &__menu-email {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    @include m.truncate;
   }
 
   &__login-label {
@@ -337,105 +349,6 @@
 
     @include m.respond-to(sm) {
       display: inline;
-    }
-  }
-}
-
-// ============================================================================
-//  MOBILE DRAWER
-// ============================================================================
-
-.mobile-nav-backdrop {
-  position: fixed;
-  inset: var(--header-height) 0 0;
-  z-index: var(--z-overlay);
-  background: var(--overlay);
-  animation: fade-in var(--duration-fast) var(--ease-out) both;
-
-  @include m.respond-to(lg) {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-.mobile-nav {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  z-index: calc(var(--z-overlay) + 1);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  max-height: calc(100vh - var(--header-height));
-  overflow-y: auto;
-  padding: var(--space-3);
-  background: var(--surface-1);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-3);
-  animation: fade-in-up var(--duration-normal) var(--ease-out) both;
-
-  @include m.respond-to(lg) {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  &__link {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    width: 100%;
-    min-height: 48px;
-    padding: var(--space-3);
-    border: 0;
-    border-radius: var(--radius-md);
-    background: none;
-    font: inherit;
-    font-size: var(--text-base);
-    font-weight: var(--weight-medium);
-    text-align: left;
-    text-decoration: none;
-    color: var(--text-primary);
-    cursor: pointer;
-    @include m.focus-ring;
-
-    &:hover {
-      background: var(--surface-2);
-      text-decoration: none;
-      color: var(--text-primary);
-    }
-
-    &.is-active {
-      background: var(--brand-soft);
-      color: var(--brand);
-    }
-
-    mat-icon {
-      flex: 0 0 auto;
-      color: var(--text-tertiary);
-    }
-
-    &.is-active mat-icon {
-      color: var(--brand);
-    }
-
-    &--danger {
-      color: var(--error);
-
-      mat-icon {
-        color: var(--error);
-      }
-
-      &:hover {
-        background: var(--error-soft);
-        color: var(--error);
-      }
     }
   }
 }

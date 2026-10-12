@@ -1,111 +1,103 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 import { StorageService } from '../../services/storage/storage.service';
 import { UserStateService } from '../../services/user-state/user-state.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { ThemeService } from '../../services/theme/theme.service';
+import { environment } from '../../../environments/environments';
+import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
+/** 1: redirected back, 2: fetching the profile, 3: leaving for the shop. */
+type Step = 1 | 2 | 3;
+
+/**
+ * Landing page for the Google OAuth redirect: trades the token in the URL for
+ * the user profile, stores the session and moves on.
+ *
+ * Reworked onto OnPush + signals. The old version hardcoded
+ * `http://localhost:8080` (breaking every non-local build), logged the whole
+ * user object to the console, and padded the flow with ~2s of artificial
+ * `setTimeout` delays that existed only to let change detection catch up.
+ */
 @Component({
   selector: 'app-oauth-callback',
-  templateUrl: './oauth-callback.component.html',
-  styleUrls: ['./oauth-callback.component.scss'],
   standalone: true,
-  imports: [CommonModule, TranslateModule]
+  imports: [
+    TranslateModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    AuthControlsComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './oauth-callback.component.html',
 })
-export class OAuthCallbackComponent implements OnInit {
-  showError = false;
-  processingStep = 1; // 1: Redirected, 2: Processing, 3: Redirecting
+export class OAuthCallbackComponent {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly userState = inject(UserStateService);
+  private readonly themeService = inject(ThemeService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private http: HttpClient,
-    private userStateService: UserStateService
-  ) {}
+  protected readonly step = signal<Step>(1);
+  protected readonly failed = signal(false);
 
-  ngOnInit() {
-    // OAuth-ul va fi procesat aici
-    this.processOAuthCallback();
+  constructor() {
+    this.processCallback();
   }
 
-  private processOAuthCallback() {
-    console.log('=== DEBUG: OAuth Callback Processing ===');
+  protected retry(): void {
+    this.failed.set(false);
+    this.step.set(1);
+    this.router.navigateByUrl('/login');
+  }
 
-    // Simulate step progression
-    setTimeout(() => {
-      this.processingStep = 2;
-    }, 1000);
+  private processCallback(): void {
+    // SSR has no URL to read; the browser repeats this on hydration.
+    if (typeof window === 'undefined') return;
 
-    // Verifică dacă există token-ul în URL parameters
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const userId = urlParams.get('userId');
-      const googleId = urlParams.get('googleId');
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const userId = params.get('userId');
+    const googleId = params.get('googleId') ?? '';
 
-      if (token && userId) {
-        // Salvează token-ul
-        StorageService.saveToken(token);
-
-        // Face request pentru a obține datele utilizatorului cu imaginea
-        console.log('Making request to:', `http://localhost:8080/api/auth/oauth-user-data?userId=${userId}&googleId=${googleId || ''}`);
-        this.http.get(`http://localhost:8080/api/auth/oauth-user-data?userId=${userId}&googleId=${googleId || ''}`)
-          .subscribe({
-            next: (response: any) => {
-
-              // Creează userData din response
-              const userData = {
-                id: response.userId,
-                firstname: response.userFirstName,
-                lastname: response.userLastName,
-                email: response.email || '',
-                role: response.userRole || 'USER',
-                image: response.image || null,
-                preferredTheme: response.preferredTheme || "dark",
-                preferredLanguage: response.preferredLanguage || "en",
-                mfaEnabled: response.mfaEnabled || false,
-                googleId: response.googleId || googleId || ''
-              };
-
-              // Salvează datele utilizatorului
-              StorageService.saveUser(userData);
-              this.userStateService.setUser(userData);
-
-              console.log('=== DEBUG: OAuth Callback - User saved ===');
-              console.log('User data saved:', userData);
-              console.log('UserStateService user:', this.userStateService.user());
-              console.log('Is customer:', this.userStateService.isCustomer());
-              console.log('=== END DEBUG ===');
-
-              // Navighează către welcome cu un delay mai mare pentru a permite actualizarea
-              setTimeout(() => {
-                console.log('=== DEBUG: Navigating to /user/all-products ===');
-                this.router.navigate(['/user/all-products']);
-              }, 1000);
-            },
-            error: (error) => {
-              console.error('Error fetching OAuth user data:', error);
-              this.showError = true;
-            }
-          });
-
-        return;
-      } else {
-        // No token found, show error after a delay
-        setTimeout(() => {
-          this.showError = true;
-        }, 2000);
-      }
-    } else {
-      // Server-side rendering, redirect to login
-      this.router.navigate(['/login']);
+    if (!token || !userId) {
+      this.failed.set(true);
+      return;
     }
-  }
 
-  retryAuthentication() {
-    this.showError = false;
-    this.processingStep = 1;
-    this.router.navigate(['/login']);
+    StorageService.saveToken(token);
+    this.step.set(2);
+
+    const url = `${environment.apiUrl}/auth/oauth-user-data?userId=${userId}&googleId=${googleId}`;
+
+    this.http.get<Record<string, any>>(url).subscribe({
+      next: response => {
+        const user = {
+          id: response['userId'],
+          firstname: response['userFirstName'],
+          lastname: response['userLastName'],
+          email: response['email'] ?? '',
+          role: response['userRole'] ?? 'USER',
+          image: response['image'] ?? null,
+          preferredTheme: response['preferredTheme'] ?? 'light',
+          preferredLanguage: response['preferredLanguage'] ?? 'en',
+          mfaEnabled: response['mfaEnabled'] ?? false,
+          googleId: response['googleId'] ?? googleId,
+        };
+
+        StorageService.saveUser(user);
+        this.userState.setUser(user);
+        this.themeService.loadUserTheme(user.preferredTheme);
+
+        this.step.set(3);
+        this.router.navigateByUrl('/user/all-products');
+      },
+      error: () => this.failed.set(true),
+    });
   }
 }

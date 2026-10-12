@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
@@ -18,17 +18,15 @@ import { ThemeService } from '../../../services/theme/theme.service';
 import { LanguageService } from '../../../services/language/language.service';
 import { CartStateService } from '../../state/cart-state.service';
 import { avatarUrl } from '../../../core/http/image-url';
+import { MobileNavComponent } from '../mobile-nav/mobile-nav.component';
+import { NavItem } from '../nav-item';
 
-interface NavItem {
-  readonly label: string;
-  readonly link: string;
-  readonly icon: string;
-}
-
+// Cart and wishlist deliberately absent: they already have badge buttons in the
+// action row, and listing them here too put the same two destinations on screen
+// twice.
 const CUSTOMER_NAV: readonly NavItem[] = [
   { label: 'header.homePage', link: '/user/all-products', icon: 'storefront' },
-  { label: 'cart.title', link: '/user/cart', icon: 'shopping_cart' },
-  { label: 'wishlist.title', link: '/user/wishlist', icon: 'favorite_border' },
+  { label: 'header.about', link: '/about', icon: 'info' },
 ];
 
 const ADMIN_NAV: readonly NavItem[] = [
@@ -62,15 +60,20 @@ const ADMIN_NAV: readonly NavItem[] = [
     MatToolbarModule,
     MatTooltipModule,
     TranslateModule,
+    MobileNavComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.scss',
+  host: {
+    '[class.is-scrolled]': 'scrolled()',
+  },
 })
 export class AppHeaderComponent {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
   private readonly themeService = inject(ThemeService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly userState = inject(UserStateService);
   protected readonly cartState = inject(CartStateService);
@@ -97,6 +100,22 @@ export class AppHeaderComponent {
 
   /** First letter of the user's name, shown when there is no avatar image. */
   protected readonly initial = computed(() => this.userName().trim().charAt(0).toUpperCase());
+
+  /**
+   * True once the page has scrolled off the top, so the frosted bar can lift
+   * onto a soft shadow instead of sitting on a hard border.
+   */
+  protected readonly scrolled = signal(false);
+
+  constructor() {
+    // SSR renders without a window; the bar simply starts in its flat state.
+    if (typeof window !== 'undefined') {
+      const onScroll = () => this.scrolled.set(window.scrollY > 4);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
+    }
+  }
 
   protected readonly navItems = computed<readonly NavItem[]>(() =>
     this.isAdmin() ? ADMIN_NAV : this.isCustomer() ? CUSTOMER_NAV : []

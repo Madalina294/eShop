@@ -9,7 +9,7 @@ export interface UserState {
   phoneNumber?: string;
   role: string;
   image: string | null;
-  preferredTheme: string | "dark";
+  preferredTheme: string;
   preferredLanguage: string | "en"
   mfaEnabled: boolean;
   googleId?: string | null;

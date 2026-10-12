@@ -1,69 +1,74 @@
-import {Component, signal} from '@angular/core';
-import {NzSpinComponent} from "ng-zorro-antd/spin";
-import {NzFormControlComponent, NzFormDirective} from 'ng-zorro-antd/form';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
-import {NzInputDirective} from 'ng-zorro-antd/input';
-import {NzButtonComponent} from 'ng-zorro-antd/button';
-import {ActivatedRoute, Router} from '@angular/router';
-import {AuthenticationService} from '../../services/auth/authentication.service';
-import {NzMessageService} from 'ng-zorro-antd/message';
-import {UserState, UserStateService} from '../../services/user-state/user-state.service';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AuthenticationService } from '../../services/auth/authentication.service';
+import { NotificationService } from '../../shared/notification/notification.service';
 import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
+/**
+ * Step one of the password reset: ask for the account email and have the
+ * backend send a reset code.
+ *
+ * Rewritten off ng-zorro onto the shared `.auth` layout. Besides the stack
+ * change, the old `onSubmit()` only gated the spinner on validity and then
+ * called the API regardless — an empty or malformed email was still sent.
+ */
 @Component({
   selector: 'app-enter-email',
+  standalone: true,
   imports: [
-    NzSpinComponent,
-    NzFormDirective,
     ReactiveFormsModule,
-    NzColDirective,
-    NzFormControlComponent,
-    NzInputDirective,
-    NzRowDirective,
-    NzButtonComponent,
-    TranslateModule
-  ,
-    AuthControlsComponent
+    RouterLink,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    AuthControlsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './enter-email.component.html',
-  styleUrl: './enter-email.component.scss'
 })
 export class EnterEmailComponent {
-  isSpinning = signal(false);
-  emailForm!: FormGroup;
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthenticationService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
 
-  constructor(private router: Router,
-              private fb: FormBuilder,
-              private authService: AuthenticationService,
-              private message: NzMessageService,
-              private translate: TranslateService){
-    this.emailForm = this.fb.group({
-      email:['', [Validators.required, Validators.email]]
-    });
+  protected readonly year = new Date().getFullYear();
+  protected readonly submitting = signal(false);
 
+  protected readonly emailForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+  });
 
-  }
-
-  onSubmit() {
-    if(this.emailForm.valid){
-      this.isSpinning.set(true);
+  protected onSubmit(): void {
+    if (this.emailForm.invalid) {
+      this.emailForm.markAllAsTouched();
+      return;
     }
-    const userEmail = this.emailForm.get('email')?.value;
-    this.authService.forgotPassword(userEmail).subscribe({
-      next: (response) =>{
-        this.isSpinning.set(false); // Stop spinner first
-        this.message.success(this.translate.instant('enterEmail.successMessage'));
-        // Redirect to reset password page with email
-        this.router.navigate(['/reset-password'], {
-          queryParams: { email: userEmail }
-        });
+
+    this.submitting.set(true);
+    const email = this.emailForm.getRawValue().email;
+
+    this.authService.forgotPassword(email).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notifications.success('enterEmail.successMessage');
+        this.router.navigate(['/reset-password'], { queryParams: { email } });
       },
-      error: (response) => {
-        this.isSpinning.set(false);
-        this.message.error(this.translate.instant('enterEmail.errorMessage'));
-      }
-    })
+      error: () => {
+        this.submitting.set(false);
+        this.notifications.error('enterEmail.errorMessage');
+      },
+    });
   }
 }

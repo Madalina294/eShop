@@ -1,290 +1,264 @@
-<!-- The auth screens render without the app header, so language and
-     theme controls live on the page itself. -->
-<app-auth-controls />
+<div class="auth">
+  <!-- Language and theme live on the page: the auth screens render without the
+       app header, and a visitor must be able to switch before signing up. -->
+  <app-auth-controls />
 
-<!-- Main Container -->
-<div class="register-page-container">
-  <!-- Registration Form Section -->
-  <div class="register-card" *ngIf="!authResponse?.mfaEnabled">
-    <nz-spin
-      [nzSpinning]="isSpinning()"
-      [nzSize]="'large'"
-      [nzTip]="'register.creatingAccount' | translate"
-      class="register-spinner"
-    >
-      <div class="card-header">
-        <h1 class="register-title">{{ "register.title" | translate }}</h1>
-        <p class="register-subtitle">{{ "register.subtitle" | translate }}</p>
+  <aside class="auth__showcase">
+    <span class="auth__glow auth__glow--one" aria-hidden="true"></span>
+    <span class="auth__glow auth__glow--two" aria-hidden="true"></span>
+
+    <div class="auth__showcase-inner">
+      <a class="brand" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
+
+      <div class="auth__pitch">
+        <h2 class="auth__pitch-title">{{ "register.brandTitle" | translate }}</h2>
+        <p class="auth__pitch-text">{{ "register.brandText" | translate }}</p>
+
+        <ul class="auth__perks">
+          <li>
+            <mat-icon aria-hidden="true">local_shipping</mat-icon>
+            {{ "login.perkDelivery" | translate }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">lock</mat-icon>
+            {{ "login.perkSecure" | translate }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">favorite</mat-icon>
+            {{ "login.perkWishlist" | translate }}
+          </li>
+        </ul>
       </div>
 
-      <form
-        nz-form
-        [formGroup]="registerForm"
-        (ngSubmit)="registerUser()"
-        class="register-form"
-      >
-        <!-- First Name -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="firstNameErrorTpl"
-            [nzValidateStatus]="registerForm.controls['firstname']"
-          >
-            <input
-              nz-input
-              placeholder="{{ 'register.firstName' | translate }}"
-              formControlName="firstname"
-              class="form-input"
-            />
-            <ng-template #firstNameErrorTpl let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "register.firstNameRequired" | translate }}
-              </ng-container>
-              <ng-container *ngIf="control.hasError('minlength')">
-                {{ "register.firstNameMin" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
+      <p class="auth__legal">&copy; {{ year }} {{ "app.name" | translate }}</p>
+    </div>
+  </aside>
 
-        <!-- Last Name -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="lastNameErrorTpl"
-            [nzValidateStatus]="registerForm.controls['lastname']"
-          >
-            <input
-              nz-input
-              placeholder="{{ 'register.lastName' | translate }}"
-              formControlName="lastname"
-              class="form-input"
-            />
-            <ng-template #lastNameErrorTpl let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "register.lastNameRequired" | translate }}
-              </ng-container>
-              <ng-container *ngIf="control.hasError('minlength')">
-                {{ "register.lastNameMin" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
+  <main class="auth__panel">
+    <div class="auth-card auth-card--wide">
+      <a class="brand brand--compact" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
 
-        <!-- Email -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            nzErrorTip="{{ 'register.emailInvalid' | translate }}"
-            [nzValidateStatus]="registerForm.controls['email']"
-          >
+      @if (!inMfaStep()) {
+        <!-- ------------------------------------------------------------ -->
+        <!--  Account details                                              -->
+        <!-- ------------------------------------------------------------ -->
+        <header class="auth-card__header">
+          <h1 class="auth-card__title">{{ "register.title" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "register.subtitle" | translate }}</p>
+        </header>
+
+        <form class="auth-card__form" [formGroup]="registerForm" (ngSubmit)="register()">
+          <div class="auth-card__row">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ "register.firstName" | translate }}</mat-label>
+              <input matInput formControlName="firstname" autocomplete="given-name" />
+              <mat-icon matSuffix>person_outline</mat-icon>
+              @if (registerForm.controls.firstname.hasError("required")) {
+                <mat-error>{{ "register.firstNameRequired" | translate }}</mat-error>
+              } @else if (registerForm.controls.firstname.hasError("minlength")) {
+                <mat-error>{{ "register.firstNameMin" | translate }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ "register.lastName" | translate }}</mat-label>
+              <input matInput formControlName="lastname" autocomplete="family-name" />
+              <mat-icon matSuffix>person_outline</mat-icon>
+              @if (registerForm.controls.lastname.hasError("required")) {
+                <mat-error>{{ "register.lastNameRequired" | translate }}</mat-error>
+              } @else if (registerForm.controls.lastname.hasError("minlength")) {
+                <mat-error>{{ "register.lastNameMin" | translate }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "auth.email" | translate }}</mat-label>
             <input
-              nz-input
-              placeholder="{{ 'auth.email' | translate }}"
-              formControlName="email"
+              matInput
               type="email"
-              class="form-input"
+              formControlName="email"
+              autocomplete="email"
+              autocapitalize="none"
+              spellcheck="false"
             />
-          </nz-form-control>
-        </nz-form-item>
+            <mat-icon matSuffix>mail_outline</mat-icon>
+            @if (registerForm.controls.email.hasError("required")) {
+              <mat-error>{{ "common.required" | translate }}</mat-error>
+            } @else if (registerForm.controls.email.hasError("email")) {
+              <mat-error>{{ "register.emailInvalid" | translate }}</mat-error>
+            }
+          </mat-form-field>
 
-        <!-- Phone Number -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="phoneErrorTpl"
-            [nzValidateStatus]="registerForm.controls['phoneNumber']"
-          >
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "register.phoneNumber" | translate }}</mat-label>
+            <input matInput type="tel" formControlName="phoneNumber" autocomplete="tel" />
+            <mat-icon matSuffix>phone</mat-icon>
+            @if (registerForm.controls.phoneNumber.hasError("required")) {
+              <mat-error>{{ "register.phoneRequired" | translate }}</mat-error>
+            } @else if (registerForm.controls.phoneNumber.hasError("pattern")) {
+              <mat-error>{{ "register.phoneInvalid" | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "auth.password" | translate }}</mat-label>
             <input
-              nz-input
-              placeholder="{{ 'register.phoneNumber' | translate }}"
-              formControlName="phoneNumber"
-              type="tel"
-              class="form-input"
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="new-password"
             />
-            <ng-template #phoneErrorTpl let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "register.phoneRequired" | translate }}
-              </ng-container>
-              <ng-container *ngIf="control.hasError('pattern')">
-                {{ "register.phoneInvalid" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              [attr.aria-label]="
+                (passwordVisible() ? 'register.hidePassword' : 'register.showPassword') | translate
+              "
+              [attr.aria-pressed]="passwordVisible()"
+              (click)="passwordVisible.set(!passwordVisible())"
+            >
+              <mat-icon>{{ passwordVisible() ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
+            @if (registerForm.controls.password.hasError("required")) {
+              <mat-error>{{ "register.passwordRequired" | translate }}</mat-error>
+            } @else if (registerForm.controls.password.hasError("pattern")) {
+              <mat-error>{{ "register.passwordRules" | translate }}</mat-error>
+            }
+          </mat-form-field>
 
-        <!-- Password -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="passwordErrorTpl"
-            [nzValidateStatus]="registerForm.controls['password']"
-          >
-            <div class="password-input-wrapper">
-              <input
-                nz-input
-                placeholder="{{ 'auth.password' | translate }}"
-                [type]="passwordVisible() ? 'text' : 'password'"
-                formControlName="password"
-                class="form-input password-input"
-              />
-              <span
-                nz-icon
-                [nzType]="passwordVisible() ? 'eye' : 'eye-invisible'"
-                (click)="passwordVisible.set(!passwordVisible())"
-                class="eye-icon"
-              ></span>
-            </div>
-            <ng-template #passwordErrorTpl let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "register.passwordRequired" | translate }}
-              </ng-container>
-              <ng-container *ngIf="control.hasError('pattern')">
-                {{ "register.passwordRules" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
-
-        <!-- Confirm Password -->
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="confirmPasswordErrorTpl"
-            [nzValidateStatus]="registerForm.controls['confirmPassword']"
-          >
-            <div class="password-input-wrapper">
-              <input
-                nz-input
-                placeholder="{{ 'register.confirmPassword' | translate }}"
-                [type]="confirmPasswordVisible() ? 'text' : 'password'"
-                formControlName="confirmPassword"
-                class="form-input password-input"
-              />
-              <span
-                nz-icon
-                [nzType]="confirmPasswordVisible() ? 'eye' : 'eye-invisible'"
-                (click)="confirmPasswordVisible.set(!confirmPasswordVisible())"
-                class="eye-icon"
-              ></span>
-            </div>
-            <ng-template #confirmPasswordErrorTpl let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "register.confirmPasswordRequired" | translate }}
-              </ng-container>
-              <ng-container
-                *ngIf="
-                  registerForm.hasError('passwordsMismatch') && control.dirty
-                "
-              >
-                {{ "register.passwordsMismatch" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
-
-        <!-- 2FA Checkbox -->
-        <div class="checkbox-group">
-          <label class="checkbox-container">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "register.confirmPassword" | translate }}</mat-label>
             <input
-              type="checkbox"
-              formControlName="mfaEnabled"
-              class="checkbox-input"
+              matInput
+              [type]="confirmPasswordVisible() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
             />
-            <span class="checkmark"></span>
-            <span class="checkbox-text">
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              [attr.aria-label]="
+                (confirmPasswordVisible() ? 'register.hidePassword' : 'register.showPassword')
+                  | translate
+              "
+              [attr.aria-pressed]="confirmPasswordVisible()"
+              (click)="confirmPasswordVisible.set(!confirmPasswordVisible())"
+            >
+              <mat-icon>{{ confirmPasswordVisible() ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
+            @if (registerForm.controls.confirmPassword.hasError("required")) {
+              <mat-error>{{ "register.confirmPasswordRequired" | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Group-level error: only worth showing once both fields are filled
+               in and touched, otherwise it fires while the user is still typing
+               the first password. -->
+          @if (
+            registerForm.hasError("passwordsMismatch") &&
+            registerForm.controls.confirmPassword.touched &&
+            !registerForm.controls.confirmPassword.hasError("required")
+          ) {
+            <p class="auth-card__error" role="alert">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              {{ "register.passwordsMismatch" | translate }}
+            </p>
+          }
+
+          <div class="auth-card__mfa">
+            <mat-checkbox formControlName="mfaEnabled" color="primary">
               {{ "register.enableMfa" | translate }}
-            </span>
-          </label>
-          <p class="checkbox-description">
-            {{ "register.enableMfaDesc" | translate }}
-          </p>
-        </div>
+            </mat-checkbox>
+            <p class="auth-card__mfa-hint">{{ "register.enableMfaDesc" | translate }}</p>
+          </div>
 
-        <button
-          nz-button
-          class="register-button"
-          [nzType]="'primary'"
-          type="submit"
-          [disabled]="registerForm.invalid || isSpinning()"
-        >
-          {{ "register.submit" | translate }}
-        </button>
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="auth-card__submit"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              <mat-progress-spinner mode="indeterminate" diameter="18" />
+            } @else {
+              <mat-icon>person_add</mat-icon>
+            }
+            <span>{{
+              (submitting() ? "register.creatingAccount" : "register.submit") | translate
+            }}</span>
+          </button>
+        </form>
 
-        <div class="login-link">
+        <p class="auth-card__footer">
           {{ "register.alreadyHaveAccount" | translate }}
           <a routerLink="/login">{{ "auth.login" | translate }}</a>
-        </div>
-      </form>
-    </nz-spin>
-  </div>
-
-  <!-- 2FA Setup Section -->
-  <div class="register-card mfa-card" *ngIf="showMfaEnabled">
-    <nz-spin
-      [nzSpinning]="isVerifying()"
-      [nzSize]="'large'"
-      [nzTip]="'register.verifying' | translate"
-      class="verify-spinner"
-    >
-      <div class="card-header">
-        <h1 class="register-title">{{ "register.mfaTitle" | translate }}</h1>
-        <p class="register-subtitle">
-          {{ "register.mfaSubtitle" | translate }}
         </p>
-      </div>
+      } @else {
+        <!-- ------------------------------------------------------------ -->
+        <!--  Two-factor setup                                             -->
+        <!-- ------------------------------------------------------------ -->
+        <header class="auth-card__header">
+          <h1 class="auth-card__title">{{ "register.mfaTitle" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "register.mfaSubtitle" | translate }}</p>
+        </header>
 
-      <div class="qr-section">
-        <div class="qr-code-container">
-          <img
-            [src]="qrCodeUri"
-            [alt]="'mfa.qrAlt' | translate"
-            class="qr-code"
-            (load)="onQrCodeLoaded()"
-            (error)="onQrCodeError($event)"
-          />
+        @if (qrCodeUrl()) {
+          <figure class="auth-card__qr">
+            <img [src]="qrCodeUrl()" [alt]="'mfa.qrAlt' | translate" width="180" height="180" />
+            <figcaption>{{ "mfa.instructions" | translate }}</figcaption>
+          </figure>
+        }
+
+        <form class="auth-card__form" [formGroup]="otpForm" (ngSubmit)="verifyCode()">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "mfa.enterCode" | translate }}</mat-label>
+            <input
+              matInput
+              formControlName="code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              placeholder="000000"
+              class="auth-card__otp"
+            />
+            @if (otpForm.controls.code.hasError("required")) {
+              <mat-error>{{ "common.required" | translate }}</mat-error>
+            } @else if (otpForm.controls.code.hasError("pattern")) {
+              <mat-error>{{ "mfa.codeFormat" | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="auth-card__submit"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              <mat-progress-spinner mode="indeterminate" diameter="18" />
+            } @else {
+              <mat-icon>verified_user</mat-icon>
+            }
+            <span>{{ (submitting() ? "register.verifying" : "register.complete") | translate }}</span>
+          </button>
+        </form>
+
+        <div class="auth-card__help">
+          <h2 class="auth-card__help-title">{{ "register.helpTitle" | translate }}</h2>
+          <p>{{ "register.helpText" | translate }}</p>
         </div>
-        <p class="qr-instructions">
-          {{ "mfa.instructions" | translate }}
-        </p>
-      </div>
-
-      <form class="verification-form">
-        <nz-form-item>
-          <label class="verification-label">
-            {{ "mfa.enterCode" | translate }}
-          </label>
-          <input
-            nz-input
-            type="text"
-            placeholder="000000"
-            [(ngModel)]="otpCode"
-            name="otpCode"
-            maxlength="6"
-            class="verification-input"
-            [disabled]="isVerifying()"
-            (keyup.enter)="verifyTfa()"
-          />
-        </nz-form-item>
-
-        <button
-          nz-button
-          [nzType]="'primary'"
-          type="button"
-          (click)="verifyTfa()"
-          [disabled]="otpCode.length !== 6 || isVerifying()"
-          class="verify-button"
-        >
-          {{ "register.complete" | translate }}
-        </button>
-
-        <div class="help-section">
-          <p class="help-text">
-            <strong>{{ "register.helpTitle" | translate }}</strong>
-            {{ "register.helpText" | translate }}
-          </p>
-        </div>
-      </form>
-    </nz-spin>
-  </div>
+      }
+    </div>
+  </main>
 </div>

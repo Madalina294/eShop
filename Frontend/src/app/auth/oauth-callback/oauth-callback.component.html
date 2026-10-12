@@ -1,87 +1,64 @@
-<!-- OAuth Callback Container -->
-<div class="oauth-callback-container">
-  <!-- Main Processing Card -->
-  <div class="processing-card">
-    <!-- Header Section -->
-    <div class="card-header">
-      <div class="loading-icon">
-        <div class="spinner"></div>
-      </div>
-      <h1 class="processing-title">
-        {{ "oauth.processing.title" | translate }}
-      </h1>
-      <p class="processing-subtitle">
-        {{ "oauth.processing.subtitle" | translate }}
-      </p>
-    </div>
+<div class="auth auth--single">
+  <app-auth-controls />
 
-    <!-- Progress Indicator -->
-    <div class="progress-section">
-      <div class="progress-steps">
-        <div class="step" [class.completed]="processingStep >= 1">
-          <div class="step-icon">✓</div>
-          <span class="step-text">{{
-            "oauth.steps.redirected" | translate
-          }}</span>
+  <main class="auth__panel">
+    <div class="auth-card">
+      <span class="brand brand--compact">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </span>
+
+      @if (!failed()) {
+        <header class="auth-card__header">
+          <h1 class="auth-card__title">{{ "oauth.processing.title" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "oauth.processing.subtitle" | translate }}</p>
+        </header>
+
+        <div class="auth-card__progress" role="status" aria-live="polite">
+          <mat-progress-spinner mode="indeterminate" diameter="40" />
+          <p>
+            {{ (step() === 1 ? "oauth.status.verifying" : "oauth.status.loading") | translate }}
+          </p>
         </div>
-        <div
-          class="step"
-          [class.active]="processingStep === 2"
-          [class.completed]="processingStep > 2"
+
+        <ol class="auth-card__steps">
+          <li [class.is-done]="step() > 1" [class.is-current]="step() === 1">
+            <mat-icon aria-hidden="true">{{
+              step() > 1 ? "check_circle" : "radio_button_unchecked"
+            }}</mat-icon>
+            {{ "oauth.steps.redirected" | translate }}
+          </li>
+          <li [class.is-done]="step() > 2" [class.is-current]="step() === 2">
+            <mat-icon aria-hidden="true">{{
+              step() > 2 ? "check_circle" : "radio_button_unchecked"
+            }}</mat-icon>
+            {{ "oauth.steps.processing" | translate }}
+          </li>
+          <li [class.is-current]="step() === 3">
+            <mat-icon aria-hidden="true">radio_button_unchecked</mat-icon>
+            {{ "oauth.steps.redirecting" | translate }}
+          </li>
+        </ol>
+      } @else {
+        <header class="auth-card__header">
+          <span class="auth-card__status-icon auth-card__status-icon--error">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+          </span>
+          <h1 class="auth-card__title">{{ "oauth.error.title" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "oauth.error.message" | translate }}</p>
+        </header>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="auth-card__submit"
+          (click)="retry()"
         >
-          <div class="step-icon">
-            <div class="mini-spinner" *ngIf="processingStep === 2"></div>
-            <span *ngIf="processingStep !== 2">✓</span>
-          </div>
-          <span class="step-text">{{
-            "oauth.steps.processing" | translate
-          }}</span>
-        </div>
-        <div
-          class="step"
-          [class.active]="processingStep === 3"
-          [class.completed]="processingStep > 3"
-        >
-          <div class="step-icon">
-            <div class="mini-spinner" *ngIf="processingStep === 3"></div>
-            <span *ngIf="processingStep !== 3">3</span>
-          </div>
-          <span class="step-text">{{
-            "oauth.steps.redirecting" | translate
-          }}</span>
-        </div>
-      </div>
+          <mat-icon>refresh</mat-icon>
+          <span>{{ "oauth.error.retry" | translate }}</span>
+        </button>
+      }
     </div>
-
-    <!-- Status Messages -->
-    <div class="status-messages">
-      <div class="status-item">
-        <div class="status-icon">🔐</div>
-        <span class="status-text">{{
-          "oauth.status.verifying" | translate
-        }}</span>
-      </div>
-      <div class="status-item">
-        <div class="status-icon">👤</div>
-        <span class="status-text">{{
-          "oauth.status.loading" | translate
-        }}</span>
-      </div>
-    </div>
-
-    <!-- Error State -->
-    <div class="error-state" *ngIf="showError">
-      <div class="error-icon">⚠️</div>
-      <h3 class="error-title">{{ "oauth.error.title" | translate }}</h3>
-      <p class="error-message">
-        {{ "oauth.error.message" | translate }}
-      </p>
-      <button class="retry-button" (click)="retryAuthentication()">
-        {{ "oauth.error.retry" | translate }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Background Pattern -->
-  <div class="background-pattern"></div>
+  </main>
 </div>

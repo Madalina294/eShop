@@ -29,7 +29,7 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
   styleUrl: './edit-preferences.component.scss'
 })
 export class EditPreferencesComponent implements OnInit, OnDestroy {
-  selectedTheme = signal("dark");
+  selectedTheme = signal("light");
   selectedLanguage = signal("en")
   isLoading = signal(false);
   private themeSubscription?: Subscription;

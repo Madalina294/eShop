@@ -1,96 +1,105 @@
-import {Component, signal} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AuthenticationService} from '../../services/auth/authentication.service';
-import {NzMessageService} from 'ng-zorro-antd/message';
-import {NzSpinComponent} from 'ng-zorro-antd/spin';
-import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
-import {NzInputDirective, NzInputGroupComponent} from 'ng-zorro-antd/input';
-import {NzIconDirective} from 'ng-zorro-antd/icon';
-import {NgIf} from '@angular/common';
-import {NzButtonComponent} from 'ng-zorro-antd/button';
-import {UserStateService} from '../../services/user-state/user-state.service';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AuthenticationService } from '../../services/auth/authentication.service';
+import { UserStateService } from '../../services/user-state/user-state.service';
+import { NotificationService } from '../../shared/notification/notification.service';
 import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
+/** At least 8 chars, one lower, one upper, one digit, one symbol. */
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+/**
+ * Step two of the password reset: the 6-digit code plus the new password.
+ *
+ * Rewritten off ng-zorro onto the shared `.auth` layout. The old version also
+ * built `isUserLoggedIn` by OR-ing the two `isCustomer`/`isAdmin` signal
+ * *functions* rather than calling them, so it was always truthy and the
+ * "back" link never pointed at sign-in for an anonymous visitor.
+ */
 @Component({
   selector: 'app-reset-password',
+  standalone: true,
   imports: [
-    NzSpinComponent,
-    NzFormDirective,
     ReactiveFormsModule,
-    NzFormItemComponent,
-    NzFormLabelComponent,
-    NzFormControlComponent,
-    NzInputDirective,
-    NzIconDirective,
-    NgIf,
-    NzButtonComponent,
     RouterLink,
-    TranslateModule
-  ,
-    AuthControlsComponent
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    AuthControlsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reset-password.component.html',
-  styleUrl: './reset-password.component.scss'
 })
 export class ResetPasswordComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthenticationService);
+  private readonly userState = inject(UserStateService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  email: string;
-  resetForm!: FormGroup;
-  isLoading = signal(false);
-  isUserLoggedIn: any;
-  newPasswordVisible = signal(false); // Pentru show/hide new password
-  confirmPasswordVisible = signal(false); // Pentru show/hide confirm password
+  protected readonly year = new Date().getFullYear();
+  protected readonly submitting = signal(false);
+  protected readonly newPasswordVisible = signal(false);
+  protected readonly confirmPasswordVisible = signal(false);
 
-  constructor(private router: Router,
-              private fb: FormBuilder,
-              private authService: AuthenticationService,
-              private message: NzMessageService,
-              private route: ActivatedRoute,
-              private userState: UserStateService,
-              private translate: TranslateService){
-    this.isUserLoggedIn = this.userState.isCustomer || this.userState.isAdmin;
-    this.email = this.route.snapshot.queryParams['email'] || '';
+  /** Carried over from `/enter-email` as a query param. */
+  protected readonly email: string = this.route.snapshot.queryParams['email'] ?? '';
 
-    this.resetForm = this.fb.group({
+  protected readonly isSignedIn = computed(
+    () => this.userState.isCustomer() || this.userState.isAdmin()
+  );
+
+  protected readonly resetForm = this.fb.nonNullable.group(
+    {
       resetCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-      newPassword: ['', [
-        Validators.required,
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
-      ]],
-      confirmPassword: ['', Validators.required]
-    }, { validators: this.passwordMatchValidator });
-  }
-  passwordMatchValidator = (group: any) => {
-    const password = group.get('newPassword')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordsMismatch: true };
-  };
+      newPassword: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
+      confirmPassword: ['', Validators.required],
+    },
+    { validators: passwordsMatchValidator }
+  );
 
-  onSubmit(){
-    if (this.resetForm.valid) {
-      this.isLoading.set(true);
-
-      const request = {
-        email: this.email,
-        resetCode: this.resetForm.get('resetCode')?.value,
-        newPassword: this.resetForm.get('newPassword')?.value
-      };
-
-      this.authService.resetPassword(request).subscribe({
-        next: (response) => {
-          this.isLoading.set(false);
-          this.message.success(this.translate.instant('resetPassword.successMessage'));
-          this.router.navigate(['/login']);
-
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          this.message.error(error.error || this.translate.instant('resetPassword.errorMessage'));
-        }
-      });
+  protected onSubmit(): void {
+    if (this.resetForm.invalid) {
+      this.resetForm.markAllAsTouched();
+      return;
     }
-  }
 
+    this.submitting.set(true);
+    const { resetCode, newPassword } = this.resetForm.getRawValue();
+
+    this.authService.resetPassword({ email: this.email, resetCode, newPassword }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notifications.success('resetPassword.successMessage');
+        this.router.navigateByUrl('/login');
+      },
+      error: error => {
+        this.submitting.set(false);
+        // Prefer the backend's own wording when it sends one.
+        this.notifications.error(
+          'resetPassword.errorMessage',
+          typeof error?.error === 'string' ? error.error : undefined
+        );
+      },
+    });
+  }
+}
+
+/** Cross-field check: `confirmPassword` must match `newPassword`. */
+function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('newPassword')?.value;
+  const confirmPassword = group.get('confirmPassword')?.value;
+  return password === confirmPassword ? null : { passwordsMismatch: true };
 }

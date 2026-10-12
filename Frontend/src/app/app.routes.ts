@@ -39,6 +39,14 @@ export const routes: Routes = [
       import('./pages/enter-email/enter-email.component').then(m => m.EnterEmailComponent),
   },
 
+  // Public on purpose: a visitor deciding whether to sign up should be able to
+  // read it.
+  {
+    path: 'about',
+    title: 'titles.about',
+    loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent),
+  },
+
   {
     path: 'welcome',
     title: 'titles.welcome',

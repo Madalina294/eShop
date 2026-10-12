@@ -1,13 +1,51 @@
 <!doctype html>
-<html lang="en" class="dark-mode">
+<html lang="en" class="light-mode">
 <head>
   <meta charset="utf-8">
   <title>eShop</title>
   <base href="/">
+
+  <!--
+    Theme bootstrap — must stay inline and synchronous so it runs before the
+    first paint. `app.routes.server.ts` renders everything client-side, so this
+    shell paints with whatever class the HTML shipped; without this a returning
+    dark-mode user would see a full cream flash, made worse by the 220ms
+    background-color transition on `body`.
+
+    `light-mode` is added explicitly rather than just dropping `dark-mode`:
+    ~18 stylesheets branch on the literal `.light-mode` class, and the ng-zorro
+    `--ant-*` light values are keyed on `:root` while the dark ones live under
+    `.dark-mode`.
+  -->
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('theme');
+        if (!theme) {
+          // ThemeService only re-applies the signed-in user's preference on the
+          // first NavigationEnd — i.e. after paint — so read it here too.
+          var raw = localStorage.getItem('user');
+          if (raw) theme = (JSON.parse(raw) || {}).preferredTheme;
+        }
+        var dark = theme === 'dark';
+        document.documentElement.classList.toggle('dark-mode', dark);
+        document.documentElement.classList.toggle('light-mode', !dark);
+        // <body> does not exist yet inside <head>. The <html> class alone
+        // drives every token, so this deferral causes no visible gap.
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.toggle('dark-mode', dark);
+          document.body.classList.toggle('light-mode', !dark);
+        });
+      } catch (e) {
+        /* private mode / blocked storage: keep the light default */
+      }
+    })();
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="eShop — browse the catalogue, manage your cart and check out securely.">
-  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf6ee" media="(prefers-color-scheme: light)">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +55,7 @@
 
   <script src="https://js.stripe.com/v3/" defer></script>
 </head>
-<body class="mat-typography dark-mode">
+<body class="mat-typography light-mode">
   <app-root></app-root>
 </body>
 </html>

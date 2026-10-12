@@ -170,3 +170,66 @@ $breakpoints: (
     background: var(--skeleton-base);
   }
 }
+
+// --- Chrome controls --------------------------------------------------------
+// The header and the chromeless auth screens each render a language pill and a
+// theme toggle. They are separate components with separate stylesheets, so the
+// geometry used to be copy-pasted — and drifted: a centring fix applied to one
+// left the other with off-centre glyphs. The geometry now lives here; each
+// component supplies only its own colours.
+
+/// A 40x40 icon button whose glyph is actually centred.
+/// Material's density scale leaves the icon off-centre in the hit area.
+@mixin icon-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  .mat-icon {
+    margin: 0;
+    line-height: 1;
+  }
+}
+
+/// A `mat-button-toggle-group` styled as one quiet segmented pill.
+/// Centring has to be asserted at all three levels Material renders, which is
+/// why a bare `line-height` on the label never lined the text up.
+@mixin segmented-pill($height: 32px) {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: $height;
+  border: 0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  --mat-standard-button-toggle-divider-color: transparent;
+  --mat-standard-button-toggle-background-color: transparent;
+  --mat-standard-button-toggle-hover-state-layer-opacity: 0;
+
+  .mat-button-toggle {
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+  }
+
+  .mat-button-toggle-button {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .mat-button-toggle-label-content {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    padding-inline: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.02em;
+  }
+}
