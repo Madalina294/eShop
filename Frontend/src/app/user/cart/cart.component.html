@@ -1,181 +1,180 @@
-<div class="cart-container">
-  <!-- Header -->
-  <mat-card class="header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>shopping_cart</mat-icon>
-      </div>
-      <mat-card-title>{{ "cart.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-          "cart.subtitle" | translate
-        }}</mat-card-subtitle>
-    </mat-card-header>
-  </mat-card>
-
-  <!-- Loading Spinner -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "cart.loading" | translate }}</p>
-  </div>
-
-  <!-- Main Content -->
-  <div *ngIf="!loading()" class="content-wrapper">
-    <!-- Cart Info -->
-    <div class="cart-info" *ngIf="cartItems().length > 0">
-      {{ "cart.showing" | translate }}
-      {{ cartItems().length }}
-      {{
-        cartItems().length === 1
-          ? ("cart.item" | translate)
-          : ("cart.items" | translate)
-      }}
-    </div>
-
-    <!-- Empty Cart Message -->
-    <div *ngIf="cartItems().length === 0" class="empty-cart">
-      <mat-icon>shopping_cart</mat-icon>
-      <h3>{{ "cart.empty.title" | translate }}</h3>
-      <p>{{ "cart.empty.message" | translate }}</p>
-      <button mat-raised-button color="primary" (click)="goToAllProducts()">
-        <mat-icon>shopping_cart</mat-icon>
-        {{ "cart.empty.browseProducts" | translate }}
+<div class="page cart">
+  <app-page-header
+    icon="shopping_cart"
+    [title]="'cart.title' | translate"
+    [subtitle]="state() === 'ready' ? itemsLabel() : ('cart.subtitle' | translate)"
+  >
+    @if (state() === "ready") {
+      <button mat-button type="button" class="cart__clear" (click)="clearCart()">
+        <mat-icon>remove_shopping_cart</mat-icon>
+        {{ "cart.clearCart" | translate }}
       </button>
-    </div>
+    }
+  </app-page-header>
 
-    <!-- Cart Items -->
-    <div class="cart-items" *ngIf="cartItems().length > 0">
-      <mat-card *ngFor="let item of cartItems()" class="cart-item-card">
-        <!-- Product Image -->
-        <div class="product-image-container">
-          <img
-            mat-card-image
-            [src]="getProductImage(item)"
-            [alt]="item.productName"
-            class="product-image"
-            (click)="goToViewProduct(item.productId)"
-          />
-        </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="list" [count]="3" [label]="'cart.loading' | translate" />
+    }
 
-        <!-- Product Content -->
-        <mat-card-content class="product-content">
-          <h3 class="product-name" (click)="goToViewProduct(item.productId)">
-            {{ item.productName }}
-          </h3>
+    @case ("error") {
+      <app-error-state
+        [title]="'errors.loadFailedTitle' | translate"
+        [description]="'errors.loadFailedDescription' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
 
-          <div class="product-price">
-            {{ item.productPrice | currency : "RON" : "symbol" : "1.2-2" }}
+    @case ("empty") {
+      <app-empty-state
+        icon="shopping_cart"
+        [title]="'cart.empty.title' | translate"
+        [description]="'cart.empty.message' | translate"
+      >
+        <a mat-flat-button color="primary" routerLink="/user/all-products">
+          <mat-icon>storefront</mat-icon>
+          {{ "cart.empty.browseProducts" | translate }}
+        </a>
+      </app-empty-state>
+    }
+
+    @default {
+      <div class="cart__layout">
+        <!-- ------------------------------------------------------------ -->
+        <!--  Lines                                                        -->
+        <!-- ------------------------------------------------------------ -->
+        <section class="cart__lines">
+          <!-- Column headers, desktop only; the cards carry their own labels -->
+          <div class="cart-row cart-row--head" aria-hidden="true">
+            <span>{{ "cart.product" | translate }}</span>
+            <span>{{ "cart.unitPrice" | translate }}</span>
+            <span>{{ "cart.quantity" | translate }}</span>
+            <span>{{ "cart.lineTotal" | translate }}</span>
+            <span></span>
           </div>
 
-          <!-- Quantity Controls -->
-          <div class="quantity-controls">
-            <label>{{ "cart.quantity" | translate }}:</label>
-            <div class="quantity-input-group">
-              <button
-                mat-icon-button
-                (click)="updateQuantity(item.productId, item.quantity - 1)"
-                [disabled]="item.quantity <= 1"
-                class="quantity-btn"
-              >
-                <mat-icon>remove</mat-icon>
-              </button>
+          <ul class="cart__list">
+            @for (row of rows(); track row.productId) {
+              <li class="cart-row" [class.is-pending]="isPending(row.productId)">
+                <!-- Product -->
+                <div class="cart-row__product">
+                  <a
+                    class="cart-row__thumb"
+                    routerLink="/user/view-product"
+                    [queryParams]="{ id: row.productId }"
+                    tabindex="-1"
+                    aria-hidden="true"
+                  >
+                    <img
+                      [src]="row.imageUrl"
+                      [alt]="row.productName"
+                      loading="lazy"
+                      decoding="async"
+                      width="80"
+                      height="80"
+                    />
+                  </a>
 
-              <mat-form-field class="quantity-field">
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="item.quantity"
-                  (ngModelChange)="updateQuantity(item.productId, $event)"
-                  min="1"
-                  class="quantity-input"
-                />
-              </mat-form-field>
+                  <div class="cart-row__info">
+                    <a
+                      class="cart-row__name"
+                      routerLink="/user/view-product"
+                      [queryParams]="{ id: row.productId }"
+                    >
+                      {{ row.productName }}
+                    </a>
 
-              <button
-                mat-icon-button
-                (click)="updateQuantity(item.productId, item.quantity + 1)"
-                class="quantity-btn"
-              >
-                <mat-icon>add</mat-icon>
-              </button>
+                    @if (row.availableQuantity && row.quantity >= row.availableQuantity) {
+                      <span class="cart-row__limit">
+                        {{ "cart.stockLimit" | translate: { count: row.availableQuantity } }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Unit price -->
+                <div class="cart-row__cell" [attr.data-label]="'cart.unitPrice' | translate">
+                  {{ row.productPrice | currency: "RON" : "symbol" : "1.2-2" }}
+                </div>
+
+                <!-- Quantity -->
+                <div class="cart-row__cell" [attr.data-label]="'cart.quantity' | translate">
+                  <app-quantity-stepper
+                    size="sm"
+                    [value]="row.quantity"
+                    [min]="1"
+                    [max]="row.maxQuantity"
+                    [disabled]="isPending(row.productId)"
+                    [label]="row.productName"
+                    (valueChange)="onQuantityChange(row, $event)"
+                  />
+                </div>
+
+                <!-- Line total -->
+                <div
+                  class="cart-row__cell cart-row__cell--total"
+                  [attr.data-label]="'cart.lineTotal' | translate"
+                >
+                  {{ row.lineTotal | currency: "RON" : "symbol" : "1.2-2" }}
+                </div>
+
+                <!-- Remove -->
+                <div class="cart-row__remove">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [disabled]="isPending(row.productId)"
+                    [attr.aria-label]="'cart.removeItem' | translate: { name: row.productName }"
+                    [matTooltip]="'cart.remove' | translate"
+                    (click)="remove(row)"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+
+          <a class="cart__continue" routerLink="/user/all-products">
+            <mat-icon>arrow_back</mat-icon>
+            {{ "cart.continueShopping" | translate }}
+          </a>
+        </section>
+
+        <!-- ------------------------------------------------------------ -->
+        <!--  Summary                                                      -->
+        <!-- ------------------------------------------------------------ -->
+        <aside class="cart__summary" [attr.aria-label]="'cart.summary' | translate">
+          <h2 class="cart__summary-title">{{ "cart.summary" | translate }}</h2>
+
+          <dl class="data-rows data-rows--total">
+            <div class="data-rows__row">
+              <dt>{{ "cart.totalItems" | translate }}</dt>
+              <dd>{{ totalUnits() }}</dd>
             </div>
-          </div>
+            <div class="data-rows__row">
+              <dt>{{ "cart.subtotal" | translate }}</dt>
+              <dd>{{ subtotal() | currency: "RON" : "symbol" : "1.2-2" }}</dd>
+            </div>
+          </dl>
 
-          <!-- Item Total -->
-          <div class="item-total">
-            {{ "cart.itemTotal" | translate }}:
-            {{ (item.productPrice * item.quantity) | currency : "RON" : "symbol" : "1.2-2" }}
-          </div>
-        </mat-card-content>
+          <p class="cart__shipping-note">
+            <mat-icon aria-hidden="true">local_shipping</mat-icon>
+            {{ "cart.shippingNote" | translate }}
+          </p>
 
-        <!-- Action Buttons -->
-        <mat-card-actions class="card-actions">
-          <button
-            mat-raised-button
+          <a
+            mat-flat-button
             color="primary"
-            class="view-product-btn"
-            (click)="goToViewProduct(item.productId)"
+            class="cart__checkout"
+            routerLink="/user/checkout"
           >
-            <mat-icon>visibility</mat-icon>
-            {{ "cart.viewProduct" | translate }}
-          </button>
-
-          <button
-            mat-stroked-button
-            color="warn"
-            class="remove-from-cart-btn"
-            (click)="removeFromCart(item.productId, $event)"
-          >
-            <mat-icon>delete</mat-icon>
-            {{ "cart.remove" | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-
-    <!-- Cart Summary -->
-    <div class="cart-summary" *ngIf="cartItems().length > 0">
-      <mat-card class="summary-card">
-        <mat-card-header>
-          <mat-card-title>{{ "cart.summary" | translate }}</mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          <div class="summary-row">
-            <span>{{ "cart.totalItems" | translate }}:</span>
-            <span>{{ totalProducts(cartItems()) }}</span>
-          </div>
-
-          <div class="summary-row total-row">
-            <span>{{ "cart.totalPrice" | translate }}:</span>
-            <span class="total-price">{{ totalPrice() | currency : "RON" : "symbol" : "1.2-2" }}</span>
-          </div>
-        </mat-card-content>
-
-        <mat-card-actions class="summary-actions">
-          <button
-            mat-stroked-button
-            color="warn"
-            (click)="clearCart()"
-            class="clear-cart-btn"
-          >
-            <mat-icon>clear_all</mat-icon>
-            {{ "cart.clearCart" | translate }}
-          </button>
-
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="proceedToCheckout()"
-            class="checkout-btn"
-          >
-            <mat-icon>payment</mat-icon>
+            <mat-icon>lock</mat-icon>
             {{ "cart.proceedToCheckout" | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </div>
+          </a>
+        </aside>
+      </div>
+    }
+  }
 </div>

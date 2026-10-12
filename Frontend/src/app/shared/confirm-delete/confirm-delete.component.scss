@@ -1,22 +1,26 @@
-h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.confirm {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
 
-mat-dialog-content p {
-  margin: 16px 0;
-  font-size: 16px;
-}
+  &__icon {
+    flex: 0 0 auto;
+    color: var(--warning);
 
-mat-dialog-actions {
-  gap: 8px;
-}
+    &.is-destructive {
+      color: var(--error);
+    }
+  }
 
-button {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+  &__message {
+    margin: 0;
+    color: var(--text-secondary);
+  }
 
-// Stilurile pentru dark/light mode sunt acum în theme.scss global
+  &__confirm-btn.is-destructive {
+    background: var(--error);
+    color: #fff;
+  }
+}

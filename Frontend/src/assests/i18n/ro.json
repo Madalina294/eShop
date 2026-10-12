@@ -731,7 +731,19 @@
       "clearError": "Eroare la golirea coșului!",
       "productNotFound": "Produsul nu a fost găsit!",
       "ok": "Ok"
-    }
+    },
+    "itemsOne": "1 produs în coș",
+    "itemsMany": "{{count}} produse în coș",
+    "product": "Produs",
+    "unitPrice": "Preț unitar",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "shippingNote": "Transportul se calculează la finalizarea comenzii",
+    "confirmClear": "Se vor scoate toate produsele din coș. Le poți adăuga din nou mai târziu.",
+    "confirmClearTitle": "Golești coșul?",
+    "removeItem": "Scoate {{name}} din coș",
+    "continueShopping": "Continuă cumpărăturile",
+    "stockLimit": "Disponibile doar {{count}}"
   },
   "checkout": {
     "title": "Finalizează Comanda",
@@ -832,5 +844,8 @@
     "firstPage": "Prima pagină",
     "lastPage": "Ultima pagină",
     "of": "din"
+  },
+  "confirm": {
+    "defaultTitle": "Ești sigur?"
   }
 }

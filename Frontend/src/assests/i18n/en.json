@@ -731,7 +731,19 @@
       "clearError": "Error clearing cart!",
       "productNotFound": "Product not found!",
       "ok": "Ok"
-    }
+    },
+    "itemsOne": "1 item in your cart",
+    "itemsMany": "{{count}} items in your cart",
+    "product": "Product",
+    "unitPrice": "Unit price",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "shippingNote": "Shipping is calculated at checkout",
+    "confirmClear": "This removes every product from your cart. You can add them again later.",
+    "confirmClearTitle": "Empty your cart?",
+    "removeItem": "Remove {{name}} from cart",
+    "continueShopping": "Continue shopping",
+    "stockLimit": "Only {{count}} available"
   },
   "checkout": {
     "title": "Checkout",
@@ -832,5 +844,8 @@
     "firstPage": "First page",
     "lastPage": "Last page",
     "of": "of"
+  },
+  "confirm": {
+    "defaultTitle": "Are you sure?"
   }
 }

@@ -207,20 +207,6 @@
     color: #dc3545 !important;
   }
 
-  // Confirm delete dialog
-  h2 {
-    color: #333333 !important;
-  }
-
-  mat-dialog-content p {
-    color: #666666 !important;
-  }
-
-  mat-dialog-actions button:not([color]) {
-    background: #f8f9fa !important;
-    color: #333333 !important;
-  }
-
   // Ng-Zorro form labels în light mode
   ::ng-deep nz-form-label {
     color: #333333 !important;
@@ -522,20 +508,6 @@
 
   mat-error {
     color: #ff4d4f !important;
-  }
-
-  // Confirm delete dialog
-  h2 {
-    color: #ffffff !important;
-  }
-
-  mat-dialog-content p {
-    color: rgba(255, 255, 255, 0.8) !important;
-  }
-
-  mat-dialog-actions button:not([color]) {
-    background: #2f2f2f !important;
-    color: #ffffff !important;
   }
 
 }
