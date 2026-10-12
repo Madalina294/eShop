@@ -1,173 +1,204 @@
-<!-- Main Container -->
-<div class="login-page-container">
-  <!-- Login Form Section -->
-  <div class="login-card" *ngIf="!authResponse?.mfaEnabled">
-    <nz-spin
-      [nzSpinning]="isSpinning()"
-      [nzSize]="'large'"
-      nzTip="{{ 'login.signingIn' | translate }}"
-      class="login-spinner"
-    >
-      <div class="card-header">
-        <h1 class="login-title">{{ "login.title" | translate }}</h1>
-        <p class="login-subtitle">{{ "login.subtitle" | translate }}</p>
+<div class="auth">
+  <!-- Language and theme live on the page: the auth screens render without the
+       app header, and a visitor must be able to switch before signing in. -->
+  <app-auth-controls />
+
+  <!-- Showcase panel. Decorative on wide screens; on narrow ones it collapses
+       and the form carries the page, with its own compact brand lockup. -->
+  <aside class="auth__showcase">
+    <span class="auth__glow auth__glow--one" aria-hidden="true"></span>
+    <span class="auth__glow auth__glow--two" aria-hidden="true"></span>
+
+    <div class="auth__showcase-inner">
+      <a class="brand" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
+
+      <div class="auth__pitch">
+        <h2 class="auth__pitch-title">{{ "login.brandTitle" | translate }}</h2>
+        <p class="auth__pitch-text">{{ "login.brandText" | translate }}</p>
+
+        <ul class="auth__perks">
+          <li>
+            <mat-icon aria-hidden="true">local_shipping</mat-icon>
+            {{ "login.perkDelivery" | translate }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">lock</mat-icon>
+            {{ "login.perkSecure" | translate }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">favorite</mat-icon>
+            {{ "login.perkWishlist" | translate }}
+          </li>
+        </ul>
       </div>
 
-      <form
-        nz-form
-        [formGroup]="loginForm"
-        (ngSubmit)="login()"
-        class="login-form"
-      >
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            nzErrorTip="{{ 'login.emailInvalid' | translate }}"
-            [nzValidateStatus]="loginForm.controls['email']"
-          >
+      <p class="auth__legal">&copy; {{ year }} {{ "app.name" | translate }}</p>
+    </div>
+  </aside>
+
+  <main class="auth__panel">
+    <div class="auth-card">
+      <a class="brand brand--compact" routerLink="/login">
+        <span class="brand__mark"><mat-icon>shopping_bag</mat-icon></span>
+        <span class="brand__name">{{ "app.name" | translate }}</span>
+      </a>
+
+      @if (!inMfaStep()) {
+        <!-- ------------------------------------------------------------ -->
+        <!--  Credentials                                                  -->
+        <!-- ------------------------------------------------------------ -->
+        <header class="auth-card__header">
+          <h1 class="auth-card__title">{{ "login.title" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "login.subtitle" | translate }}</p>
+        </header>
+
+        <form class="auth-card__form" [formGroup]="loginForm" (ngSubmit)="login()">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "auth.email" | translate }}</mat-label>
             <input
-              nz-input
-              placeholder="{{ 'auth.email' | translate }}"
-              id="email"
+              matInput
+              type="email"
               formControlName="email"
-              class="form-input"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
             />
-          </nz-form-control>
-        </nz-form-item>
+            <mat-icon matSuffix>mail_outline</mat-icon>
+            @if (loginForm.controls.email.hasError("required")) {
+              <mat-error>{{ "common.required" | translate }}</mat-error>
+            } @else if (loginForm.controls.email.hasError("email")) {
+              <mat-error>{{ "login.emailInvalid" | translate }}</mat-error>
+            }
+          </mat-form-field>
 
-        <nz-form-item>
-          <nz-form-control
-            nzHasFeedback
-            [nzErrorTip]="errorPass"
-            [nzValidateStatus]="loginForm.controls['password']"
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "auth.password" | translate }}</mat-label>
+            <input
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              [attr.aria-label]="
+                (passwordVisible() ? 'login.hidePassword' : 'login.showPassword') | translate
+              "
+              [attr.aria-pressed]="passwordVisible()"
+              (click)="passwordVisible.set(!passwordVisible())"
+            >
+              <mat-icon>{{ passwordVisible() ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
+            @if (loginForm.controls.password.hasError("required")) {
+              <mat-error>{{ "login.passwordRequired" | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <a class="auth-card__forgot" routerLink="/enter-email">
+            {{ "login.forgotPassword" | translate }}
+          </a>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="auth-card__submit"
+            [disabled]="submitting()"
           >
-            <div class="password-input-wrapper">
-              <input
-                nz-input
-                placeholder="{{ 'auth.password' | translate }}"
-                [type]="passwordVisible() ? 'text' : 'password'"
-                id="password"
-                formControlName="password"
-                class="form-input password-input"
-              />
-              <span
-                nz-icon
-                [nzType]="passwordVisible() ? 'eye' : 'eye-invisible'"
-                (click)="passwordVisible.set(!passwordVisible())"
-                class="eye-icon"
-              ></span>
-            </div>
-            <ng-template style="margin-bottom: 10px" #errorPass let-control>
-              <ng-container *ngIf="control.hasError('required')">
-                {{ "login.passwordRequired" | translate }}
-              </ng-container>
-              <ng-container
-                *ngIf="control.hasError('pattern')"
-                style="margin-bottom: 10px"
-              >
-                {{ "login.passwordRules" | translate }}
-              </ng-container>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
+            @if (submitting()) {
+              <mat-progress-spinner mode="indeterminate" diameter="18" />
+            } @else {
+              <mat-icon>login</mat-icon>
+            }
+            <span>{{ (submitting() ? "login.signingIn" : "auth.login") | translate }}</span>
+          </button>
+        </form>
 
-        <div style="margin-top: 20px; padding-top: 10px;">
-          <a href="/enter-email">{{ "login.forgotPassword" | translate }}</a>
+        <div class="auth-card__divider">
+          <span>{{ "login.orContinueWith" | translate }}</span>
         </div>
 
         <button
-          nz-button
-          class="login-button"
-          [nzType]="'primary'"
-          type="submit"
-          [disabled]="loginForm.invalid"
+          mat-stroked-button
+          type="button"
+          class="auth-card__google"
+          [disabled]="submitting()"
+          (click)="loginWithGoogle()"
         >
-          {{ "auth.login" | translate }}
+          <!-- Google's mark; Material Icons has no brand glyph for it. -->
+          <svg class="auth-card__google-mark" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.3z"/>
+            <path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.2 15.5 46 24 46z"/>
+            <path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.7-.7-4.3s.3-3 .7-4.3v-5.7H4.5C2.9 17.2 2 20.5 2 24s.9 6.8 2.5 10l7.3-5.7z"/>
+            <path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.1 29.9 2 24 2 15.5 2 8.1 6.8 4.5 13.9l7.3 5.7c1.7-5.1 6.5-8.9 12.2-8.9z"/>
+          </svg>
+          <span>{{ "login.continueWithGoogle" | translate }}</span>
         </button>
 
-        <!-- OAuth Login Section -->
-        <div class="oauth-section">
-          <div class="divider">
-            <span>{{ "login.orContinueWith" | translate }}</span>
-          </div>
-
-          <div class="oauth-buttons">
-            <button nz-button class="google-btn" (click)="loginWithGoogle()">
-              {{ "login.continueWithGoogle" | translate }}
-            </button>
-          </div>
-        </div>
-
-        <div class="signup-link">
+        <p class="auth-card__footer">
           {{ "login.noAccount" | translate }}
           <a routerLink="/register">{{ "auth.register" | translate }}</a>
-        </div>
-      </form>
-    </nz-spin>
-  </div>
+        </p>
+      } @else {
+        <!-- ------------------------------------------------------------ -->
+        <!--  Second factor                                                -->
+        <!-- ------------------------------------------------------------ -->
+        <header class="auth-card__header">
+          <h1 class="auth-card__title">{{ "mfa.title" | translate }}</h1>
+          <p class="auth-card__subtitle">{{ "mfa.subtitle" | translate }}</p>
+        </header>
 
-  <!-- 2FA Verification Section -->
-  <div
-    class="login-card mfa-card"
-    *ngIf="showMfaSection()"
-    style="display: block !important; visibility: visible !important"
-  >
-    <div class="card-header">
-      <h1 class="login-title">{{ "mfa.title" | translate }}</h1>
-      <p class="login-subtitle">{{ "mfa.subtitle" | translate }}</p>
+        @if (qrCodeUrl()) {
+          <figure class="auth-card__qr">
+            <img [src]="qrCodeUrl()" [alt]="'mfa.qrAlt' | translate" width="180" height="180" />
+            <figcaption>{{ "mfa.instructions" | translate }}</figcaption>
+          </figure>
+        }
+
+        <form class="auth-card__form" [formGroup]="otpForm" (ngSubmit)="verifyCode()">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "mfa.enterCode" | translate }}</mat-label>
+            <input
+              matInput
+              formControlName="code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              placeholder="000000"
+              class="auth-card__otp"
+            />
+            @if (otpForm.controls.code.hasError("required")) {
+              <mat-error>{{ "common.required" | translate }}</mat-error>
+            } @else if (otpForm.controls.code.hasError("pattern")) {
+              <mat-error>{{ "mfa.codeFormat" | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="auth-card__submit"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              <mat-progress-spinner mode="indeterminate" diameter="18" />
+            } @else {
+              <mat-icon>verified_user</mat-icon>
+            }
+            <span>{{ (submitting() ? "login.signingIn" : "mfa.verify") | translate }}</span>
+          </button>
+
+          <button mat-button type="button" (click)="backToPassword()">
+            {{ "common.back" | translate }}
+          </button>
+        </form>
+      }
     </div>
-
-    <div class="qr-section">
-      <div class="qr-code-container">
-        <div *ngIf="!qrCodeUri" class="qr-loading">
-          {{ "mfa.loading" | translate }}
-        </div>
-        <img
-          *ngIf="qrCodeUri"
-          [src]="qrCodeUri"
-          [alt]="'mfa.qrAlt' | translate"
-          class="qr-code"
-          (load)="onQrCodeLoaded()"
-          (error)="onQrCodeError($event)"
-        />
-      </div>
-      <p class="qr-instructions">
-        {{ "mfa.instructions" | translate }}
-      </p>
-    </div>
-    <nz-spin
-      [nzSpinning]="isSpinning()"
-      [nzSize]="'large'"
-      [nzTip]="'login.signingIn' | translate"
-      class="login-spinner"
-    >
-      <form class="verification-form">
-        <nz-form-item>
-          <label class="verification-label">{{
-            "mfa.enterCode" | translate
-          }}</label>
-          <input
-            nz-input
-            type="text"
-            placeholder="000000"
-            [(ngModel)]="otpCode"
-            name="otpCode"
-            maxlength="6"
-            class="verification-input"
-          />
-        </nz-form-item>
-
-        <button
-          nz-button
-          [nzType]="'primary'"
-          type="button"
-          (click)="verifyCode()"
-          [disabled]="otpCode.length !== 6"
-          class="verify-button"
-        >
-          {{ "mfa.verify" | translate }}
-        </button>
-      </form>
-    </nz-spin>
-  </div>
+  </main>
 </div>

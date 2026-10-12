@@ -146,6 +146,19 @@
   --shadow-3: 0 12px 20px -6px rgba(15, 23, 42, 0.10), 0 24px 48px -12px rgba(15, 23, 42, 0.18);
   --shadow-brand: 0 8px 20px -6px rgba(99, 102, 241, 0.45);
 
+  // Chrome: translucent so page content shows through the blur behind it.
+  --header-bg: rgba(255, 255, 255, 0.72);
+  --header-bg-solid: rgba(255, 255, 255, 0.94);
+  --header-border: rgba(15, 23, 42, 0.08);
+  --header-hover: rgba(15, 23, 42, 0.05);
+  --header-active: rgba(99, 102, 241, 0.12);
+
+  // Auth screens render chromeless; these controls float over the page.
+  --auth-control-bg: rgba(15, 23, 42, 0.06);
+  --auth-control-fg: var(--text-secondary);
+  --auth-control-active: rgba(99, 102, 241, 0.14);
+  --auth-control-active-fg: var(--brand);
+
   --overlay: rgba(15, 23, 42, 0.48);
   --skeleton-base:  #e2e8f0;
   --skeleton-shine: #f1f5f9;
@@ -161,7 +174,9 @@
   --brand-hover: var(--brand-300);
   --brand-soft:  rgba(99, 102, 241, 0.16);
   --on-brand:    #0b1120;
-  --brand-gradient: linear-gradient(135deg, #4338ca 0%, #6d28d9 55%, #7e22ce 100%);
+  // Deeper than the light-mode ramp: a saturated slab reads as glare against
+  // near-black surfaces.
+  --brand-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4c1d95 100%);
 
   --accent:      var(--accent-400);
   --accent-soft: rgba(245, 158, 11, 0.16);
@@ -195,6 +210,17 @@
   --shadow-2: 0 4px 6px -2px rgba(0, 0, 0, 0.36), 0 10px 20px -4px rgba(0, 0, 0, 0.44);
   --shadow-3: 0 12px 20px -6px rgba(0, 0, 0, 0.44), 0 24px 48px -12px rgba(0, 0, 0, 0.60);
   --shadow-brand: 0 8px 20px -6px rgba(129, 140, 248, 0.40);
+
+  --header-bg: rgba(11, 17, 32, 0.62);
+  --header-bg-solid: rgba(11, 17, 32, 0.92);
+  --header-border: rgba(255, 255, 255, 0.08);
+  --header-hover: rgba(255, 255, 255, 0.07);
+  --header-active: rgba(129, 140, 248, 0.18);
+
+  --auth-control-bg: rgba(255, 255, 255, 0.07);
+  --auth-control-fg: var(--text-secondary);
+  --auth-control-active: rgba(129, 140, 248, 0.20);
+  --auth-control-active-fg: var(--brand);
 
   --overlay: rgba(2, 6, 23, 0.68);
   --skeleton-base:  #1e293b;

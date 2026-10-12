@@ -124,7 +124,19 @@
     "forgotPassword": "Ai uitat parola?",
     "orContinueWith": "Sau continuă cu",
     "continueWithGoogle": "Continuă cu Google",
-    "noAccount": "Nu ai cont?"
+    "noAccount": "Nu ai cont?",
+    "brandTitle": "Tot ce îți trebuie, într-un singur loc.",
+    "brandText": "Autentifică-te ca să continui de unde ai rămas — coșul și produsele salvate te așteaptă.",
+    "perkDelivery": "Livrare în 2–3 zile lucrătoare",
+    "perkSecure": "Plată securizată prin Stripe",
+    "perkWishlist": "Salvează produsele care îți plac",
+    "showPassword": "Arată parola",
+    "hidePassword": "Ascunde parola",
+    "errors": {
+      "badCredentials": "Emailul și parola nu corespund niciunui cont.",
+      "generic": "Nu te-am putut autentifica. Te rugăm să încerci din nou.",
+      "invalidCode": "Codul nu este valid. Verifică aplicația de autentificare și încearcă din nou."
+    }
   },
   "mfa": {
     "title": "Autentificare în doi pași",
@@ -133,7 +145,8 @@
     "qrAlt": "Cod QR",
     "instructions": "Scanează acest cod cu Google Authenticator, Authy sau orice aplicație TOTP compatibilă",
     "enterCode": "Introdu codul de 6 cifre din aplicație",
-    "verify": "Verifică și continuă"
+    "verify": "Verifică și continuă",
+    "codeFormat": "Introdu cele 6 cifre din aplicație."
   },
   "register": {
     "creatingAccount": "Se creează contul...",

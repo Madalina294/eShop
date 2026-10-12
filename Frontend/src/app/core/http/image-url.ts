@@ -1,7 +1,7 @@
 import { environment } from '../../../environments/environments';
 
-/** API origin without the trailing `/api` segment — where uploads are served. */
-const FILES_ORIGIN = environment.apiUrl.replace(/\/api\/?$/, '');
+/** API origin without the trailing `/api` segment — serves uploads and OAuth. */
+export const API_ORIGIN = environment.apiUrl.replace(/\/api\/?$/, '');
 
 const PLACEHOLDER_PRODUCT = 'assets/images/product-placeholder.svg';
 const PLACEHOLDER_AVATAR = 'assets/images/avatar-placeholder.svg';
@@ -21,7 +21,7 @@ export function resolveImageUrl(path: string | null | undefined, fallback = ''):
   }
 
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${FILES_ORIGIN}${normalized}`;
+  return `${API_ORIGIN}${normalized}`;
 }
 
 /** Product image with the shared product placeholder as fallback. */

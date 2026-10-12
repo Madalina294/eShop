@@ -179,7 +179,7 @@
             <span>{{ "header.logout" | translate }}</span>
           </button>
         </mat-menu>
-      } @else {
+      } @else if (showLoginCta()) {
         <a mat-flat-button color="primary" routerLink="/login" class="header__login">
           <mat-icon>login</mat-icon>
           <span class="header__login-label">{{ "auth.login" | translate }}</span>

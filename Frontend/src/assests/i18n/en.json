@@ -124,7 +124,19 @@
     "forgotPassword": "Forgot password?",
     "orContinueWith": "Or continue with",
     "continueWithGoogle": "Continue with Google",
-    "noAccount": "Don't have an account?"
+    "noAccount": "Don't have an account?",
+    "brandTitle": "Everything you need, in one place.",
+    "brandText": "Sign in to pick up where you left off — your cart and your saved products are waiting.",
+    "perkDelivery": "Delivery in 2–3 business days",
+    "perkSecure": "Secure payment through Stripe",
+    "perkWishlist": "Save the products you love",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "errors": {
+      "badCredentials": "That email and password do not match an account.",
+      "generic": "We could not sign you in. Please try again.",
+      "invalidCode": "That code is not valid. Check your authenticator app and try again."
+    }
   },
   "mfa": {
     "title": "Two-Factor Authentication",
@@ -133,7 +145,8 @@
     "qrAlt": "QR Code",
     "instructions": "Scan this QR code with Google Authenticator, Authy, or any compatible TOTP app",
     "enterCode": "Enter the 6-digit code from your app",
-    "verify": "Verify & Continue"
+    "verify": "Verify & Continue",
+    "codeFormat": "Enter the 6 digits from your app."
   },
   "register": {
     "creatingAccount": "Creating account...",

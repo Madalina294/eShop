@@ -1,235 +1,164 @@
-import {Component, ChangeDetectorRef, OnInit, signal} from '@angular/core';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AuthenticationRequest} from '../../models/authentication-request';
-import {AuthenticationResponse} from '../../models/authentication-response';
-import {AuthenticationService} from '../../services/auth/authentication.service';
-import {Router, RouterLink} from '@angular/router';
-import {VerificationRequest} from '../../models/verification-request';
-import {NzSpinComponent} from 'ng-zorro-antd/spin';
-import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
-import {NzFormControlComponent, NzFormDirective} from 'ng-zorro-antd/form';
-import {NzInputDirective} from 'ng-zorro-antd/input';
-import {NzButtonComponent} from 'ng-zorro-antd/button';
-import {NzMessageService} from 'ng-zorro-antd/message';
-import {StorageService} from '../../services/storage/storage.service';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
+import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
+
+import { AuthenticationService } from '../../services/auth/authentication.service';
+import { StorageService } from '../../services/storage/storage.service';
 import { UserStateService } from '../../services/user-state/user-state.service';
-import {NzIconDirective} from 'ng-zorro-antd/icon';
-import {TranslatePipe} from '@ngx-translate/core';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { AuthenticationResponse } from '../../models/authentication-response';
+import { API_ORIGIN } from '../../core/http/image-url';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [
-    NgIf,
-    FormsModule,
-    RouterLink,
     ReactiveFormsModule,
-    NzSpinComponent,
-    NzRowDirective,
-    NzColDirective,
-    NzFormDirective,
-    NzFormControlComponent,
-    NzInputDirective,
-    NzIconDirective,
-    NzButtonComponent,
-    TranslatePipe
+    RouterLink,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    AuthControlsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit{
-  authRequest: AuthenticationRequest = {};
-  otpCode = '';
-  authResponse: AuthenticationResponse | null = null;
-  loginForm!: FormGroup;
-  isSpinning = signal(false);
-  qrCodeUri: string ='';
-  showMfaSection = signal(false);// Variabilă separată pentru controlul afișării 2FA
-  passwordVisible = signal(false); // Pentru show/hide password
-  private message : NzMessageService;
+export class LoginComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthenticationService);
+  private readonly userState = inject(UserStateService);
+  private readonly notifications = inject(NotificationService);
+  private readonly router = inject(Router);
 
+  protected readonly year = new Date().getFullYear();
+  protected readonly submitting = signal(false);
+  protected readonly passwordVisible = signal(false);
 
-  constructor(
-    private authService: AuthenticationService,
-    private router: Router,
-    private fb: FormBuilder,
-     message: NzMessageService,
-    private userStateService: UserStateService
-  ) {
-    this.message = message;
-    this.router = router;
-    this.loginForm = this.fb.group({
-      email: [null, [Validators.required, Validators.email]],
-      password: [null, [
-        Validators.required,
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
-      ]],
-    });
-  }
+  /** Set once the backend asks for a second factor. */
+  protected readonly mfaResponse = signal<AuthenticationResponse | null>(null);
+  protected readonly inMfaStep = computed(() => this.mfaResponse() !== null);
+  protected readonly qrCodeUrl = computed(() => this.mfaResponse()?.qrCodeUrl ?? '');
 
+  /**
+   * Only `required` on the password.
+   *
+   * The old form also applied the registration complexity pattern here and
+   * disabled the submit button while the form was invalid — so anyone whose
+   * existing password predated that policy could not sign in at all, and the
+   * rules were advertised to anyone on the login screen.
+   */
+  protected readonly loginForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+  });
 
-  ngOnInit() {
-    this.authResponse = null; // Reset state
-    this.otpCode = '';
-    this.authRequest = {};
+  protected readonly otpForm = this.fb.nonNullable.group({
+    code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+  });
 
-    // Verifică dacă suntem în browser (nu în SSR)
-    if (typeof window !== 'undefined') {
-      // Verifică dacă există token în URL (pentru OAuth)
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-
-      if (token) {
-        console.log('OAuth token found in URL:', token);
-        // Salvează token-ul și navighează către welcome (ca logarea normală)
-        StorageService.saveToken(token);
-
-        // Obține datele utilizatorului direct din URL (trimise de backend)
-        const imageParam = urlParams.get('image');
-
-        const userData = {
-          id: parseInt(urlParams.get('id') || '0'),
-          firstname: urlParams.get('firstname') || '',
-          lastname: urlParams.get('lastname') || '',
-          email: urlParams.get('email') || '',
-          phoneNumber: urlParams.get('phoneNumber') || '',
-          role: urlParams.get('role') || 'USER',
-          image: imageParam || null,
-          preferredTheme: urlParams.get('preferredTheme') || "dark",
-          preferredLanguage: urlParams.get('preferredLanguage') || "en",
-          mfaEnabled: urlParams.get('mfaEnabled') === 'true'
-        };
-
-        console.log('User data from OAuth backend:', userData);
-
-        StorageService.saveUser(userData);
-        this.userStateService.setUser(userData);
-
-        // Navighează către welcome
-        this.router.navigate(['/user/all-products']);
-      }
-    }
-  }
-
-
-  login() {
+  protected login(): void {
     if (this.loginForm.invalid) {
-      Object.values(this.loginForm.controls).forEach(control => control.markAsDirty());
-      this.loginForm.updateValueAndValidity();
+      this.loginForm.markAllAsTouched();
       return;
     }
-    this.isSpinning.set(true);
 
-    // Populez authRequest din form
-    this.authRequest = {
-      email: this.loginForm.get('email')?.value,
-      password: this.loginForm.get('password')?.value
-    };
+    this.submitting.set(true);
+    const { email, password } = this.loginForm.getRawValue();
 
-    this.authService.login(this.authRequest).subscribe({
-      next: (res): any => {
-        console.log('Login response:', res);
-        this.isSpinning.set(false);
+    this.authService.login({ email, password }).subscribe({
+      next: response => {
+        this.submitting.set(false);
 
-        if (res.userId !== null) {
-          if (res.mfaEnabled) {
-            this.authResponse = res;
-            this.showMfaSection.set(true);
-            this.qrCodeUri = res.qrCodeUrl || '';
-
-            return;
-          }
-
-          const user = {
-            id: res.userId,
-            role: res.userRole,
-            firstname: res.userFirstName,
-            lastname: res.userLastName,
-            email: this.authRequest.email || '',
-            phoneNumber: res.phoneNumber || '',
-            image: res.image || null,
-            preferredTheme: res.preferredTheme || "dark",
-            preferredLanguage: res.preferredLanguage || "en",
-            mfaEnabled: res.mfaEnabled || false,
-            googleId: res.googleId || null
-          };
-
-          this.userStateService.setUser(user);
-          StorageService.saveUser(user);
-          StorageService.saveToken(res.accessToken as string);
-
-          if (StorageService.isAdminLoggedIn()) {
-            this.router.navigateByUrl("/welcome");
-          } else if (StorageService.isCustomerLoggedIn()) {
-            this.router.navigateByUrl("/user/all-products");
-          }
-        } else {
-          this.isSpinning.set(false);
-          return this.message.error("Bad credentials", {nzDuration: 5000});
+        if (response.userId == null) {
+          this.notifications.error('login.errors.badCredentials');
+          return;
         }
-        this.isSpinning.set(false);
+
+        if (response.mfaEnabled) {
+          this.mfaResponse.set(response);
+          return;
+        }
+
+        this.completeSignIn(response, email);
       },
-      error: (err) => {
-        this.isSpinning.set(false);
-        if (err && (err.status === 401 || err.status === 403)) {
-          this.message.error("Email or password is incorrect", {nzDuration: 5000});
-        } else {
-          this.isSpinning.set(false);
-          this.message.error("Error at authentication. Try again.", {nzDuration: 5000});
-        }
-      }
+      error: error => {
+        this.submitting.set(false);
+        const invalidCredentials = error?.status === 401 || error?.status === 403;
+        this.notifications.error(
+          invalidCredentials ? 'login.errors.badCredentials' : 'login.errors.generic'
+        );
+      },
     });
   }
 
-  verifyCode() {
-    const verifyRequest: VerificationRequest = {
-      email: this.authRequest.email,
-      code: this.otpCode
-    };
-    this.isSpinning.set(true);
-
-    this.authService.verifyCode(verifyRequest)
-      .subscribe({
-        next: (response) => {
-          this.isSpinning.set(false);
-          const user = {
-            id: response.userId,
-            role: response.userRole,
-            firstname: response.userFirstName,
-            lastname: response.userLastName,
-            email: this.authRequest.email || '',
-            phoneNumber: response.phoneNumber || '',
-            image: response.image || null,
-            preferredTheme: response.preferredTheme || "dark",
-            preferredLanguage: response.preferredLanguage || "en",
-            mfaEnabled: true,
-            googleId: response.googleId || null
-          };
-
-          this.userStateService.setUser(user);
-          StorageService.saveToken(response.accessToken as string);
-
-          this.router.navigate(['welcome']);
-        },
-        error: (err) => {
-          this.isSpinning.set(false);
-          this.message.error("Verification code is incorrect!", {nzDuration: 5000});
-        }
-      });
-  }
-
-  onQrCodeLoaded() {
-    console.log('QR Code loaded successfully!');
-  }
-
-  onQrCodeError(event: any) {
-    console.error('QR Code failed to load:', event);
-    console.error('QR Code URL was:', this.qrCodeUri);
-  }
-
-  loginWithGoogle() {
-    if (typeof window !== 'undefined') {
-      window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  protected verifyCode(): void {
+    if (this.otpForm.invalid) {
+      this.otpForm.markAllAsTouched();
+      return;
     }
+
+    this.submitting.set(true);
+    const email = this.loginForm.getRawValue().email;
+
+    this.authService.verifyCode({ email, code: this.otpForm.getRawValue().code }).subscribe({
+      next: response => {
+        this.submitting.set(false);
+        this.completeSignIn({ ...response, mfaEnabled: true }, email);
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.notifications.error('login.errors.invalidCode');
+      },
+    });
+  }
+
+  protected backToPassword(): void {
+    this.mfaResponse.set(null);
+    this.otpForm.reset();
+  }
+
+  protected loginWithGoogle(): void {
+    if (typeof window === 'undefined') return;
+    // Was hardcoded to localhost:8080, which broke every non-local build.
+    window.location.href = `${API_ORIGIN}/oauth2/authorization/google`;
+  }
+
+  /** Stores the session and routes by role. */
+  private completeSignIn(response: AuthenticationResponse, email: string): void {
+    const user = {
+      id: response.userId,
+      role: response.userRole,
+      firstname: response.userFirstName,
+      lastname: response.userLastName,
+      email,
+      phoneNumber: response.phoneNumber ?? '',
+      image: response.image ?? null,
+      preferredTheme: response.preferredTheme ?? 'dark',
+      preferredLanguage: response.preferredLanguage ?? 'en',
+      mfaEnabled: response.mfaEnabled ?? false,
+      googleId: response.googleId ?? null,
+    };
+
+    StorageService.saveToken(response.accessToken as string);
+    StorageService.saveUser(user);
+    this.userState.setUser(user);
+
+    // The two-factor path used to always land on `/welcome`, ignoring the role.
+    this.router.navigateByUrl(user.role === 'ADMIN' ? '/admin/dashboard' : '/user/all-products');
   }
 }

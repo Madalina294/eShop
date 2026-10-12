@@ -1,0 +1,24 @@
+<div class="auth-controls">
+  <mat-button-toggle-group
+    class="auth-controls__lang"
+    [value]="currentLang()"
+    [hideSingleSelectionIndicator]="true"
+    [attr.aria-label]="'header.language' | translate"
+    (change)="changeLanguage($any($event.value))"
+  >
+    <mat-button-toggle value="ro">RO</mat-button-toggle>
+    <mat-button-toggle value="en">EN</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="auth-controls__theme"
+    [matTooltip]="(isDarkMode() ? 'preferences.lightMode' : 'preferences.darkMode') | translate"
+    [attr.aria-label]="(isDarkMode() ? 'preferences.lightMode' : 'preferences.darkMode') | translate"
+    [attr.aria-pressed]="isDarkMode()"
+    (click)="toggleTheme()"
+  >
+    <mat-icon>{{ isDarkMode() ? "light_mode" : "dark_mode" }}</mat-icon>
+  </button>
+</div>

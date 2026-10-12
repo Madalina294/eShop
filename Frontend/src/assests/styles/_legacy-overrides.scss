@@ -35,22 +35,6 @@
   --ant-box-shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.08);
 
   // Stiluri globale pentru elementele custom în light mode
-  h1, h2, h3, h4, h5, h6 {
-    color: #333333 !important;
-  }
-
-  p {
-    color: #666666 !important;
-  }
-
-  a {
-    color: #1976d2 !important;
-
-    &:hover {
-      color: #0d47a1 !important;
-    }
-  }
-
   .custom-button {
     background: #f8f9fa !important;
     color: #333333 !important;
@@ -283,22 +267,6 @@
   }
 
   // Stiluri globale pentru elementele custom în dark mode
-  h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
-  }
-
-  p {
-    color: rgba(255, 255, 255, 0.8) !important;
-  }
-
-  a {
-    color: #1890ff !important;
-
-    &:hover {
-      color: #40a9ff !important;
-    }
-  }
-
   .custom-button {
     color: rgba(230, 227, 227, 0.7) !important;
 

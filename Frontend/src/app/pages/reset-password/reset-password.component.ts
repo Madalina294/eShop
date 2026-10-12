@@ -11,6 +11,7 @@ import {NgIf} from '@angular/common';
 import {NzButtonComponent} from 'ng-zorro-antd/button';
 import {UserStateService} from '../../services/user-state/user-state.service';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
 @Component({
   selector: 'app-reset-password',
@@ -27,6 +28,8 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
     NzButtonComponent,
     RouterLink,
     TranslateModule
+  ,
+    AuthControlsComponent
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'

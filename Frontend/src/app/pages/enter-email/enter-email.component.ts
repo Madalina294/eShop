@@ -10,6 +10,7 @@ import {AuthenticationService} from '../../services/auth/authentication.service'
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {UserState, UserStateService} from '../../services/user-state/user-state.service';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
 @Component({
   selector: 'app-enter-email',
@@ -23,6 +24,8 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
     NzRowDirective,
     NzButtonComponent,
     TranslateModule
+  ,
+    AuthControlsComponent
   ],
   templateUrl: './enter-email.component.html',
   styleUrl: './enter-email.component.scss'

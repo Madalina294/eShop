@@ -107,6 +107,23 @@ export class AppHeaderComponent {
     this.isAdmin() ? '/admin/dashboard' : this.isCustomer() ? '/user/all-products' : '/login'
   );
 
+  /**
+   * Current path, so the header can drop the sign-in call to action while the
+   * user is already on an auth screen.
+   */
+  private readonly path = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      startWith(null),
+      map(() => this.router.url.split('?')[0])
+    ),
+    { initialValue: '' }
+  );
+
+  protected readonly showLoginCta = computed(
+    () => !['/login', '/register', '/enter-email', '/reset-password'].includes(this.path())
+  );
+
   protected readonly mobileNavOpen = signal(false);
   protected readonly searchOpen = signal(false);
   /**

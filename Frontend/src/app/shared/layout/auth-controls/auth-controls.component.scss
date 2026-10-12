@@ -1,0 +1,56 @@
+// The host element must be taken out of flow: this component sits inside the
+// auth page's grid, and in normal flow it would claim the first grid cell and
+// push the showcase and the form into the wrong tracks.
+:host {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.auth-controls {
+  display: contents;
+
+  &__lang {
+    height: 30px;
+    border: 0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    background: var(--auth-control-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    --mat-standard-button-toggle-divider-color: transparent;
+    --mat-standard-button-toggle-background-color: transparent;
+    --mat-standard-button-toggle-text-color: var(--auth-control-fg);
+    --mat-standard-button-toggle-selected-state-background-color: var(--auth-control-active);
+    --mat-standard-button-toggle-selected-state-text-color: var(--auth-control-active-fg);
+    --mat-standard-button-toggle-hover-state-layer-opacity: 0;
+
+    .mat-button-toggle {
+      border: 0;
+    }
+
+    .mat-button-toggle-label-content {
+      line-height: 28px;
+      padding-inline: var(--space-3);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: 0.02em;
+    }
+  }
+
+  &__theme {
+    color: var(--auth-control-fg);
+    background: var(--auth-control-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    &:hover {
+      color: var(--auth-control-active-fg);
+    }
+  }
+}

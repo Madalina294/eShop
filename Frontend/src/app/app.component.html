@@ -1,9 +1,12 @@
-<a class="skip-link" href="#main-content">{{ "common.skipToContent" | translate }}</a>
-
-<app-header />
+@if (showChrome()) {
+  <a class="skip-link" href="#main-content">{{ "common.skipToContent" | translate }}</a>
+  <app-header />
+}
 
 <main id="main-content" class="app-main" tabindex="-1">
   <router-outlet />
 </main>
 
-<app-footer />
+@if (showChrome()) {
+  <app-footer />
+}

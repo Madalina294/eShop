@@ -15,6 +15,7 @@ import {StorageService} from '../../services/storage/storage.service';
 import { UserStateService } from '../../services/user-state/user-state.service';
 import {TranslatePipe} from '@ngx-translate/core';
 import {NzIconDirective} from 'ng-zorro-antd/icon';
+import { AuthControlsComponent } from '../../shared/layout/auth-controls/auth-controls.component';
 
 @Component({
   selector: 'app-register',
@@ -31,6 +32,8 @@ import {NzIconDirective} from 'ng-zorro-antd/icon';
     NzFormDirective,
     NzFormItemComponent,
     TranslatePipe
+  ,
+    AuthControlsComponent
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
