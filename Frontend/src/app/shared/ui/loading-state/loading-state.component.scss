@@ -30,8 +30,8 @@
 }
 
 .skeleton-line {
-  @include m.skeleton;
   height: 12px;
+  @include m.skeleton;
 
   &--title { width: 72%; height: 16px; }
   &--meta  { width: 46%; }
@@ -46,8 +46,8 @@
   overflow: hidden;
 
   &__media {
-    @include m.skeleton(0);
     aspect-ratio: 4 / 3;
+    @include m.skeleton(0);
   }
 
   &__body {
@@ -68,10 +68,10 @@
   border-radius: var(--radius-md);
 
   &__avatar {
-    @include m.skeleton(var(--radius-full));
     flex: 0 0 auto;
     width: 44px;
     height: 44px;
+    @include m.skeleton(var(--radius-full));
   }
 
   &__body {

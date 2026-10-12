@@ -635,7 +635,21 @@
       "firstPage": "First page",
       "lastPage": "Last page",
       "ofLabel": "of"
-    }
+    },
+    "sortLabel": "Sort by",
+    "sortNewest": "Newest first",
+    "sortNameAsc": "Name (A–Z)",
+    "sortNameDesc": "Name (Z–A)",
+    "sortPriceAsc": "Price (low to high)",
+    "sortPriceDesc": "Price (high to low)",
+    "filters": "Filters",
+    "resultsOne": "1 product",
+    "resultsMany": "{{count}} products",
+    "searchResultsFor": "Results for \"{{term}}\"",
+    "noSearchResults": "Nothing matched your search",
+    "noSearchResultsHint": "Try a different spelling, or a shorter search term.",
+    "noProductsHint": "There is nothing in this category yet. Try another one.",
+    "clearSearch": "Clear search"
   },
   "wishlist": {
     "title": "Wishlist",
@@ -795,5 +809,13 @@
     "account": "Account",
     "contact": "Contact",
     "hours": "Mon–Fri, 9:00–18:00"
+  },
+  "paginator": {
+    "itemsPerPage": "Items per page",
+    "nextPage": "Next page",
+    "previousPage": "Previous page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "of": "of"
   }
 }

@@ -37,6 +37,8 @@ export class ProductCardComponent {
   readonly currency = input<string>('RON');
   /** Router link for the whole card. */
   readonly link = input<unknown[] | string | null>(null);
+  /** Query params for the link; product detail pages are addressed by `?id=`. */
+  readonly linkQueryParams = input<Record<string, string | number> | null>(null);
 
   readonly showAddToCart = input<boolean>(false);
   readonly showWishlist = input<boolean>(false);

@@ -2,7 +2,7 @@
   <!-- The clickable surface is a real link when we have a route, a real
        button otherwise — never a div, so it is always keyboard reachable. -->
   @if (link()) {
-    <a class="product-card__link" [routerLink]="link()">
+    <a class="product-card__link" [routerLink]="link()" [queryParams]="linkQueryParams()">
       <ng-container [ngTemplateOutlet]="cardBody" />
     </a>
   } @else {

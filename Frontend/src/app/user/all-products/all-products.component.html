@@ -1,118 +1,175 @@
-<div class="all-products-container">
-  <!-- Header -->
-  <mat-card class="header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>shopping_cart</mat-icon>
-      </div>
-      <mat-card-title>{{ "allProducts.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-        "allProducts.subtitle" | translate
-      }}</mat-card-subtitle>
-    </mat-card-header>
-  </mat-card>
+<div class="page catalogue">
+  <app-page-header
+    icon="storefront"
+    [title]="'allProducts.title' | translate"
+    [subtitle]="'allProducts.subtitle' | translate"
+  >
+    <!-- Mobile-only filter trigger; the sidebar takes over from lg up. -->
+    <button
+      mat-stroked-button
+      type="button"
+      class="catalogue__filter-trigger"
+      [attr.aria-expanded]="filtersOpen()"
+      aria-controls="catalogue-filters"
+      (click)="toggleFilters()"
+    >
+      <mat-icon>tune</mat-icon>
+      {{ "allProducts.filters" | translate }}
+    </button>
+  </app-page-header>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "allProducts.loadingProducts" | translate }}</p>
-  </div>
+  <div class="catalogue__layout">
+    <!-- ------------------------------------------------------------------ -->
+    <!--  Filters                                                            -->
+    <!-- ------------------------------------------------------------------ -->
+    <aside
+      id="catalogue-filters"
+      class="catalogue__sidebar"
+      [class.is-open]="filtersOpen()"
+      [attr.aria-label]="'allProducts.categories' | translate"
+    >
+      <h2 class="catalogue__sidebar-title">{{ "allProducts.categories" | translate }}</h2>
 
-  <!-- Main Content -->
-  <div *ngIf="!loading()" class="content-wrapper">
-    <!-- Sidebar with Categories -->
-    <aside class="categories-sidebar">
-      <mat-card class="categories-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>category</mat-icon>
-            {{ "allProducts.categories" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item
-              class="category-item"
-              [class.active]="selectedCategoryId() === null"
-              (click)="onCategorySelect(null)"
-            >
-              <mat-icon matListItemIcon>all_inclusive</mat-icon>
-              <span matListItemTitle>{{
-                "allProducts.allCategories" | translate
-              }}</span>
-            </mat-list-item>
-            <mat-list-item
-              *ngFor="let category of categories()"
-              class="category-item"
-              [class.active]="selectedCategoryId() === category.id"
+      <!-- Real buttons, so the filter is reachable with a keyboard. The old
+           version used `<mat-list-item (click)>`, which was mouse-only. -->
+      <ul class="category-list">
+        <li>
+          <button
+            type="button"
+            class="category-list__item"
+            [class.is-active]="categoryId() === null"
+            [attr.aria-current]="categoryId() === null ? 'true' : null"
+            (click)="onCategorySelect(null)"
+          >
+            <mat-icon aria-hidden="true">all_inclusive</mat-icon>
+            <span>{{ "allProducts.allCategories" | translate }}</span>
+          </button>
+        </li>
+
+        @for (category of categories(); track category.id) {
+          <li>
+            <button
+              type="button"
+              class="category-list__item"
+              [class.is-active]="categoryId() === category.id"
+              [attr.aria-current]="categoryId() === category.id ? 'true' : null"
               (click)="onCategorySelect(category.id)"
             >
-              <mat-icon matListItemIcon>label</mat-icon>
-              <span matListItemTitle>{{ category.name }}</span>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
+              <mat-icon aria-hidden="true">label</mat-icon>
+              <span>{{ category.name }}</span>
+            </button>
+          </li>
+        }
+      </ul>
     </aside>
 
-    <!-- Products Grid -->
-    <div class="products-section">
-      <!-- Pagination Info -->
-      <div class="pagination-info" *ngIf="totalElements() > 0">
-        {{ "allProducts.showing" | translate }}
-        {{ currentPage() * pageSize() + 1 }} -
-        {{ Math.min((currentPage() + 1) * pageSize(), totalElements()) }}
-        {{ "allProducts.of" | translate }} {{ totalElements() }}
-        {{ "allProducts.products" | translate }}
+    <!-- ------------------------------------------------------------------ -->
+    <!--  Results                                                            -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="catalogue__results">
+      <div class="catalogue__toolbar">
+        <div class="catalogue__summary">
+          @if (isSearching()) {
+            <p class="catalogue__search-label">
+              {{ "allProducts.searchResultsFor" | translate: { term: searchTerm() } }}
+            </p>
+          }
+
+          @if (state() === "ready") {
+            <p class="catalogue__count" aria-live="polite">{{ resultsLabel() }}</p>
+          }
+        </div>
+
+        <div class="catalogue__toolbar-actions">
+          @if (hasActiveFilters()) {
+            <button mat-button type="button" (click)="clearFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              {{ "common.clearFilters" | translate }}
+            </button>
+          }
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="catalogue__sort">
+            <mat-label>{{ "allProducts.sortLabel" | translate }}</mat-label>
+            <mat-select [value]="sort()" (valueChange)="onSortChange($event)">
+              @for (option of sortOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
       </div>
 
-      <!-- No Products Message -->
-      <div *ngIf="products().length === 0" class="no-products">
-        <mat-icon>inventory_2</mat-icon>
-        <p>{{ "allProducts.noProductsFound" | translate }}</p>
-      </div>
+      @switch (state()) {
+        @case ("loading") {
+          <app-loading-state
+            variant="grid"
+            [count]="pageSize() > 12 ? 12 : pageSize()"
+            [label]="'allProducts.loadingProducts' | translate"
+          />
+        }
 
-      <!-- Products Grid -->
-      <div class="products-grid" *ngIf="products().length > 0">
-        <mat-card
-          *ngFor="let product of products()"
-          class="product-card"
-          (click)="goToViewProduct(product.id)"
-        >
-          <div class="product-image-container">
-            <img
-              mat-card-image
-              [src]="getProductImage(product)"
-              [alt]="product.name"
-              class="product-image"
+        @case ("error") {
+          <app-error-state
+            [title]="'errors.loadFailedTitle' | translate"
+            [description]="'errors.loadFailedDescription' | translate"
+            [retryLabel]="'common.retry' | translate"
+            (retry)="reload()"
+          />
+        }
+
+        @case ("empty") {
+          @if (isSearching()) {
+            <app-empty-state
+              icon="search_off"
+              [title]="'allProducts.noSearchResults' | translate"
+              [description]="'allProducts.noSearchResultsHint' | translate"
+              [actionLabel]="'allProducts.clearSearch' | translate"
+              actionIcon="filter_alt_off"
+              (action)="clearFilters()"
             />
-          </div>
-          <mat-card-content>
-            <h3 class="product-name">{{ product.name }}</h3>
-            <div class="product-category">
-              <mat-icon>label</mat-icon>
-              <span>{{ getCategoryName(product.categoryId) }}</span>
-            </div>
-            <p class="product-price">{{ product.price }} $</p>
-          </mat-card-content>
-        </mat-card>
-      </div>
+          } @else {
+            <app-empty-state
+              icon="inventory_2"
+              [title]="'allProducts.noProductsFound' | translate"
+              [description]="'allProducts.noProductsHint' | translate"
+              [actionLabel]="categoryId() !== null ? ('allProducts.allCategories' | translate) : ''"
+              actionIcon="all_inclusive"
+              (action)="onCategorySelect(null)"
+            />
+          }
+        }
 
-      <!-- Pagination -->
-      <mat-paginator
-        *ngIf="totalElements() > 0"
-        [length]="totalElements()"
-        [pageSize]="pageSize()"
-        [pageIndex]="currentPage()"
-        [pageSizeOptions]="pageSizeOptions"
-        [showFirstLastButtons]="true"
-        (page)="onPageChange($event)"
-        class="pagination-controls"
-      >
-      </mat-paginator>
-    </div>
+        @default {
+          <ul class="product-grid">
+            @for (product of products(); track product.id; let i = $index) {
+              <li>
+                <app-product-card
+                  [product]="product"
+                  [categoryName]="categoryName(product.categoryId)"
+                  [link]="['/user/view-product']"
+                  [linkQueryParams]="{ id: product.id }"
+                  [eager]="i < 4"
+                  [showAddToCart]="true"
+                  [showWishlist]="true"
+                  [inWishlist]="wishlistIds().has(product.id)"
+                  (addToCart)="addToCart($event)"
+                  (toggleWishlist)="toggleWishlist($event)"
+                />
+              </li>
+            }
+          </ul>
+
+          <mat-paginator
+            class="catalogue__paginator"
+            [length]="totalElements()"
+            [pageSize]="pageSize()"
+            [pageIndex]="pageIndex()"
+            [pageSizeOptions]="pageSizeOptions"
+            [showFirstLastButtons]="true"
+            (page)="onPageChange($event)"
+          />
+        }
+      }
+    </section>
   </div>
 </div>

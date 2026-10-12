@@ -635,7 +635,21 @@
       "firstPage": "Prima pagină",
       "lastPage": "Ultima pagină",
       "ofLabel": "din"
-    }
+    },
+    "sortLabel": "Sortează după",
+    "sortNewest": "Cele mai noi",
+    "sortNameAsc": "Nume (A–Z)",
+    "sortNameDesc": "Nume (Z–A)",
+    "sortPriceAsc": "Preț crescător",
+    "sortPriceDesc": "Preț descrescător",
+    "filters": "Filtre",
+    "resultsOne": "1 produs",
+    "resultsMany": "{{count}} produse",
+    "searchResultsFor": "Rezultate pentru „{{term}}”",
+    "noSearchResults": "Nimic nu corespunde căutării",
+    "noSearchResultsHint": "Încearcă o altă scriere sau un termen mai scurt.",
+    "noProductsHint": "Momentan nu există nimic în această categorie. Încearcă alta.",
+    "clearSearch": "Șterge căutarea"
   },
   "wishlist": {
     "title": "Lista de Dorințe",
@@ -795,5 +809,13 @@
     "account": "Cont",
     "contact": "Contact",
     "hours": "Luni–Vineri, 9:00–18:00"
+  },
+  "paginator": {
+    "itemsPerPage": "Produse pe pagină",
+    "nextPage": "Pagina următoare",
+    "previousPage": "Pagina anterioară",
+    "firstPage": "Prima pagină",
+    "lastPage": "Ultima pagină",
+    "of": "din"
   }
 }
