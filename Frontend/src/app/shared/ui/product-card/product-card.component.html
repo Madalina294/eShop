@@ -58,6 +58,10 @@
     <span class="product-card__price">
       {{ product().price | currency: currency() : "symbol" : "1.2-2" }}
     </span>
+
+    @if (footnote()) {
+      <span class="product-card__footnote">{{ footnote() }}</span>
+    }
   </span>
 </ng-template>
 

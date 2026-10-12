@@ -45,6 +45,8 @@ export class ProductCardComponent {
   readonly inWishlist = input<boolean>(false);
   /** Set on the first row of a grid so the hero images are not lazy-loaded. */
   readonly eager = input<boolean>(false);
+  /** Optional small line under the price, e.g. "Added on …" in the wishlist. */
+  readonly footnote = input<string>('');
 
   readonly addToCart = output<Product>();
   readonly toggleWishlist = output<Product>();

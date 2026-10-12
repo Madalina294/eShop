@@ -688,7 +688,9 @@
     "errors": {
       "loadingFailed": "Ceva nu a mers bine la încărcarea listei de dorințe!",
       "ok": "Ok"
-    }
+    },
+    "itemsOne": "1 produs salvat",
+    "itemsMany": "{{count}} produse salvate"
   },
   "cart": {
     "title": "Coșul de Cumpărături",

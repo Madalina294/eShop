@@ -1,116 +1,58 @@
-<div class="wishlist-container">
-  <!-- Header -->
-  <mat-card class="header-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>favorite</mat-icon>
-      </div>
-      <mat-card-title>{{ "wishlist.title" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{
-        "wishlist.subtitle" | translate
-      }}</mat-card-subtitle>
-    </mat-card-header>
-  </mat-card>
+<div class="page wishlist">
+  <app-page-header
+    icon="favorite"
+    [title]="'wishlist.title' | translate"
+    [subtitle]="state() === 'ready' ? itemsLabel() : ('wishlist.subtitle' | translate)"
+  />
 
-  <!-- Loading Spinner -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="50"
-    ></mat-progress-spinner>
-    <p>{{ "wishlist.loading" | translate }}</p>
-  </div>
+  @switch (state()) {
+    @case ("loading") {
+      <app-loading-state variant="grid" [count]="4" [label]="'wishlist.loading' | translate" />
+    }
 
-  <!-- Main Content -->
-  <div *ngIf="!loading()" class="content-wrapper">
-    <!-- Wishlist Info -->
-    <div class="wishlist-info" *ngIf="wishlistItems().length > 0">
-      {{ "wishlist.showing" | translate }}
-      {{ wishlistItems().length }}
-      {{
-        wishlistItems().length === 1
-          ? ("wishlist.item" | translate)
-          : ("wishlist.items" | translate)
-      }}
-    </div>
+    @case ("error") {
+      <app-error-state
+        [title]="'errors.loadFailedTitle' | translate"
+        [description]="'errors.loadFailedDescription' | translate"
+        [retryLabel]="'common.retry' | translate"
+        (retry)="load()"
+      />
+    }
 
-    <!-- Empty Wishlist Message -->
-    <div *ngIf="wishlistItems().length === 0" class="empty-wishlist">
-      <mat-icon>favorite_border</mat-icon>
-      <h3>{{ "wishlist.empty.title" | translate }}</h3>
-      <p>{{ "wishlist.empty.message" | translate }}</p>
-      <button mat-raised-button color="primary" (click)="goToAllProducts()">
-        <mat-icon>shopping_cart</mat-icon>
-        {{ "wishlist.empty.browseProducts" | translate }}
-      </button>
-    </div>
+    @case ("empty") {
+      <app-empty-state
+        icon="favorite_border"
+        [title]="'wishlist.empty.title' | translate"
+        [description]="'wishlist.empty.message' | translate"
+      >
+        <a mat-flat-button color="primary" routerLink="/user/all-products">
+          <mat-icon>storefront</mat-icon>
+          {{ "wishlist.empty.browseProducts" | translate }}
+        </a>
+      </app-empty-state>
+    }
 
-    <!-- Wishlist Grid -->
-    <div class="wishlist-grid" *ngIf="wishlistItems().length > 0">
-      <mat-card *ngFor="let item of wishlistItems()" class="wishlist-item-card">
-        <!-- Product Image -->
-        <div class="product-image-container">
-          <img
-            mat-card-image
-            [src]="getProductImage(item)"
-            [alt]="item.productName"
-            class="product-image"
-            (click)="goToViewProduct(item.productId)"
-          />
-
-          <!-- Remove from Wishlist Button -->
-          <button
-            mat-icon-button
-            class="remove-wishlist-btn"
-            (click)="removeFromWishlist(item.productId, $event)"
-            [matTooltip]="'wishlist.removeFromWishlist' | translate"
-          >
-            <mat-icon>favorite</mat-icon>
-          </button>
-        </div>
-
-        <!-- Product Content -->
-        <mat-card-content>
-          <h3 class="product-name" (click)="goToViewProduct(item.productId)">
-            {{ item.productName }}
-          </h3>
-
-          <div class="product-price">
-            {{ item.productPrice | currency : "RON" : "symbol" : "1.2-2" }}
-          </div>
-
-          <div class="product-added-date">
-            <mat-icon>schedule</mat-icon>
-            <span
-              >{{ "wishlist.addedOn" | translate }}:
-              {{ item.addedAt | date : "short" }}</span
-            >
-          </div>
-        </mat-card-content>
-
-        <!-- Action Buttons -->
-        <mat-card-actions class="card-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            class="view-product-btn"
-            (click)="goToViewProduct(item.productId)"
-          >
-            <mat-icon>visibility</mat-icon>
-            {{ "wishlist.viewProduct" | translate }}
-          </button>
-
-          <button
-            mat-stroked-button
-            color="accent"
-            class="add-to-cart-btn"
-            (click)="addToCartWithQuantity(item.productId, $event)"
-          >
-            <mat-icon>shopping_cart</mat-icon>
-            {{ "wishlist.addToCart" | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </div>
+    @default {
+      <ul class="wishlist__grid">
+        @for (entry of entries(); track entry.product.id; let i = $index) {
+          <li>
+            <!-- The filled heart removes; the catalogue card uses the same
+                 control to add, so the gesture stays consistent. -->
+            <app-product-card
+              [product]="entry.product"
+              [link]="['/user/view-product']"
+              [linkQueryParams]="{ id: entry.product.id }"
+              [footnote]="footnote(entry)"
+              [eager]="i < 4"
+              [showAddToCart]="true"
+              [showWishlist]="true"
+              [inWishlist]="true"
+              (addToCart)="openQuantityDialog($event)"
+              (toggleWishlist)="remove($event)"
+            />
+          </li>
+        }
+      </ul>
+    }
+  }
 </div>

@@ -1,0 +1,41 @@
+<h2 mat-dialog-title class="qty__title">
+  <mat-icon aria-hidden="true">add_shopping_cart</mat-icon>
+  {{ "cart.selectQuantity" | translate }}
+</h2>
+
+<mat-dialog-content class="qty__content">
+  <p class="qty__product">{{ data.productName }}</p>
+
+  @if (data.maxQuantity > 0) {
+    <p class="qty__stock">{{ "cart.maxAvailable" | translate }}: {{ data.maxQuantity }}</p>
+  }
+
+  <div class="qty__picker">
+    <app-quantity-stepper
+      [(value)]="quantity"
+      [min]="1"
+      [max]="max()"
+      [label]="data.productName"
+    />
+
+    @if (data.unitPrice) {
+      <p class="price-stack price-stack--end">
+        <span class="price-stack__label">{{ "cart.lineTotal" | translate }}</span>
+        <span class="price-stack__value">
+          {{ total() | currency: "RON" : "symbol" : "1.2-2" }}
+        </span>
+      </p>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">
+    {{ "common.cancel" | translate }}
+  </button>
+
+  <button mat-flat-button color="primary" type="button" cdkFocusInitial (click)="confirm()">
+    <mat-icon>add_shopping_cart</mat-icon>
+    {{ "product.addToCart" | translate }}
+  </button>
+</mat-dialog-actions>

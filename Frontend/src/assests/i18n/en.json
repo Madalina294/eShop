@@ -688,7 +688,9 @@
     "errors": {
       "loadingFailed": "Something went wrong while loading the wishlist!",
       "ok": "Ok"
-    }
+    },
+    "itemsOne": "1 saved product",
+    "itemsMany": "{{count}} saved products"
   },
   "cart": {
     "title": "Shopping Cart",

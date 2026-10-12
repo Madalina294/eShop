@@ -112,6 +112,11 @@
     font-variant-numeric: tabular-nums;
   }
 
+  &__footnote {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
+
   &__actions {
     padding: 0 var(--space-4) var(--space-4);
   }

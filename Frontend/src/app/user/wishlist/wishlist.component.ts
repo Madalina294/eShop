@@ -1,153 +1,161 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {UserService} from '../../services/user/user.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {Router} from '@angular/router';
-import {MatCardModule} from '@angular/material/card';
-import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule} from '@angular/material/icon';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatDialog} from '@angular/material/dialog';
-import {CommonModule} from '@angular/common';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {QuantityDialogComponent, QuantityDialogData} from '../../shared/quantity-dialog/quantity-dialog.component';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+import { UserService } from '../../services/user/user.service';
+import { NotificationService } from '../../shared/notification/notification.service';
+import { CartStateService } from '../../shared/state/cart-state.service';
+import {
+  QuantityDialogComponent,
+  QuantityDialogData,
+  QuantityDialogResult,
+} from '../../shared/quantity-dialog/quantity-dialog.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { ProductCardComponent } from '../../shared/ui/product-card/product-card.component';
+import { LoadingStateComponent } from '../../shared/ui/loading-state/loading-state.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+import { Product } from '../../models/product';
+import { ViewState } from '../../models/ui-state';
+
+/** Shape the wishlist endpoint returns. */
+interface WishlistLine {
+  productId: number;
+  productName: string;
+  productPrice: number;
+  productImage?: string | null;
+  productQuantity?: number;
+  categoryId?: number;
+  addedAt?: string;
+}
+
+/** A line adapted to `Product` so `app-product-card` can render it. */
+interface WishlistEntry {
+  readonly product: Product;
+  readonly addedAt?: string;
+}
 
 @Component({
   selector: 'app-wishlist',
+  standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
+    RouterLink,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    TranslateModule
+    TranslateModule,
+    PageHeaderComponent,
+    ProductCardComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
   ],
+  // `DatePipe` is not root-provided; the class injects it to format the date.
+  providers: [DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './wishlist.component.html',
-  styleUrl: './wishlist.component.scss'
+  styleUrl: './wishlist.component.scss',
 })
-export class WishlistComponent implements OnInit{
-  wishlistItems = signal<any[]>([]);
-  loading = signal(false);
+export class WishlistComponent {
+  private readonly userService = inject(UserService);
+  private readonly notifications = inject(NotificationService);
+  private readonly cartState = inject(CartStateService);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly datePipe = inject(DatePipe);
 
-  constructor(
-    private userService: UserService,
-    private snackBar: MatSnackBar,
-    private router: Router,
-    private translate: TranslateService,
-    private dialog: MatDialog
-  ) {}
+  protected readonly state = signal<ViewState>('loading');
+  protected readonly lines = signal<WishlistLine[]>([]);
 
-  ngOnInit() {
-    this.loadWishlist();
+  protected readonly entries = computed<WishlistEntry[]>(() =>
+    this.lines().map(line => ({
+      addedAt: line.addedAt,
+      // The wishlist DTO uses `product*` field names; the card speaks `Product`.
+      product: {
+        id: line.productId,
+        name: line.productName,
+        price: line.productPrice,
+        image: line.productImage ?? null,
+        quantity: line.productQuantity ?? 0,
+        categoryId: line.categoryId ?? 0,
+        description: '',
+      },
+    }))
+  );
+
+  protected readonly itemsLabel = computed(() => {
+    const count = this.lines().length;
+    return count === 1
+      ? this.translate.instant('wishlist.itemsOne')
+      : this.translate.instant('wishlist.itemsMany', { count });
+  });
+
+  constructor() {
+    this.load();
   }
 
-  loadWishlist(){
-    this.loading.set(true);
+  protected load(): void {
+    this.state.set('loading');
+
     this.userService.getUserWishlist().subscribe({
-      next: value => {
-        this.loading.set(false);
-        this.wishlistItems.set(value);
+      next: (items: WishlistLine[]) => {
+        this.lines.set(items ?? []);
+        this.state.set(items?.length ? 'ready' : 'empty');
       },
-      error: err => {
-        this.loading.set(false);
-        console.error('Error loading wishlist:', err);
-        const message = this.translate.instant('wishlist.errors.loadingFailed');
-        const action = this.translate.instant('wishlist.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
-      }
-    })
+      error: () => this.state.set('error'),
+    });
   }
 
-  getProductImage(item: any): string {
-    if (item.productImage) {
-      if (item.productImage.startsWith('/')) {
-        return `http://localhost:8080${item.productImage}`;
-      }
-      return `http://localhost:8080/${item.productImage}`;
-    }
-    return 'user.png'; // Fallback image
+  /** "Added on 3 Mar 2026", or nothing when the backend omits the date. */
+  protected footnote(entry: WishlistEntry): string {
+    if (!entry.addedAt) return '';
+
+    const formatted = this.datePipe.transform(entry.addedAt, 'mediumDate');
+    if (!formatted) return '';
+
+    return `${this.translate.instant('wishlist.addedOn')} ${formatted}`;
   }
 
-  removeFromWishlist(productId: number, event: Event) {
-    event.stopPropagation(); // Previne navigarea către produs când apesi pe buton
-
-    this.userService.removeFromWishlist(productId).subscribe({
+  protected remove(product: Product): void {
+    this.userService.removeFromWishlist(product.id).subscribe({
       next: () => {
-        // Actualizează lista locală prin eliminarea produsului
-        this.wishlistItems.update(items =>
-          items.filter(item => item.productId !== productId)
-        );
-        const message = this.translate.instant('wishlist.removed');
-        const action = this.translate.instant('wishlist.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
+        this.lines.update(lines => lines.filter(line => line.productId !== product.id));
+        this.cartState.optimisticWishlistRemove();
+        this.notifications.success('product.removedFromWishlist');
+
+        if (!this.lines().length) this.state.set('empty');
       },
-      error: (err) => {
-        console.error('Error removing from wishlist:', err);
-        const message = this.translate.instant('wishlist.removeError');
-        const action = this.translate.instant('wishlist.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
-      }
+      // The error interceptor already surfaces the failure.
+      error: () => undefined,
     });
   }
 
-  goToViewProduct(productId: number) {
-    this.router.navigate(['/user/view-product'], {
-      queryParams: { id: productId }
-    });
-  }
-
-  goToAllProducts() {
-    this.router.navigate(['/user/all-products']);
-  }
-
-  addToCartWithQuantity(productId: number, event: Event) {
-    event.stopPropagation(); // Previne navigarea către produs când apesi pe buton
-
-    // Găsește produsul pentru a obține numele și stocul
-    const product = this.wishlistItems().find(item => item.productId === productId);
-
-    if (!product) {
-      const message = this.translate.instant('cart.errors.productNotFound');
-      const action = this.translate.instant('cart.errors.ok');
-      this.snackBar.open(message, action, {duration: 3000});
-      return;
-    }
-
-    const dialogData: QuantityDialogData = {
-      productId: productId,
-      productName: product.productName,
-      maxQuantity: product.productQuantity || 99
+  protected openQuantityDialog(product: Product): void {
+    const data: QuantityDialogData = {
+      productId: product.id,
+      productName: product.name,
+      maxQuantity: product.quantity || 99,
+      unitPrice: product.price,
     };
 
-    const dialogRef = this.dialog.open(QuantityDialogComponent, {
-      width: '450px',
-      maxWidth: '90vw',
-      data: dialogData,
-      disableClose: false,
-      autoFocus: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && result.quantity > 0) {
-        this.addToCart(productId, result.quantity);
-      }
-    });
+    this.dialog
+      .open(QuantityDialogComponent, { width: '440px', maxWidth: '92vw', data })
+      .afterClosed()
+      .subscribe((result?: QuantityDialogResult) => {
+        if (result?.quantity) this.addToCart(product.id, result.quantity);
+      });
   }
 
-  private addToCart(productId: number, quantity: number) {
+  private addToCart(productId: number, quantity: number): void {
     this.userService.addToCart(productId, quantity).subscribe({
       next: () => {
-        const message = this.translate.instant('cart.addedToCart');
-        const action = this.translate.instant('cart.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
+        this.cartState.optimisticCartAdd(quantity);
+        this.notifications.success('product.addedToCart');
       },
-      error: (err) => {
-        console.error('Error adding to cart:', err);
-        const message = this.translate.instant('cart.addError');
-        const action = this.translate.instant('cart.errors.ok');
-        this.snackBar.open(message, action, {duration: 3000});
-      }
+      error: () => undefined,
     });
   }
 }
